@@ -1,0 +1,252 @@
+/* ==========================================================================
+   BASE — reset, tipografia, ritmo de seções, cabeçalho e rodapé
+   SCRUM-30
+   ========================================================================== */
+
+/* ---------------------------------------------------------- reset ------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  font-size: var(--texto-m);
+  line-height: var(--altura-texto);
+  color: var(--dm-tinta);
+  background: var(--dm-branco);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, fieldset, legend { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+img, picture, svg { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* ------------------------------------------------------ tipografia ------ */
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  line-height: var(--altura-titulo);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--texto-display); }
+h2 { font-size: var(--texto-xg); }
+h3 { font-size: var(--texto-g); font-weight: 700; letter-spacing: -0.01em; }
+h4 { font-size: var(--texto-m); font-weight: 700; letter-spacing: 0; }
+
+p { text-wrap: pretty; }
+strong { font-weight: 700; }
+small { font-size: var(--texto-pp); line-height: 1.45; display: inline-block; }
+
+a { color: inherit; }
+
+/* Marca-texto aqua: recurso editorial da DM nas headlines.
+   O texto vai sempre em azul — sobre aqua, o branco herdado do hero não passa. */
+mark {
+  background: var(--dm-aqua);
+  color: var(--dm-azul);
+  padding: 0.02em 0.14em;
+  margin-inline: -0.04em;
+  border-radius: 6px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ---------------------------------------------------------- foco -------- */
+
+:focus-visible {
+  outline: 3px solid var(--dm-tinta);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Sobre fundo azul o contorno escuro some; inverte para aqua. */
+.hero :focus-visible,
+.cabecalho :focus-visible,
+.beneficios :focus-visible,
+.chamada-final :focus-visible,
+.rodape :focus-visible { outline-color: var(--dm-aqua); }
+
+/* Link de atalho: fica escondido até receber foco pelo teclado. */
+.pular-link {
+  position: absolute;
+  left: var(--e-4);
+  top: var(--e-4);
+  z-index: 100;
+  transform: translateY(-200%);
+  background: var(--dm-aqua);
+  color: var(--dm-azul);
+  font-weight: 700;
+  text-decoration: none;
+  padding: var(--e-3) var(--e-5);
+  border-radius: var(--raio-pill);
+  transition: transform var(--transicao);
+}
+.pular-link:focus-visible { transform: translateY(0); }
+
+/* ----------------------------------------------- ritmo das seções ------- */
+/*
+  Grade de página com trilhas nomeadas. Cada <section> direta do <main> ganha
+  três colunas: margem, coluna de conteúdo limitada e margem. Todo filho cai
+  em "conteudo" por padrão, e quem precisa sangrar de ponta a ponta só pede
+  `grid-column: full`. Resolve o layout sem um único <div> de wrapper no HTML.
+*/
+main > section {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--esp-borda), 1fr)
+    [conteudo-start] minmax(0, var(--largura-conteudo)) [conteudo-end]
+    minmax(var(--esp-borda), 1fr) [full-end];
+  padding-block: var(--esp-secao);
+}
+main > section > * { grid-column: conteudo; }
+
+main > section > h2 { margin-bottom: var(--e-4); }
+main > section > h2 + p { margin-bottom: var(--e-7); }
+
+/* Texto de apoio abaixo do título da seção */
+.secao__apoio {
+  max-width: var(--largura-texto);
+  color: var(--dm-cinza-texto);
+  font-size: var(--texto-g);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------- superfícies -------- */
+
+.beneficios,
+.sobre,
+.chamada-final { background: var(--dm-azul); color: var(--dm-branco); }
+
+.beneficios .secao__apoio,
+.sobre .secao__apoio { color: color-mix(in srgb, var(--dm-branco) 78%, var(--dm-azul)); }
+
+.como-funciona { background: var(--dm-coral); color: var(--dm-tinta); }
+.duvidas       { background: var(--dm-lilas); }
+
+/* --------------------------------------------------------- header ------- */
+
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--e-5);
+  padding: var(--e-3) var(--esp-borda);
+  background: var(--dm-azul);
+  color: var(--dm-branco);
+}
+
+/*
+  O logo é um <img> apontando para um SVG externo, então o fill="currentColor"
+  do arquivo não é herdado. O filtro força o traçado para branco e mantém um
+  único asset servindo header e rodapé.
+*/
+.cabecalho__logo img,
+.rodape__logo { filter: brightness(0) invert(1); }
+
+.cabecalho__logo {
+  display: block;
+  flex-shrink: 0;
+  transition: opacity var(--transicao);
+}
+.cabecalho__logo:hover { opacity: 0.75; }
+
+.cabecalho__nav { margin-inline-end: auto; }
+.cabecalho__nav ul { display: flex; gap: var(--e-5); }
+.cabecalho__nav a {
+  font-size: var(--texto-p);
+  font-weight: 600;
+  text-decoration: none;
+  padding-block: var(--e-2);
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--transicao);
+}
+.cabecalho__nav a:hover { border-bottom-color: var(--dm-aqua); }
+
+.cabecalho__acoes { display: flex; gap: var(--e-3); flex-shrink: 0; }
+
+/* Variante das páginas internas: só logo e título. */
+.cabecalho--simples .cabecalho__titulo {
+  font-size: var(--texto-p);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 60rem) {
+  .cabecalho__nav { display: none; }
+  .cabecalho__acoes { margin-inline-start: auto; }
+}
+@media (max-width: 30rem) {
+  .cabecalho__acoes .btn--ghost { display: none; }
+}
+
+/* --------------------------------------------------------- rodapé ------- */
+
+.rodape {
+  background: var(--dm-tinta);
+  color: var(--dm-branco);
+  padding: var(--esp-secao) var(--esp-borda) var(--e-7);
+}
+.rodape > * { max-width: var(--largura-conteudo); margin-inline: auto; }
+
+/* margin-inline: 0 anula o `auto` herdado de `.rodape > *`, que centralizava
+   o logo de 32px enquanto as colunas ficavam alinhadas à esquerda. */
+.rodape__logo { margin: 0 0 var(--e-6); }
+
+.rodape__nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--e-6);
+  padding-bottom: var(--e-6);
+  border-bottom: 1px solid rgb(255 255 255 / 0.15);
+}
+.rodape__titulo {
+  font-size: var(--texto-p);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dm-aqua);
+  margin-bottom: var(--e-4);
+}
+.rodape__coluna li + li { margin-top: var(--e-3); }
+.rodape__coluna a {
+  font-size: var(--texto-p);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity var(--transicao);
+}
+.rodape__coluna a:hover { opacity: 1; text-decoration: underline; }
+
+.rodape__aviso {
+  margin-top: var(--e-6);
+  max-width: var(--largura-texto);
+  font-size: var(--texto-pp);
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
+.rodape--simples { padding-block: var(--e-7); }
+
+/* ------------------------------------------------------- movimento ------ */
+/*
+  Sem revelação no scroll. A primeira versão usava scroll-driven animations
+  (`animation-timeline: view()`), mas isso deixava 27 animações permanentemente
+  ativas, travava o compositor e podia congelar um bloco em opacidade parcial.
+  O movimento da página fica nas transições de hover e foco dos componentes,
+  que são finitas e baratas.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
