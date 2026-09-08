@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Peça seu cartão DM — crédito pra sua história</title>
+  <meta name="description" content="Solicite o Cartão DM Visa ou o Cartão Loja 100% online. Preencha seus dados e receba o resultado da análise na hora.">
+
+  <!--
+    SCRUM-28 · HTML semântico das seções de marketing.
+    Esta etapa entrega apenas a estrutura do documento: nenhum CSS e nenhum JavaScript.
+    As classes já estão nomeadas para que a fase de CSS (Sprint 2) seja puramente aditiva.
+  -->
+</head>
+
+<body>
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo principal</a>
+
+  <!-- ==================== CABEÇALHO ==================== -->
+  <header class="cabecalho">
+    <a class="cabecalho__logo" href="index.html">
+      <img src="static/img/logo-dm.svg" width="32" height="34" alt="DM — página inicial">
+    </a>
+
+    <nav class="cabecalho__nav" aria-label="Navegação principal">
+      <ul>
+        <li><a href="#cartoes">Cartões</a></li>
+        <li><a href="#beneficios">Benefícios</a></li>
+        <li><a href="#como-funciona">Como funciona</a></li>
+        <li><a href="#duvidas">Dúvidas</a></li>
+      </ul>
+    </nav>
+
+    <div class="cabecalho__acoes">
+      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      <a class="btn btn--ghost" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">Já sou cliente</a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero" aria-labelledby="hero-titulo">
+      <div class="hero__texto">
+        <h1 id="hero-titulo">Toda história merece <mark>crédito</mark></h1>
+        <p class="hero__subtitulo">
+          Peça seu cartão DM sem sair de casa. Você preenche seus dados,
+          a gente analisa na hora e já te dá a resposta.
+        </p>
+        <p class="hero__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
+        <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      </div>
+
+      <div class="hero__imagem">
+        <picture>
+          <source srcset="static/img/modelo-cartao-visa.webp" type="image/webp">
+          <img src="static/img/modelo-cartao-visa.jpg" width="800" height="1025"
+               alt="Mulher sorrindo segurando um cartão DM Visa">
+        </picture>
+      </div>
+    </section>
+
+    <!-- Divisor de marca: 5 blocos de cor. Puramente decorativo. -->
+    <div class="faixa-multicolor" role="presentation" aria-hidden="true">
+      <span class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></span>
+      <span class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></span>
+      <span class="faixa-multicolor__bloco faixa-multicolor__bloco--amarelo"></span>
+      <span class="faixa-multicolor__bloco faixa-multicolor__bloco--aqua"></span>
+      <span class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></span>
+    </div>
+
+    <!-- ==================== ESCOLHA SEU CARTÃO ==================== -->
+    <section class="cartoes" id="cartoes" aria-labelledby="cartoes-titulo">
+      <h2 id="cartoes-titulo">Escolha o cartão ideal pra você</h2>
+      <p class="secao__apoio">São três opções. Você escolhe uma no começo do pedido.</p>
+
+      <picture class="cartoes__ilustracao">
+        <source srcset="static/img/cartoes-dm.webp" type="image/webp">
+        <img src="static/img/cartoes-dm.png" width="768" height="515"
+             alt="Cartão DM Visa azul e Cartão Loja verde em perspectiva">
+      </picture>
+
+      <ul class="cartoes__lista">
+        <li class="cartao">
+          <h3 class="cartao__nome">Cartão DM Visa</h3>
+          <p class="cartao__resumo">
+            Cartão de crédito bandeirado. Passa em qualquer lugar que aceite Visa,
+            no Brasil inteiro, em loja física e em compras online.
+          </p>
+          <ul class="cartao__pontos">
+            <li>Aceito em qualquer estado</li>
+            <li>Compras online e por aproximação</li>
+            <li>Aumento de limite automático</li>
+          </ul>
+          <a class="btn btn--primario" href="solicitar.html?cartao=dm_visa">Pedir o DM Visa</a>
+        </li>
+
+        <li class="cartao">
+          <h3 class="cartao__nome">Cartão Loja</h3>
+          <p class="cartao__resumo">
+            Cartão da sua loja preferida. Crédito simples e descomplicado
+            pra usar nas unidades da rede parceira.
+          </p>
+          <ul class="cartao__pontos">
+            <li>Válido nas unidades da loja escolhida</li>
+            <li>Disponível apenas no estado do seu CEP</li>
+            <li>Análise facilitada</li>
+          </ul>
+          <a class="btn btn--primario" href="solicitar.html?cartao=loja">Pedir o Cartão Loja</a>
+        </li>
+
+        <li class="cartao">
+          <h3 class="cartao__nome">Cartão Loja Digital</h3>
+          <p class="cartao__resumo">
+            A versão digital do Cartão Loja, para parceiros do ramo digital.
+            Você pede de qualquer estado do país.
+          </p>
+          <ul class="cartao__pontos">
+            <li>Sem restrição de estado</li>
+            <li><strong>Não é emitido cartão físico</strong></li>
+            <li>Pronto pra usar assim que aprovado</li>
+          </ul>
+          <a class="btn btn--primario" href="solicitar.html?cartao=loja_digital">Pedir o Loja Digital</a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ==================== BENEFÍCIOS ==================== -->
+    <section class="beneficios" id="beneficios" aria-labelledby="beneficios-titulo">
+      <h2 id="beneficios-titulo">Um cartão, vários benefícios</h2>
+
+      <ul class="beneficios__lista">
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Aprovação em minutos</h3>
+          <p>Você preenche o pedido e recebe o resultado na mesma hora, sem espera.</p>
+        </li>
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Aumento de limite automático</h3>
+          <p>Conforme você usa e paga em dia, seu limite cresce sozinho.<sup>*</sup></p>
+        </li>
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Pagamento por aproximação</h3>
+          <p>É só encostar na maquininha. Rápido e sem digitar senha em compras pequenas.</p>
+        </li>
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Código de segurança dinâmico</h3>
+          <p>Mais proteção nas compras online, com um código que muda a cada uso.</p>
+        </li>
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Descontos em várias lojas</h3>
+          <p>Vantagens exclusivas em gastronomia, eletrônicos, beleza, saúde e viagens.</p>
+        </li>
+        <li class="beneficio">
+          <h3 class="beneficio__titulo">Mais prazo pra pagar</h3>
+          <p>Você escolhe o melhor vencimento e organiza suas contas com folga.</p>
+        </li>
+      </ul>
+
+      <p class="beneficios__nota"><small>*De acordo com regras pré-estabelecidas e sujeito à análise.</small></p>
+
+      <figure class="beneficios__figura">
+        <picture>
+          <source srcset="static/img/modelo-computador.webp" type="image/webp">
+          <img src="static/img/modelo-computador.jpg" width="800" height="952"
+               alt="Mulher sorrindo enquanto trabalha no computador">
+        </picture>
+      </figure>
+    </section>
+
+    <!-- ==================== COMO FUNCIONA ==================== -->
+    <section class="como-funciona" id="como-funciona" aria-labelledby="como-funciona-titulo">
+      <h2 id="como-funciona-titulo">Peça agora, é fácil!</h2>
+
+      <ol class="passos">
+        <li class="passo">
+          <h3 class="passo__titulo">Escolha o seu cartão</h3>
+          <p>DM Visa, Cartão Loja ou Cartão Loja Digital — a diferença entre eles está logo acima.</p>
+        </li>
+        <li class="passo">
+          <h3 class="passo__titulo">Preencha seus dados</h3>
+          <p>Leva menos de cinco minutos. Só o que a gente precisa pra fazer a análise.</p>
+        </li>
+        <li class="passo">
+          <h3 class="passo__titulo">Receba a resposta na hora</h3>
+          <p>Se for aprovado, já explicamos os próximos passos. Se não, te mostramos outra opção.</p>
+        </li>
+      </ol>
+
+      <p class="como-funciona__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
+      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+
+      <figure class="como-funciona__figura">
+        <picture>
+          <source srcset="static/img/modelo-celular.webp" type="image/webp">
+          <img src="static/img/modelo-celular.jpg" width="700" height="1068"
+               alt="Mulher sorrindo enquanto usa o celular">
+        </picture>
+      </figure>
+    </section>
+
+    <!-- ==================== SOBRE A DM ==================== -->
+    <section class="sobre" id="sobre" aria-labelledby="sobre-titulo">
+      <h2 id="sobre-titulo">Sobre a DM</h2>
+      <p>
+        Simplificamos e democratizamos o acesso a crédito no Brasil desde 2002. Líderes no mercado
+        de cartões private label, hoje somos uma referência em soluções financeiras acessíveis que
+        impulsionam a vida de milhões de brasileiros.
+      </p>
+
+      <figure class="sobre__figura">
+        <picture>
+          <source srcset="static/img/colaboradores-dm.webp" type="image/webp">
+          <img src="static/img/colaboradores-dm.jpg" width="980" height="451"
+               alt="Dois colaboradores da DM conversando e sorrindo no escritório">
+        </picture>
+      </figure>
+    </section>
+
+    <!-- ==================== DÚVIDAS FREQUENTES ==================== -->
+    <!--
+      Accordion nativo com <details>/<summary>: abre e fecha sem uma linha de JavaScript
+      e já vem com a semântica de expansível pronta para leitores de tela.
+    -->
+    <section class="duvidas" id="duvidas" aria-labelledby="duvidas-titulo">
+      <h2 id="duvidas-titulo">Dúvidas frequentes</h2>
+
+      <details class="duvida">
+        <summary>Quem pode pedir um cartão DM?</summary>
+        <p>
+          Qualquer pessoa maior de 18 anos com CPF regular. Colaboradores da DM têm condições
+          próprias na solicitação do Cartão DM.
+        </p>
+      </details>
+
+      <details class="duvida">
+        <summary>Qual a diferença entre o Cartão DM Visa e o Cartão Loja?</summary>
+        <p>
+          O Cartão DM Visa é bandeirado e passa em qualquer estabelecimento que aceite Visa,
+          em todo o país. O Cartão Loja é private label: vale nas unidades da rede parceira que
+          você escolher e, por isso, só pode ser solicitado para lojas do mesmo estado do seu CEP.
+        </p>
+      </details>
+
+      <details class="duvida">
+        <summary>Por que só aparecem lojas do meu estado?</summary>
+        <p>
+          Porque o Cartão Loja é aceito somente nas unidades do parceiro, e cada parceiro atua em
+          estados específicos. Se você quiser um cartão sem essa restrição, escolha o Cartão DM Visa
+          ou o Cartão Loja Digital.
+        </p>
+      </details>
+
+      <details class="duvida">
+        <summary>O Cartão Loja Digital tem cartão físico?</summary>
+        <p>
+          Não. O Cartão Loja Digital existe só na versão digital — nenhum cartão é enviado pelos
+          Correios. Em compensação, você pode pedir de qualquer estado do país.
+        </p>
+      </details>
+
+      <details class="duvida">
+        <summary>Quanto tempo demora a resposta?</summary>
+        <p>
+          Na maioria dos casos, a resposta sai na hora, assim que você envia o pedido. Se a análise
+          precisar de mais tempo, avisamos por e-mail em até 48 horas.
+        </p>
+      </details>
+
+      <details class="duvida">
+        <summary>Se meu pedido for reprovado, posso tentar outra coisa?</summary>
+        <p>
+          Sim. Mesmo quando não conseguimos aprovar o cartão, apresentamos outros produtos da DM
+          que passam por uma análise diferente, como o DM Cred e o Empréstimo Pessoal.
+        </p>
+      </details>
+    </section>
+
+    <!-- ==================== CHAMADA FINAL ==================== -->
+    <section class="chamada-final" aria-labelledby="chamada-final-titulo">
+      <h2 id="chamada-final-titulo">Pronto pra começar?</h2>
+      <p>Leva menos de cinco minutos e a resposta sai na hora.</p>
+      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      <p class="chamada-final__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
+    </section>
+
+  </main>
+
+  <!-- ==================== RODAPÉ ==================== -->
+  <footer class="rodape">
+    <img class="rodape__logo" src="static/img/logo-dm.svg" width="32" height="34" alt="DM">
+
+    <nav class="rodape__nav" aria-label="Links do rodapé">
+      <section class="rodape__coluna" aria-labelledby="rodape-produtos">
+        <h2 class="rodape__titulo" id="rodape-produtos">Nossos produtos</h2>
+        <ul>
+          <li><a href="solicitar.html?cartao=dm_visa">Cartão DM Visa</a></li>
+          <li><a href="solicitar.html?cartao=loja">Cartão Loja</a></li>
+          <li><a href="solicitar.html?cartao=loja_digital">Cartão Loja Digital</a></li>
+        </ul>
+      </section>
+
+      <section class="rodape__coluna" aria-labelledby="rodape-ajuda">
+        <h2 class="rodape__titulo" id="rodape-ajuda">Ajuda</h2>
+        <ul>
+          <li><a href="#duvidas">Dúvidas frequentes</a></li>
+          <li><a href="#como-funciona">Como funciona</a></li>
+          <li><a href="#sobre">Sobre a DM</a></li>
+        </ul>
+      </section>
+    </nav>
+
+    <p class="rodape__aviso">
+      Projeto acadêmico desenvolvido por estudantes da FATEC São José dos Campos
+      para a Aprendizagem por Projetos Integrados 2026-2, em parceria com a DM.
+      Esta página é um exercício didático e não representa um canal oficial de contratação.
+    </p>
+  </footer>
+</body>
+</html>
