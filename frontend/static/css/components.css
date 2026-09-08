@@ -1,0 +1,683 @@
+/* ==========================================================================
+   COMPONENTES — CTAs, faixa multicolor, cards, accordion, formulário
+   SCRUM-31
+   ========================================================================== */
+
+/* ============================================================ BOTÕES ==== */
+/*
+  Geometria única, idêntica à do site da DM: pill de 100px, 48px de altura,
+  peso 700. Só a cor muda entre as variantes.
+*/
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-2);
+  min-height: var(--altura-btn);
+  padding: 0 var(--e-5);
+  border: 1px solid transparent;
+  border-radius: var(--raio-pill);
+  font-family: var(--fonte);
+  font-size: var(--texto-p);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--transicao),
+              border-color var(--transicao),
+              transform var(--transicao),
+              box-shadow var(--transicao);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn--primario {
+  background: var(--dm-aqua);
+  border-color: var(--dm-aqua);
+  color: var(--dm-azul);
+}
+.btn--primario:hover {
+  background: var(--dm-aqua-escuro);
+  border-color: var(--dm-aqua-escuro);
+  box-shadow: 0 8px 20px rgb(125 244 237 / 0.35);
+}
+
+/*
+  Texto em tinta, não no azul: azul sobre coral dá 4,48:1 e reprova em AA por
+  uma casa decimal no tamanho de texto do botão. A tinta é cor de marca DM e
+  sobe para 8,7:1 — a diferença visual no corpo do botão é quase imperceptível.
+*/
+.btn--secundario {
+  background: var(--dm-coral);
+  border-color: var(--dm-coral);
+  color: var(--dm-tinta);
+}
+.btn--secundario:hover {
+  background: var(--dm-coral-escuro);
+  border-color: var(--dm-coral-escuro);
+  box-shadow: 0 8px 20px rgb(255 154 152 / 0.4);
+}
+
+/* Ghost: herda a cor do contexto — branco sobre azul, azul sobre claro. */
+.btn--ghost {
+  background: transparent;
+  border-color: currentColor;
+  color: inherit;
+}
+.btn--ghost:hover { background: rgb(255 255 255 / 0.12); }
+.duvidas .btn--ghost:hover,
+.cartoes .btn--ghost:hover { background: rgb(32 42 208 / 0.08); }
+
+/* ================================================== FAIXA MULTICOLOR ==== */
+/*
+  A assinatura da página. Na DM ela é só um divisor; aqui ela vira o elemento
+  estrutural que marca a passagem entre blocos — e, no wizard, vira a própria
+  barra de etapas (ver .progresso mais abaixo).
+*/
+.faixa-multicolor { display: flex; height: 14px; }
+.faixa-multicolor__bloco { flex: 1; }
+.faixa-multicolor__bloco--azul    { background: var(--dm-azul); }
+.faixa-multicolor__bloco--coral   { background: var(--dm-coral); }
+.faixa-multicolor__bloco--amarelo { background: var(--dm-amarelo); }
+.faixa-multicolor__bloco--aqua    { background: var(--dm-aqua); }
+.faixa-multicolor__bloco--verde   { background: var(--dm-verde); }
+
+/* ============================================================== HERO ==== */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 0;
+  background: var(--dm-azul);
+  color: var(--dm-branco);
+  overflow: hidden;
+}
+/*
+  O hero tem grade própria, sem as trilhas nomeadas de `main > section`.
+  Sem este reset os filhos herdam `grid-column: conteudo`, um nome que não
+  existe aqui — e o Grid os joga em colunas implícitas.
+*/
+.hero > * { grid-column: auto; }
+
+.hero__texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--e-4);
+  padding: var(--esp-secao) var(--esp-borda);
+  max-width: 36rem;
+}
+.hero__texto h1 { margin-bottom: var(--e-1); }
+
+.hero__subtitulo {
+  font-size: var(--texto-g);
+  font-weight: 400;
+  color: color-mix(in srgb, var(--dm-branco) 85%, var(--dm-azul));
+  max-width: 30rem;
+}
+.hero__disclaimer { opacity: 0.65; }
+.hero__texto .btn { margin-top: var(--e-2); }
+
+.hero__imagem img { width: 100%; object-fit: cover; }
+
+@media (max-width: 55.99rem) {
+  .hero__imagem img { max-height: 60vh; object-position: center 18%; }
+}
+
+@media (min-width: 56rem) {
+  /*
+    Mesma grade nomeada das outras seções, só que partida ao meio: o texto
+    fica alinhado à coluna de conteúdo do resto da página e a foto sangra
+    até a borda direita da viewport.
+  */
+  .hero {
+    grid-template-columns:
+      [full-start] minmax(var(--esp-borda), 1fr)
+      [conteudo-start] minmax(0, calc(var(--largura-conteudo) * 0.54)) [meio]
+      minmax(0, calc(var(--largura-conteudo) * 0.46)) [conteudo-end]
+      minmax(var(--esp-borda), 1fr) [full-end];
+    align-items: stretch;
+    min-height: min(76vh, 40rem);
+  }
+  .hero__texto {
+    grid-column: conteudo-start / meio;
+    justify-content: center;
+    padding: var(--e-9) var(--e-7) var(--e-9) 0;
+    max-width: none;
+  }
+  .hero__imagem {
+    grid-column: meio / full-end;
+    position: relative;
+  }
+  /* Absoluta para não ser a foto a ditar a altura da seção. */
+  .hero__imagem picture { position: absolute; inset: 0; }
+  /* Enquadra o rosto e o cartão; o corte sobra na barra da imagem. */
+  .hero__imagem img {
+    height: 100%;
+    object-position: 58% 18%;
+  }
+}
+
+/* ========================================================== CARTÕES ==== */
+
+.cartoes__ilustracao {
+  max-width: 26rem;
+  margin: 0 auto var(--e-7);
+}
+
+.cartoes__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--e-5);
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  padding: var(--e-6) var(--e-5);
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+  transition: transform var(--transicao), box-shadow var(--transicao);
+}
+.cartao:hover { transform: translateY(-4px); box-shadow: var(--sombra-alta); }
+
+.cartao__nome { color: var(--dm-azul); }
+.cartao__resumo { font-size: var(--texto-p); color: var(--dm-cinza-texto); }
+
+.cartao__pontos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+  margin-block: var(--e-2) auto;
+  padding-bottom: var(--e-5);
+  font-size: var(--texto-p);
+}
+.cartao__pontos li { position: relative; padding-left: 1.5rem; }
+.cartao__pontos li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dm-aqua);
+  outline: 2px solid var(--dm-azul);
+}
+.cartao .btn { align-self: stretch; }
+
+/* ======================================================== BENEFÍCIOS ==== */
+
+.beneficios__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--e-4);
+}
+/* São 6 itens: fixa 3 colunas para fechar 2 linhas cheias, sem sobra. */
+@media (min-width: 56rem) {
+  .beneficios__lista { grid-template-columns: repeat(3, 1fr); }
+}
+
+.beneficio {
+  padding: var(--e-5);
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: var(--raio-card);
+  transition: background-color var(--transicao);
+}
+.beneficio:hover { background: rgb(255 255 255 / 0.14); }
+.beneficio__titulo { color: var(--dm-aqua); margin-bottom: var(--e-2); }
+.beneficio p { font-size: var(--texto-p); opacity: 0.9; }
+
+.beneficios__nota { margin-top: var(--e-5); opacity: 0.6; }
+
+/*
+  Retrato numa coluna própria, não faixa sangrada: a foto tem 800px de largura
+  nativa e esticá-la para a viewport inteira deixava a imagem borrada.
+*/
+.beneficios__figura {
+  justify-self: end;
+  width: min(17rem, 55vw);
+  margin-top: var(--e-7);
+}
+.beneficios__figura img {
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-alta);
+}
+
+@media (min-width: 56rem) {
+  /*
+    Abre uma quarta trilha à direita só nesta seção: os cards e a nota ficam
+    na coluna de texto e a foto ocupa a lateral, alinhada com eles. Sem isso
+    a foto caía sozinha embaixo e deixava meia tela de azul vazio.
+  */
+  .beneficios {
+    grid-template-columns:
+      [full-start] minmax(var(--esp-borda), 1fr)
+      [conteudo-start] minmax(0, calc(var(--largura-conteudo) - 19rem)) [texto-end]
+      var(--e-6) 17rem [conteudo-end]
+      minmax(var(--esp-borda), 1fr) [full-end];
+  }
+  .beneficios > h2 { grid-column: conteudo-start / conteudo-end; }
+  .beneficios__lista,
+  .beneficios__nota { grid-column: conteudo-start / texto-end; }
+  .beneficios__lista { grid-template-columns: repeat(2, 1fr); }
+  .beneficios__figura {
+    grid-column: 4;
+    grid-row: 2 / span 2;
+    align-self: center;
+    width: 100%;
+    margin-top: 0;
+  }
+}
+
+/* ===================================================== COMO FUNCIONA ==== */
+
+.como-funciona { position: relative; }
+
+.passos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--e-6);
+  counter-reset: passo;
+}
+.passo { counter-increment: passo; }
+.passo::before {
+  content: counter(passo);
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: var(--e-3);
+  border-radius: 50%;
+  background: var(--dm-azul);
+  color: var(--dm-branco);
+  font-size: var(--texto-g);
+  font-weight: 800;
+}
+.passo__titulo { color: var(--dm-azul); margin-bottom: var(--e-2); }
+.passo p { font-size: var(--texto-p); }
+
+.como-funciona__disclaimer { margin-top: var(--e-6); opacity: 0.75; }
+.como-funciona > .btn { justify-self: start; margin-top: var(--e-4); }
+
+.como-funciona__figura {
+  justify-self: end;
+  width: min(18rem, 55vw);
+  margin-top: var(--e-7);
+}
+.como-funciona__figura img {
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-alta);
+}
+
+@media (min-width: 56rem) {
+  /* A modelo sobe e ocupa a lateral, sem sobrepor o texto. */
+  .como-funciona__figura {
+    margin-top: calc(var(--e-9) * -1);
+    margin-bottom: calc(var(--e-6) * -1);
+  }
+}
+
+/* ============================================================ SOBRE ==== */
+
+.sobre > p {
+  max-width: var(--largura-texto);
+  font-size: var(--texto-g);
+  font-weight: 400;
+  color: color-mix(in srgb, var(--dm-branco) 88%, var(--dm-azul));
+}
+/* Largura de conteúdo e proporção nativa: a origem tem 980px, então sangrar
+   até a borda da viewport só custaria nitidez. */
+.sobre__figura { margin-top: var(--e-7); }
+.sobre__figura img {
+  width: 100%;
+  border-radius: var(--raio-card);
+}
+
+/* ========================================================== DÚVIDAS ==== */
+
+.duvida {
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-mini);
+  margin-bottom: var(--e-3);
+  transition: border-color var(--transicao);
+}
+.duvida:hover { border-color: var(--dm-azul); }
+.duvida[open] { border-color: var(--dm-azul); }
+
+.duvida summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: var(--e-4) var(--e-5);
+  font-size: var(--texto-m);
+  font-weight: 600;
+  color: var(--dm-tinta);
+  cursor: pointer;
+  list-style: none;
+}
+.duvida summary::-webkit-details-marker { display: none; }
+
+/* Marcador próprio: + que gira para × quando abre. */
+.duvida summary::after {
+  content: "+";
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--dm-azul);
+  color: var(--dm-branco);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform var(--transicao);
+}
+.duvida[open] summary::after { transform: rotate(45deg); }
+
+.duvida p {
+  padding: 0 var(--e-5) var(--e-5);
+  font-size: var(--texto-p);
+  color: var(--dm-cinza-texto);
+  max-width: var(--largura-texto);
+}
+
+/* ==================================================== CHAMADA FINAL ==== */
+
+.chamada-final { text-align: center; }
+.chamada-final > * { justify-self: center; }
+.chamada-final > p { max-width: 34rem; font-size: var(--texto-g); opacity: 0.85; }
+.chamada-final > .btn { margin-top: var(--e-6); }
+.chamada-final__disclaimer { margin-top: var(--e-4); opacity: 0.6; font-size: var(--texto-p); }
+
+/* ======================================================= FORMULÁRIO ==== */
+
+main > h1 {
+  max-width: var(--largura-conteudo);
+  margin: var(--esp-secao) auto var(--e-4);
+  padding-inline: var(--esp-borda);
+}
+.intro,
+.progresso,
+.formulario,
+.resultado__anuncio {
+  max-width: var(--largura-conteudo);
+  margin-inline: auto;
+  padding-inline: var(--esp-borda);
+}
+.intro {
+  font-size: var(--texto-g);
+  font-weight: 400;
+  color: var(--dm-cinza-texto);
+  max-width: min(var(--largura-conteudo), 46rem);
+  margin-bottom: var(--e-7);
+}
+
+/* --------- barra de etapas: a faixa da DM fazendo trabalho de UI -------- */
+.progresso { margin-bottom: var(--e-7); }
+.progresso__lista { display: flex; gap: var(--e-2); }
+.progresso__item { flex: 1; }
+.progresso__item a {
+  display: block;
+  padding-top: var(--e-3);
+  border-top: 6px solid var(--dm-cinza);
+  font-size: var(--texto-p);
+  font-weight: 700;
+  color: var(--dm-cinza-texto);
+  text-decoration: none;
+  transition: color var(--transicao), border-color var(--transicao);
+}
+.progresso__item:nth-child(1) a { border-top-color: var(--dm-azul); }
+.progresso__item:nth-child(2) a { border-top-color: var(--dm-coral); }
+.progresso__item:nth-child(3) a { border-top-color: var(--dm-amarelo); }
+.progresso__item:nth-child(4) a { border-top-color: var(--dm-aqua); }
+.progresso__item a:hover { color: var(--dm-azul); }
+.progresso__item[aria-current="step"] a { color: var(--dm-azul); }
+
+@media (max-width: 40rem) {
+  .progresso__item a { font-size: var(--texto-pp); }
+}
+
+/* ------------------------------------------------------------ etapas --- */
+.formulario { padding-bottom: var(--esp-secao); }
+
+.etapa {
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-card);
+  padding: var(--e-6) var(--e-5) var(--e-5);
+  margin-bottom: var(--e-5);
+  background: var(--dm-branco);
+}
+.etapa__legenda {
+  padding-inline: var(--e-3);
+  margin-left: calc(var(--e-3) * -1);
+  font-size: var(--texto-g);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--dm-azul);
+}
+.etapa__nota {
+  margin-top: var(--e-4);
+  padding: var(--e-3) var(--e-4);
+  background: var(--dm-lilas);
+  border-radius: var(--raio-mini);
+  font-size: var(--texto-p);
+}
+.etapa--envio { background: var(--dm-lilas); }
+
+/* ---------------------------------------------------- tipo de cartão --- */
+.opcoes-cartao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--e-4);
+  margin-top: var(--e-5);
+}
+.opcao-cartao {
+  position: relative;
+  padding: var(--e-5);
+  border: 2px solid var(--dm-cinza);
+  border-radius: var(--raio-card);
+  transition: border-color var(--transicao), background-color var(--transicao);
+}
+.opcao-cartao:hover { border-color: var(--dm-azul); }
+.opcao-cartao:has(input:checked) {
+  border-color: var(--dm-azul);
+  background: var(--dm-lilas);
+}
+.opcao-cartao:has(input:focus-visible) { outline: 3px solid var(--dm-tinta); outline-offset: 3px; }
+.opcao-cartao input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.opcao-cartao label {
+  display: block;
+  font-size: var(--texto-m);
+  font-weight: 700;
+  color: var(--dm-azul);
+  cursor: pointer;
+}
+.opcao-cartao .campo__ajuda { margin-top: var(--e-2); }
+
+/* ------------------------------------------------------------ campos --- */
+.campo { margin-top: var(--e-5); }
+.campo label {
+  display: block;
+  margin-bottom: var(--e-2);
+  font-size: var(--texto-p);
+  font-weight: 700;
+  color: var(--dm-azul);
+}
+.campo__opcional {
+  font-weight: 400;
+  color: var(--dm-cinza-texto);
+  text-transform: none;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  max-width: 30rem;
+  min-height: var(--altura-btn);
+  padding: 0 var(--e-4);
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-campo);
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+.campo input::placeholder { color: var(--dm-cinza-texto); opacity: 0.8; }
+.campo input:hover,
+.campo select:hover { border-color: var(--dm-azul); }
+/*
+  Sem `outline: none`. O halo de box-shadow some no modo de alto contraste do
+  sistema, então o contorno real precisa continuar existindo para quem navega
+  por teclado — o halo é só o reforço visual.
+*/
+.campo input:focus,
+.campo select:focus {
+  border-color: var(--dm-azul);
+  box-shadow: 0 0 0 3px rgb(32 42 208 / 0.18);
+}
+/* Só sinaliza erro depois que a pessoa mexeu no campo. */
+.campo input:user-invalid,
+.campo select:user-invalid { border-color: #C62828; }
+.campo input:user-invalid:focus { box-shadow: 0 0 0 3px rgb(198 40 40 / 0.18); }
+
+.campo__ajuda {
+  margin-top: var(--e-2);
+  font-size: var(--texto-p);
+  color: var(--dm-cinza-texto);
+  max-width: 34rem;
+}
+
+.campo--checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--e-1) var(--e-3);
+  align-items: start;
+}
+.campo--checkbox input {
+  width: 1.35rem;
+  height: 1.35rem;
+  min-height: 0;
+  margin-top: 0.15rem;
+  accent-color: var(--dm-azul);
+  cursor: pointer;
+}
+.campo--checkbox label {
+  margin-bottom: 0;
+  font-weight: 600;
+  color: var(--dm-tinta);
+  cursor: pointer;
+}
+.campo--checkbox .campo__ajuda { grid-column: 2; }
+
+.formulario__disclaimer { margin-top: var(--e-5); color: var(--dm-cinza-texto); }
+.formulario__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-3);
+  margin-top: var(--e-5);
+}
+.formulario__acoes .btn--ghost { color: var(--dm-azul); }
+
+/* ========================================================= RESULTADO ==== */
+
+.resultado__anuncio:empty { display: none; }
+
+/*
+  display:block anula a grade de trilhas nomeadas que `main > section` aplica.
+  Aqui ela não serve para nada e ainda esticava os botões pela largura toda.
+*/
+.resultado {
+  display: block;
+  max-width: var(--largura-conteudo);
+  margin: 0 auto var(--e-7);
+  padding: var(--e-7) var(--e-6);
+  border-radius: var(--raio-card);
+  border: 1px solid var(--dm-cinza);
+  box-shadow: var(--sombra-card);
+}
+/* A borda superior colorida diz o desfecho antes da leitura. */
+.resultado--aprovado   { border-top: 8px solid var(--dm-verde); }
+.resultado--em-analise { border-top: 8px solid var(--dm-amarelo); }
+.resultado--reprovado  { border-top: 8px solid var(--dm-coral); }
+
+@media (max-width: 60rem) {
+  .resultado { margin-inline: var(--esp-borda); }
+}
+
+.resultado h2 { color: var(--dm-azul); margin-bottom: var(--e-3); }
+.resultado h3 { margin-block: var(--e-6) var(--e-3); }
+.resultado__mensagem { font-size: var(--texto-g); font-weight: 400; max-width: var(--largura-texto); }
+
+.resultado__passos { counter-reset: etapa; display: grid; gap: var(--e-3); }
+.resultado__passos li {
+  counter-increment: etapa;
+  position: relative;
+  padding-left: 2.25rem;
+  font-size: var(--texto-p);
+}
+.resultado__passos li::before {
+  content: counter(etapa);
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--dm-lilas);
+  color: var(--dm-azul);
+  font-size: var(--texto-p);
+  font-weight: 700;
+}
+
+.resultado__resumo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--e-2) var(--e-5);
+  margin-block: var(--e-6);
+  padding: var(--e-4) var(--e-5);
+  background: var(--dm-lilas);
+  border-radius: var(--raio-mini);
+  font-size: var(--texto-p);
+}
+.resultado__resumo dt { font-weight: 700; color: var(--dm-azul); }
+
+.oferta-alternativa {
+  margin-top: var(--e-6);
+  padding-top: var(--e-6);
+  border-top: 1px solid var(--dm-cinza);
+}
+.oferta-alternativa__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--e-4);
+  margin-top: var(--e-5);
+}
+.oferta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  padding: var(--e-5);
+  background: var(--dm-lilas);
+  border-radius: var(--raio-card);
+}
+.oferta__nome { color: var(--dm-azul); font-size: var(--texto-g); }
+.oferta p { font-size: var(--texto-p); margin-bottom: auto; }
+.oferta .btn { align-self: flex-start; }
+
+.oferta-alternativa__figura { margin-top: var(--e-6); }
+.oferta-alternativa__figura img {
+  width: 100%;
+  aspect-ratio: 16 / 6;
+  object-fit: cover;
+  object-position: 50% 25%;
+  border-radius: var(--raio-card);
+}
