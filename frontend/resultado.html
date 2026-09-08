@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resultado da sua solicitação — DM</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    SCRUM-29 · HTML semântico das telas de resultado. Sem CSS e sem JavaScript.
+
+    Os três desfechos possíveis estão todos na página, um abaixo do outro, para que a estrutura
+    de cada um possa ser revisada nesta etapa. Na Sprint 2 o JavaScript exibe apenas o desfecho
+    correspondente ao retorno da pré-qualificação e esconde os outros dois.
+
+    Enquanto não há JS, dá para inspecionar cada estado direto pela âncora:
+      resultado.html#aprovado
+      resultado.html#em-analise
+      resultado.html#reprovado
+  -->
+</head>
+
+<body>
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="index.html">
+      <img src="static/img/logo-dm.svg" width="32" height="34" alt="DM — voltar para a página inicial">
+    </a>
+    <p class="cabecalho__titulo">Resultado da solicitação</p>
+  </header>
+
+  <main id="conteudo">
+    <h1>Resultado da sua solicitação</h1>
+
+    <!-- Região onde o JS anunciará a mudança de estado para leitores de tela. -->
+    <p class="resultado__anuncio" role="status" aria-live="polite"></p>
+
+    <!-- ==================== APROVADO ==================== -->
+    <section class="resultado resultado--aprovado" id="aprovado" aria-labelledby="aprovado-titulo">
+      <h2 id="aprovado-titulo">Aprovado!</h2>
+      <p class="resultado__mensagem">
+        Boa notícia: seu cartão foi aprovado. Agora é só concluir a ativação.
+      </p>
+
+      <h3>Próximos passos</h3>
+      <ol class="resultado__passos">
+        <li>Confirme seu e-mail pelo link que acabamos de enviar.</li>
+        <li>Separe um documento com foto para a retirada.</li>
+        <li>Assim que o cartão estiver pronto, avisamos por e-mail e SMS.</li>
+      </ol>
+
+      <dl class="resultado__resumo">
+        <dt>Protocolo</dt>
+        <dd data-campo="protocolo">—</dd>
+        <dt>Cartão solicitado</dt>
+        <dd data-campo="cartao">—</dd>
+        <dt>Loja</dt>
+        <dd data-campo="loja">—</dd>
+      </dl>
+
+      <a class="btn btn--primario" href="index.html">Voltar para o início</a>
+    </section>
+
+    <!-- ==================== EM ANÁLISE ==================== -->
+    <section class="resultado resultado--em-analise" id="em-analise" aria-labelledby="em-analise-titulo">
+      <h2 id="em-analise-titulo">Sua solicitação está em análise</h2>
+      <p class="resultado__mensagem">
+        Recebemos seu pedido e ele está passando por uma análise mais detalhada.
+        Isso é normal e não significa que foi negado.
+      </p>
+
+      <h3>O que acontece agora</h3>
+      <ol class="resultado__passos">
+        <li>Nosso time analisa as informações que você enviou.</li>
+        <li>Você recebe o resultado por e-mail em até 48 horas.</li>
+        <li>Se precisarmos de algum documento, avisamos pelo mesmo e-mail.</li>
+      </ol>
+
+      <dl class="resultado__resumo">
+        <dt>Protocolo</dt>
+        <dd data-campo="protocolo">—</dd>
+        <dt>Cartão solicitado</dt>
+        <dd data-campo="cartao">—</dd>
+      </dl>
+
+      <a class="btn btn--primario" href="index.html">Voltar para o início</a>
+    </section>
+
+    <!-- ==================== REPROVADO ==================== -->
+    <section class="resultado resultado--reprovado" id="reprovado" aria-labelledby="reprovado-titulo">
+      <h2 id="reprovado-titulo">Não foi dessa vez</h2>
+      <p class="resultado__mensagem">
+        Não conseguimos aprovar seu cartão agora. Isso pode mudar com o tempo —
+        você pode tentar de novo em 90 dias.
+      </p>
+
+      <!-- Atende a US SCRUM-18: oferecer outros produtos a quem foi reprovado. -->
+      <section class="oferta-alternativa" aria-labelledby="oferta-titulo">
+        <h3 id="oferta-titulo">Mas temos outras opções pra você</h3>
+        <p>
+          Estes produtos passam por uma análise diferente da do cartão e podem se encaixar melhor
+          no seu momento.
+        </p>
+
+        <ul class="oferta-alternativa__lista">
+          <li class="oferta">
+            <h4 class="oferta__nome">DM Cred</h4>
+            <p>Microcrédito para resolver o que não pode esperar, com parcelas que cabem no bolso.</p>
+            <a class="btn btn--secundario" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">Conhecer o DM Cred</a>
+          </li>
+          <li class="oferta">
+            <h4 class="oferta__nome">Empréstimo Pessoal</h4>
+            <p>Dinheiro na conta pra quitar dívidas, cobrir um imprevisto ou tirar um plano do papel.</p>
+            <a class="btn btn--secundario" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">Simular empréstimo</a>
+          </li>
+        </ul>
+
+        <figure class="oferta-alternativa__figura">
+          <picture>
+            <source srcset="static/img/modelo-emprestimo.webp" type="image/webp">
+            <img src="static/img/modelo-emprestimo.jpg" width="900" height="920"
+                 alt="Homem sorrindo enquanto olha o celular ao ar livre">
+          </picture>
+        </figure>
+      </section>
+
+      <dl class="resultado__resumo">
+        <dt>Protocolo</dt>
+        <dd data-campo="protocolo">—</dd>
+      </dl>
+
+      <a class="btn btn--ghost" href="index.html">Voltar para o início</a>
+    </section>
+  </main>
+
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">
+      Projeto acadêmico da FATEC São José dos Campos em parceria com a DM.
+      Os resultados exibidos aqui são simulados e não representam uma decisão de crédito real.
+    </p>
+  </footer>
+</body>
+</html>

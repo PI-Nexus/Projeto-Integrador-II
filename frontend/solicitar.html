@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solicitar cartão — DM</title>
+  <meta name="description" content="Preencha seus dados e receba na hora o resultado da análise do seu cartão DM.">
+  <meta name="robots" content="noindex">
+
+  <!--
+    SCRUM-29 · HTML semântico do wizard de solicitação.
+    Sem CSS e sem JavaScript nesta etapa.
+
+    O formulário é UM ÚNICO <form> com quatro <fieldset>. Assim ele funciona por completo sem
+    JavaScript: o usuário rola a página, preenche tudo e envia. Na Sprint 2 o JS transforma
+    cada fieldset em uma etapa navegável — sem precisar reescrever a marcação.
+
+    A validação aqui é a nativa do HTML (required, pattern, min, max, inputmode). O JS de
+    validação da Sprint 2 apenas complementa, com dígito verificador de CPF e consulta de CEP.
+  -->
+</head>
+
+<body>
+  <a class="pular-link" href="#formulario">Pular para o formulário</a>
+
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="index.html">
+      <img src="static/img/logo-dm.svg" width="32" height="34" alt="DM — voltar para a página inicial">
+    </a>
+    <p class="cabecalho__titulo">Solicitação de cartão</p>
+  </header>
+
+  <main id="conteudo">
+    <h1>Peça seu cartão DM</h1>
+    <p class="intro">
+      São quatro etapas rápidas. Ao final, a gente analisa seus dados e mostra o resultado na hora.
+    </p>
+
+    <!-- Indicador de progresso. Vira a barra de etapas quando o JS entrar. -->
+    <nav class="progresso" aria-label="Etapas da solicitação">
+      <ol class="progresso__lista">
+        <li class="progresso__item" aria-current="step"><a href="#etapa-cartao">1. Seu cartão</a></li>
+        <li class="progresso__item"><a href="#etapa-dados">2. Seus dados</a></li>
+        <li class="progresso__item"><a href="#etapa-endereco">3. Onde você está</a></li>
+        <li class="progresso__item"><a href="#etapa-loja">4. Sua loja</a></li>
+      </ol>
+    </nav>
+
+    <form class="formulario" id="formulario" action="/api/solicitacoes" method="post">
+
+      <!-- ============ ETAPA 1 · TIPO DE CARTÃO ============ -->
+      <fieldset class="etapa" id="etapa-cartao">
+        <legend class="etapa__legenda">Etapa 1 · Qual cartão você quer?</legend>
+
+        <div class="opcoes-cartao">
+          <div class="opcao-cartao">
+            <input type="radio" id="cartao-dm-visa" name="tipo_cartao" value="dm_visa"
+                   required aria-describedby="ajuda-dm-visa">
+            <label for="cartao-dm-visa">Cartão DM Visa</label>
+            <p class="campo__ajuda" id="ajuda-dm-visa">
+              Bandeirado. Passa em qualquer estabelecimento que aceite Visa, em todo o Brasil.
+            </p>
+          </div>
+
+          <div class="opcao-cartao">
+            <input type="radio" id="cartao-loja" name="tipo_cartao" value="loja"
+                   aria-describedby="ajuda-loja">
+            <label for="cartao-loja">Cartão Loja</label>
+            <p class="campo__ajuda" id="ajuda-loja">
+              Private label. Vale nas unidades da rede parceira e só está disponível para lojas
+              do mesmo estado do seu CEP.
+            </p>
+          </div>
+
+          <div class="opcao-cartao">
+            <input type="radio" id="cartao-loja-digital" name="tipo_cartao" value="loja_digital"
+                   aria-describedby="ajuda-loja-digital">
+            <label for="cartao-loja-digital">Cartão Loja Digital</label>
+            <p class="campo__ajuda" id="ajuda-loja-digital">
+              Versão digital do Cartão Loja, sem restrição de estado.
+              <strong>Não é emitido cartão físico.</strong>
+            </p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ============ ETAPA 2 · DADOS PESSOAIS ============ -->
+      <fieldset class="etapa" id="etapa-dados">
+        <legend class="etapa__legenda">Etapa 2 · Seus dados</legend>
+
+        <div class="campo">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" name="nome" required minlength="5" maxlength="120"
+                 autocomplete="name" placeholder="Como está no seu documento">
+        </div>
+
+        <div class="campo">
+          <label for="cpf">CPF</label>
+          <input type="text" id="cpf" name="cpf" required inputmode="numeric"
+                 pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" maxlength="14"
+                 autocomplete="off" placeholder="000.000.000-00" aria-describedby="ajuda-cpf">
+          <p class="campo__ajuda" id="ajuda-cpf">Somente números ou no formato 000.000.000-00.</p>
+        </div>
+
+        <div class="campo">
+          <label for="nascimento">Data de nascimento</label>
+          <input type="date" id="nascimento" name="nascimento" required
+                 min="1900-01-01" max="2008-09-08"
+                 autocomplete="bday" aria-describedby="ajuda-nascimento">
+          <p class="campo__ajuda" id="ajuda-nascimento">Você precisa ter 18 anos ou mais.</p>
+        </div>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required maxlength="120"
+                 autocomplete="email" placeholder="voce@email.com" aria-describedby="ajuda-email">
+          <p class="campo__ajuda" id="ajuda-email">É por aqui que avisamos o resultado da análise.</p>
+        </div>
+
+        <div class="campo">
+          <label for="celular">Celular</label>
+          <input type="tel" id="celular" name="celular" required inputmode="tel"
+                 pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}" maxlength="16"
+                 autocomplete="tel" placeholder="(12) 99999-9999">
+        </div>
+
+        <div class="campo">
+          <label for="renda">Renda mensal</label>
+          <input type="number" id="renda" name="renda" required min="0" step="0.01"
+                 inputmode="decimal" placeholder="0,00" aria-describedby="ajuda-renda">
+          <p class="campo__ajuda" id="ajuda-renda">Em reais, sem pontos. Usamos na análise de crédito.</p>
+        </div>
+
+        <div class="campo campo--checkbox">
+          <input type="checkbox" id="colaborador" name="colaborador" value="sim"
+                 aria-describedby="ajuda-colaborador">
+          <label for="colaborador">Sou colaborador da DM</label>
+          <p class="campo__ajuda" id="ajuda-colaborador">
+            Colaboradores da DM têm regras próprias de aprovação. Marque apenas se for o seu caso.
+          </p>
+        </div>
+
+        <div class="campo" id="campo-matricula">
+          <label for="matricula">Matrícula DM</label>
+          <input type="text" id="matricula" name="matricula" maxlength="20"
+                 autocomplete="off" aria-describedby="ajuda-matricula">
+          <p class="campo__ajuda" id="ajuda-matricula">
+            Preencha apenas se você marcou a opção acima.
+          </p>
+        </div>
+      </fieldset>
+
+      <!-- ============ ETAPA 3 · ENDEREÇO ============ -->
+      <fieldset class="etapa" id="etapa-endereco">
+        <legend class="etapa__legenda">Etapa 3 · Onde você está</legend>
+
+        <div class="campo">
+          <label for="cep">CEP</label>
+          <input type="text" id="cep" name="cep" required inputmode="numeric"
+                 pattern="\d{5}-?\d{3}" maxlength="9"
+                 autocomplete="postal-code" placeholder="00000-000" aria-describedby="ajuda-cep">
+          <p class="campo__ajuda" id="ajuda-cep">
+            O estado do seu CEP define quais lojas parceiras aparecem na etapa 4.
+          </p>
+        </div>
+
+        <div class="campo">
+          <label for="logradouro">Rua ou avenida</label>
+          <input type="text" id="logradouro" name="logradouro" required maxlength="120"
+                 autocomplete="address-line1">
+        </div>
+
+        <div class="campo">
+          <label for="numero">Número</label>
+          <input type="text" id="numero" name="numero" required maxlength="10"
+                 inputmode="numeric" autocomplete="address-line2">
+        </div>
+
+        <div class="campo">
+          <label for="complemento">Complemento <span class="campo__opcional">(opcional)</span></label>
+          <input type="text" id="complemento" name="complemento" maxlength="60"
+                 placeholder="Apartamento, bloco, referência">
+        </div>
+
+        <div class="campo">
+          <label for="bairro">Bairro</label>
+          <input type="text" id="bairro" name="bairro" required maxlength="80">
+        </div>
+
+        <div class="campo">
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" name="cidade" required maxlength="80"
+                 autocomplete="address-level2">
+        </div>
+
+        <div class="campo">
+          <label for="uf">Estado</label>
+          <select id="uf" name="uf" required autocomplete="address-level1">
+            <option value="">Selecione</option>
+            <option value="AC">Acre</option>
+            <option value="AL">Alagoas</option>
+            <option value="AP">Amapá</option>
+            <option value="AM">Amazonas</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+            <option value="DF">Distrito Federal</option>
+            <option value="ES">Espírito Santo</option>
+            <option value="GO">Goiás</option>
+            <option value="MA">Maranhão</option>
+            <option value="MT">Mato Grosso</option>
+            <option value="MS">Mato Grosso do Sul</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="PA">Pará</option>
+            <option value="PB">Paraíba</option>
+            <option value="PR">Paraná</option>
+            <option value="PE">Pernambuco</option>
+            <option value="PI">Piauí</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RN">Rio Grande do Norte</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="RO">Rondônia</option>
+            <option value="RR">Roraima</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="SP">São Paulo</option>
+            <option value="SE">Sergipe</option>
+            <option value="TO">Tocantins</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- ============ ETAPA 4 · LOJA ============ -->
+      <!--
+        A busca usa <input list> + <datalist>: o navegador já entrega autocomplete nativo,
+        sem JavaScript. Na Sprint 2 o datalist é alimentado a partir de lojas.json e filtrado
+        pela UF do CEP quando o cartão escolhido for o Cartão Loja físico.
+      -->
+      <fieldset class="etapa" id="etapa-loja">
+        <legend class="etapa__legenda">Etapa 4 · Sua loja</legend>
+
+        <p class="etapa__nota">
+          Preencha apenas se você escolheu <strong>Cartão Loja</strong> ou
+          <strong>Cartão Loja Digital</strong>. Quem pediu o DM Visa pode pular esta etapa.
+        </p>
+
+        <div class="campo">
+          <label for="loja">Loja parceira</label>
+          <input type="text" id="loja" name="loja" list="lojas-parceiras" maxlength="120"
+                 autocomplete="off" placeholder="Digite o nome da loja"
+                 aria-describedby="ajuda-loja-campo">
+          <datalist id="lojas-parceiras">
+            <option value="Supermercado Bom Preço — São José dos Campos/SP"></option>
+            <option value="Supermercado Bom Preço — Taubaté/SP"></option>
+            <option value="Magazine Aurora — Campinas/SP"></option>
+            <option value="Magazine Aurora — Santos/SP"></option>
+            <option value="Casa &amp; Construção Vale — Jacareí/SP"></option>
+            <option value="Rede Farma Mais — Belo Horizonte/MG"></option>
+            <option value="Rede Farma Mais — Uberlândia/MG"></option>
+            <option value="Lojas Litoral — Rio de Janeiro/RJ"></option>
+            <option value="Mercado Sul — Porto Alegre/RS"></option>
+            <option value="Mercado Sul — Curitiba/PR"></option>
+          </datalist>
+          <p class="campo__ajuda" id="ajuda-loja-campo">
+            No Cartão Loja, só aparecem lojas do mesmo estado do CEP que você informou.
+            No Cartão Loja Digital, não há restrição de estado.
+          </p>
+        </div>
+
+        <div class="campo">
+          <label for="vendedor">Vendedor que te atendeu <span class="campo__opcional">(opcional)</span></label>
+          <input type="text" id="vendedor" name="vendedor" maxlength="80"
+                 autocomplete="off" aria-describedby="ajuda-vendedor">
+          <p class="campo__ajuda" id="ajuda-vendedor">
+            Se alguém da loja te ajudou a fazer o pedido, informe o nome ou o código.
+          </p>
+        </div>
+      </fieldset>
+
+      <!-- ============ CONSENTIMENTO E ENVIO ============ -->
+      <fieldset class="etapa etapa--envio">
+        <legend class="etapa__legenda">Confirmação</legend>
+
+        <div class="campo campo--checkbox">
+          <input type="checkbox" id="consentimento" name="consentimento" value="sim" required>
+          <label for="consentimento">
+            Autorizo a DM a consultar meus dados para a análise de crédito desta solicitação.
+          </label>
+        </div>
+
+        <p class="formulario__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
+
+        <div class="formulario__acoes">
+          <a class="btn btn--ghost" href="index.html">Voltar</a>
+          <button class="btn btn--primario" type="submit">Enviar solicitação</button>
+        </div>
+      </fieldset>
+
+    </form>
+  </main>
+
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">
+      Projeto acadêmico da FATEC São José dos Campos em parceria com a DM.
+      Não envie dados reais nesta página — ela é um exercício didático.
+    </p>
+  </footer>
+</body>
+</html>
