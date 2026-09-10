@@ -19,6 +19,10 @@
     validação da Sprint 2 apenas complementa, com dígito verificador de CPF e consulta de CEP.
 
     SCRUM-30/31 · Estilo aplicado sem alterar a marcação.
+
+    Máscaras · static/js/mascaras.js formata CPF, data de nascimento e celular durante a
+    digitação. Sem JS os campos continuam válidos: os patterns aceitam o valor com ou sem
+    pontuação e o placeholder mostra o formato esperado.
   -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +32,9 @@
   <link rel="stylesheet" href="static/css/tokens.css">
   <link rel="stylesheet" href="static/css/base.css">
   <link rel="stylesheet" href="static/css/components.css">
+
+  <!-- Máscaras de digitação: CPF, data de nascimento e celular. -->
+  <script src="static/js/mascaras.js" defer></script>
 </head>
 
 <body>
@@ -109,15 +116,17 @@
           <input type="text" id="cpf" name="cpf" required inputmode="numeric"
                  pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" maxlength="14"
                  autocomplete="off" placeholder="000.000.000-00" aria-describedby="ajuda-cpf">
-          <p class="campo__ajuda" id="ajuda-cpf">Somente números ou no formato 000.000.000-00.</p>
+          <p class="campo__ajuda" id="ajuda-cpf">Digite só os números — a pontuação entra sozinha.</p>
         </div>
 
         <div class="campo">
           <label for="nascimento">Data de nascimento</label>
-          <input type="date" id="nascimento" name="nascimento" required
-                 min="1900-01-01" max="2008-09-08"
-                 autocomplete="bday" aria-describedby="ajuda-nascimento">
-          <p class="campo__ajuda" id="ajuda-nascimento">Você precisa ter 18 anos ou mais.</p>
+          <input type="text" id="nascimento" name="nascimento" required inputmode="numeric"
+                 pattern="\d{2}/\d{2}/\d{4}" maxlength="10"
+                 autocomplete="bday" placeholder="DD/MM/AAAA" aria-describedby="ajuda-nascimento">
+          <p class="campo__ajuda" id="ajuda-nascimento">
+            No formato DD/MM/AAAA. Você precisa ter 18 anos ou mais.
+          </p>
         </div>
 
         <div class="campo">
@@ -129,9 +138,10 @@
 
         <div class="campo">
           <label for="celular">Celular</label>
-          <input type="tel" id="celular" name="celular" required inputmode="tel"
-                 pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}" maxlength="16"
-                 autocomplete="tel" placeholder="(12) 99999-9999">
+          <input type="tel" id="celular" name="celular" required inputmode="numeric"
+                 pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}" maxlength="15"
+                 autocomplete="tel" placeholder="(12) 99999-9999" aria-describedby="ajuda-celular">
+          <p class="campo__ajuda" id="ajuda-celular">Digite só os números — o formato entra sozinho.</p>
         </div>
 
         <div class="campo">
