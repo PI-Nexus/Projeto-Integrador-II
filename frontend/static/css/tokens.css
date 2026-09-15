@@ -1,0 +1,69 @@
+/* ==========================================================================
+   TOKENS — Identidade visual DM
+   SCRUM-30 · Valores extraídos do CSS de produção de vocedm.com.br.
+   Ver docs/identidade-visual-dm.md para a origem de cada valor.
+   ========================================================================== */
+
+:root {
+  /* ---------- Cor ---------- */
+  --dm-azul:          #202AD0;
+  --dm-azul-escuro:   #1A21A6;   /* hover de superfície azul */
+  --dm-tinta:         #000033;
+  --dm-aqua:          #7DF4ED;
+  --dm-aqua-escuro:   #5FE4DC;   /* hover do CTA primário */
+  --dm-coral:         #FF9A98;
+  --dm-coral-escuro:  #F98784;   /* hover do CTA secundário */
+  --dm-amarelo:       #FDE383;
+  --dm-verde:         #6DDE9A;
+  --dm-lilas:         #F1EFFF;
+  --dm-cinza:         #E3E1EC;
+  --dm-cinza-texto:   #5F5E6B;   /* escurecido do #91909A da DM: o original dá 3,1:1 e reprova em AA */
+  --dm-branco:        #FFFFFF;
+
+  /* ---------- Tipografia ---------- */
+  --fonte: "Catamaran", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Escala fluida: cresce com a viewport sem media query */
+  --texto-display: clamp(2.25rem, 1.4rem + 4.2vw, 4rem);
+  --texto-xg:      clamp(1.75rem, 1.25rem + 2.4vw, 2.75rem);
+  --texto-g:       clamp(1.25rem, 1.05rem + 0.9vw, 1.625rem);
+  --texto-m:       clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --texto-p:       0.9375rem;
+  --texto-pp:      0.8125rem;
+
+  --altura-titulo: 1.08;
+  --altura-texto:  1.6;
+
+  /* ---------- Espaçamento ---------- */
+  --e-1:  0.25rem;
+  --e-2:  0.5rem;
+  --e-3:  0.75rem;
+  --e-4:  1rem;
+  --e-5:  1.5rem;
+  --e-6:  2rem;
+  --e-7:  3rem;
+  --e-8:  4rem;
+  --e-9:  6rem;
+
+  --esp-secao:  clamp(3.5rem, 2rem + 6vw, 6.5rem);   /* respiro vertical entre seções */
+  --esp-borda:  clamp(1.25rem, 0.5rem + 3vw, 3rem);  /* margem lateral da página */
+
+  /* ---------- Layout ---------- */
+  --largura-conteudo: 68rem;
+  --largura-texto:    42rem;   /* medida de leitura confortável */
+
+  /* ---------- Forma ---------- */
+  --raio-pill:  100px;   /* geometria fixa dos CTAs da DM */
+  --raio-card:  16px;
+  --raio-campo: 12px;
+  --raio-mini:  10px;
+
+  --sombra-card:  0 2px 4px rgb(0 0 51 / 0.04), 0 12px 28px rgb(0 0 51 / 0.08);
+  --sombra-alta:  0 4px 8px rgb(0 0 51 / 0.06), 0 24px 48px rgb(0 0 51 / 0.14);
+
+  /* ---------- Movimento ---------- */
+  --transicao: 180ms cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* ---------- Altura do CTA (padrão DM) ---------- */
+  --altura-btn: 48px;
+}
