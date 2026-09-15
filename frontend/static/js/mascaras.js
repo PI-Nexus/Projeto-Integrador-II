@@ -1,12 +1,5 @@
 /* ==========================================================================
    MÁSCARAS DE DIGITAÇÃO — CPF, data de nascimento e celular
-   ==========================================================================
-
-   O usuário digita só números; os separadores (. - / parênteses) entram
-   sozinhos enquanto ele escreve.
-
-   Sem JavaScript a página continua funcionando: os campos são <input type="text">
-   com pattern e placeholder, então o navegador ainda valida o formato no envio.
    ========================================================================== */
 
 (function () {
@@ -16,11 +9,6 @@
     return texto.replace(/\D/g, '');
   };
 
-  /*
-    Devolve a posição do cursor logo depois do enésimo dígito do texto já
-    formatado. É isso que mantém o cursor no lugar certo quando o usuário
-    edita no meio do campo, em vez de jogá-lo sempre para o fim.
-  */
   var posicaoDoDigito = function (texto, quantidade) {
     if (quantidade === 0) return 0;
 
@@ -34,12 +22,6 @@
     return texto.length;
   };
 
-  /*
-    Liga uma máscara a um campo.
-
-    formatar    função que recebe só os dígitos e devolve o texto formatado
-    maxDigitos  quantos dígitos o campo aceita
-  */
   var aplicarMascara = function (campo, formatar, maxDigitos) {
     if (!campo) return;
 
@@ -59,11 +41,6 @@
       escrever(montar(campo.value), digitosAntes);
     });
 
-    /*
-      Backspace em cima de um separador: sem isso o navegador apagaria o ponto,
-      a máscara o devolveria na hora e o campo pareceria travado. Aqui apagamos
-      o dígito anterior ao separador, que é o que o usuário quis fazer.
-    */
     campo.addEventListener('keydown', function (evento) {
       if (evento.key !== 'Backspace') return;
 
@@ -78,13 +55,11 @@
       escrever(montar(antes + depois), antes.length);
     });
 
-    // Colar do clipboard cai no evento 'input', então já sai formatado.
     if (campo.value) campo.value = montar(campo.value);
   };
 
   /* ==================================================== FORMATADORES ==== */
 
-  // 000.000.000-00
   var formatarCpf = function (d) {
     var texto = d.slice(0, 3);
     if (d.length > 3) texto += '.' + d.slice(3, 6);
@@ -93,7 +68,6 @@
     return texto;
   };
 
-  // DD/MM/AAAA
   var formatarData = function (d) {
     var texto = d.slice(0, 2);
     if (d.length > 2) texto += '/' + d.slice(2, 4);
@@ -101,7 +75,6 @@
     return texto;
   };
 
-  // (00) 00000-0000 — com 10 dígitos vira (00) 0000-0000, para fixo.
   var formatarCelular = function (d) {
     if (d.length === 0) return '';
 
@@ -116,10 +89,6 @@
   var IDADE_MINIMA = 18;
   var ANO_MINIMO = 1900;
 
-  /*
-    Converte DD/MM/AAAA em Date. Devolve null se a data não existe no
-    calendário — 31/02/2000, por exemplo, que o Date aceitaria virando 02/03.
-  */
   var lerData = function (texto) {
     var partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(texto);
     if (!partes) return null;
@@ -146,7 +115,6 @@
     if (!campo) return;
 
     var conferir = function () {
-      // Campo vazio: quem cobra é o required, não a gente.
       if (campo.value === '') {
         campo.setCustomValidity('');
         return;
@@ -177,9 +145,11 @@
 
   /* ================================================== INICIALIZAÇÃO ==== */
 
-  aplicarMascara(document.getElementById('cpf'), formatarCpf, 11);
-  aplicarMascara(document.getElementById('nascimento'), formatarData, 8);
-  aplicarMascara(document.getElementById('celular'), formatarCelular, 11);
+  document.addEventListener('DOMContentLoaded', function () {
+    aplicarMascara(document.getElementById('cpf'), formatarCpf, 11);
+    aplicarMascara(document.getElementById('nascimento'), formatarData, 8);
+    aplicarMascara(document.getElementById('celular'), formatarCelular, 11);
 
-  validarNascimento(document.getElementById('nascimento'));
+    validarNascimento(document.getElementById('nascimento'));
+  });
 })();
