@@ -1,16 +1,24 @@
-##aqui vai ficar a conexão com o mysql
-import pymysql
 import os
 from contextlib import contextmanager
 
+import pymysql
+from dotenv import load_dotenv
+
+
 @contextmanager
 def get_connection():
+    load_dotenv()
+
+    password = os.getenv("MYSQL_ROOT_PASSWORD")
+    if not password:
+        raise RuntimeError("MYSQL_ROOT_PASSWORD não foi configurada no ambiente.")
+
     conn = pymysql.connect(
-        host=os.getenv("MYSQL_HOST", "localhost"),
-        port=int(os.getenv("MYSQL_PORT", "3307")),
-        user=os.getenv("MYSQL_USER", "root"),
-        password=os.getenv("MYSQL_ROOT_PASSWORD", "nexus"),
-        database=os.getenv("MYSQL_DATABASE", "bd_analise")
+        host=os.getenv("HOST", "localhost"),
+        user=os.getenv("USER", "root"),
+        password=password,
+        database=os.getenv("DATABASE", "db_cartoes"),
+        port=int(os.getenv("DB_PORT", os.getenv("MYSQL_PORT", os.getenv("PORT", "3306")))),
     )
 
     try:

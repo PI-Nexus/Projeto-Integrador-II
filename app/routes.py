@@ -1,7 +1,7 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 from flask import Blueprint, request, jsonify
 from .services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras
-from .repository import listar_lojas_parceiras
+from .mock_lojas import listar_lojas_parceiras
 
 # criando o blueprint para centralizar as rotas da aplicação
 routes_bp = Blueprint('routes', __name__)
