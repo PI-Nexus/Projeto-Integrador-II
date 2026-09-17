@@ -6,20 +6,13 @@
   <title>Peça seu cartão DM — crédito pra sua história</title>
   <meta name="description" content="Solicite o Cartão DM Visa ou o Cartão Loja 100% online. Preencha seus dados e receba o resultado da análise na hora.">
 
-  <!--
-    SCRUM-28 · HTML semântico das seções de marketing.
-    SCRUM-30/31 · Estilo aplicado. A marcação não mudou: o CSS entrou de forma
-    puramente aditiva, sobre as classes que já existiam.
-    Ainda sem JavaScript — o accordion do FAQ é <details>/<summary> nativo.
-  -->
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="static/css/tokens.css">
-  <link rel="stylesheet" href="static/css/base.css">
-  <link rel="stylesheet" href="static/css/components.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 </head>
 
 <body>
@@ -27,8 +20,8 @@
 
   <!-- ==================== CABEÇALHO ==================== -->
   <header class="cabecalho">
-    <a class="cabecalho__logo" href="index.html">
-      <img src="static/img/logo-dm.svg" width="32" height="34" alt="DM — página inicial">
+    <a class="cabecalho__logo" href="/">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM – página inicial">
     </a>
 
     <nav class="cabecalho__nav" aria-label="Navegação principal">
@@ -41,7 +34,7 @@
     </nav>
 
     <div class="cabecalho__acoes">
-      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      <a class="btn btn--primario" href="/solicitar">Peça seu cartão</a>
       <a class="btn btn--ghost" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">Já sou cliente</a>
     </div>
   </header>
@@ -57,19 +50,19 @@
           a gente analisa na hora e já te dá a resposta.
         </p>
         <p class="hero__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
-        <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+        <a class="btn btn--primario" href="/solicitar">Peça seu cartão</a>
       </div>
 
       <div class="hero__imagem">
         <picture>
-          <source srcset="static/img/modelo-cartao-visa.webp" type="image/webp">
-          <img src="static/img/modelo-cartao-visa.jpg" width="800" height="1025"
+          <source srcset="{{ url_for('static', filename='img/modelo-cartao-visa.webp') }}" type="image/webp">
+          <img src="{{ url_for('static', filename='img/modelo-cartao-visa.jpg') }}" width="800" height="1025"
                alt="Mulher sorrindo segurando um cartão DM Visa">
         </picture>
       </div>
     </section>
 
-    <!-- Divisor de marca: 5 blocos de cor. Puramente decorativo. -->
+    <!-- Divisor de marca -->
     <div class="faixa-multicolor" role="presentation" aria-hidden="true">
       <span class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></span>
       <span class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></span>
@@ -84,8 +77,8 @@
       <p class="secao__apoio">São três opções. Você escolhe uma no começo do pedido.</p>
 
       <picture class="cartoes__ilustracao">
-        <source srcset="static/img/cartoes-dm.webp" type="image/webp">
-        <img src="static/img/cartoes-dm.png" width="768" height="515"
+        <source srcset="{{ url_for('static', filename='img/cartoes-dm.webp') }}" type="image/webp">
+        <img src="{{ url_for('static', filename='img/cartoes-dm.png') }}" width="768" height="515"
              alt="Cartão DM Visa azul e Cartão Loja verde em perspectiva">
       </picture>
 
@@ -101,7 +94,7 @@
             <li>Compras online e por aproximação</li>
             <li>Aumento de limite automático</li>
           </ul>
-          <a class="btn btn--primario" href="solicitar.html?cartao=dm_visa">Pedir o DM Visa</a>
+          <a class="btn btn--primario" href="/solicitar?cartao=dm_visa">Pedir o DM Visa</a>
         </li>
 
         <li class="cartao">
@@ -115,7 +108,7 @@
             <li>Disponível apenas no estado do seu CEP</li>
             <li>Análise facilitada</li>
           </ul>
-          <a class="btn btn--primario" href="solicitar.html?cartao=loja">Pedir o Cartão Loja</a>
+          <a class="btn btn--primario" href="/solicitar?cartao=loja">Pedir o Cartão Loja</a>
         </li>
 
         <li class="cartao">
@@ -129,7 +122,7 @@
             <li><strong>Não é emitido cartão físico</strong></li>
             <li>Pronto pra usar assim que aprovado</li>
           </ul>
-          <a class="btn btn--primario" href="solicitar.html?cartao=loja_digital">Pedir o Loja Digital</a>
+          <a class="btn btn--primario" href="/solicitar?cartao=loja_digital">Pedir o Loja Digital</a>
         </li>
       </ul>
     </section>
@@ -169,8 +162,8 @@
 
       <figure class="beneficios__figura">
         <picture>
-          <source srcset="static/img/modelo-computador.webp" type="image/webp">
-          <img src="static/img/modelo-computador.jpg" width="800" height="952"
+          <source srcset="{{ url_for('static', filename='img/modelo-computador.webp') }}" type="image/webp">
+          <img src="{{ url_for('static', filename='img/modelo-computador.jpg') }}" width="800" height="952"
                alt="Mulher sorrindo enquanto trabalha no computador">
         </picture>
       </figure>
@@ -196,12 +189,12 @@
       </ol>
 
       <p class="como-funciona__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
-      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      <a class="btn btn--primario" href="/solicitar">Peça seu cartão</a>
 
       <figure class="como-funciona__figura">
         <picture>
-          <source srcset="static/img/modelo-celular.webp" type="image/webp">
-          <img src="static/img/modelo-celular.jpg" width="700" height="1068"
+          <source srcset="{{ url_for('static', filename='img/modelo-celular.webp') }}" type="image/webp">
+          <img src="{{ url_for('static', filename='img/modelo-celular.jpg') }}" width="700" height="1068"
                alt="Mulher sorrindo enquanto usa o celular">
         </picture>
       </figure>
@@ -218,18 +211,14 @@
 
       <figure class="sobre__figura">
         <picture>
-          <source srcset="static/img/colaboradores-dm.webp" type="image/webp">
-          <img src="static/img/colaboradores-dm.jpg" width="980" height="451"
+          <source srcset="{{ url_for('static', filename='img/colaboradores-dm.webp') }}" type="image/webp">
+          <img src="{{ url_for('static', filename='img/colaboradores-dm.jpg') }}" width="980" height="451"
                alt="Dois colaboradores da DM conversando e sorrindo no escritório">
         </picture>
       </figure>
     </section>
 
     <!-- ==================== DÚVIDAS FREQUENTES ==================== -->
-    <!--
-      Accordion nativo com <details>/<summary>: abre e fecha sem uma linha de JavaScript
-      e já vem com a semântica de expansível pronta para leitores de tela.
-    -->
     <section class="duvidas" id="duvidas" aria-labelledby="duvidas-titulo">
       <h2 id="duvidas-titulo">Dúvidas frequentes</h2>
 
@@ -288,7 +277,7 @@
     <section class="chamada-final" aria-labelledby="chamada-final-titulo">
       <h2 id="chamada-final-titulo">Pronto pra começar?</h2>
       <p>Leva menos de cinco minutos e a resposta sai na hora.</p>
-      <a class="btn btn--primario" href="solicitar.html">Peça seu cartão</a>
+      <a class="btn btn--primario" href="/solicitar">Peça seu cartão</a>
       <p class="chamada-final__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
     </section>
 
@@ -296,15 +285,15 @@
 
   <!-- ==================== RODAPÉ ==================== -->
   <footer class="rodape">
-    <img class="rodape__logo" src="static/img/logo-dm.svg" width="32" height="34" alt="DM">
+    <img class="rodape__logo" src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM">
 
     <nav class="rodape__nav" aria-label="Links do rodapé">
       <section class="rodape__coluna" aria-labelledby="rodape-produtos">
         <h2 class="rodape__titulo" id="rodape-produtos">Nossos produtos</h2>
         <ul>
-          <li><a href="solicitar.html?cartao=dm_visa">Cartão DM Visa</a></li>
-          <li><a href="solicitar.html?cartao=loja">Cartão Loja</a></li>
-          <li><a href="solicitar.html?cartao=loja_digital">Cartão Loja Digital</a></li>
+          <li><a href="/solicitar?cartao=dm_visa">Cartão DM Visa</a></li>
+          <li><a href="/solicitar?cartao=loja">Cartão Loja</a></li>
+          <li><a href="/solicitar?cartao=loja_digital">Cartão Loja Digital</a></li>
         </ul>
       </section>
 
@@ -324,5 +313,10 @@
       Esta página é um exercício didático e não representa um canal oficial de contratação.
     </p>
   </footer>
+
+  <!-- Scripts JavaScript -->
+  <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/mascaras.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
