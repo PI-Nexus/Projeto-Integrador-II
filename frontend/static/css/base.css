@@ -158,16 +158,18 @@ main > section > h2 + p { margin-bottom: var(--e-7); }
 .cabecalho__logo:hover { opacity: 0.75; }
 
 .cabecalho__nav { margin-inline-end: auto; }
-.cabecalho__nav ul { display: flex; gap: var(--e-5); }
+.cabecalho__nav ul { display: flex; gap: var(--e-1); }
 .cabecalho__nav a {
   font-size: var(--texto-p);
   font-weight: 600;
   text-decoration: none;
-  padding-block: var(--e-2);
+  padding: var(--e-2) var(--e-4);
+  border-radius: var(--raio-pill);
   border-bottom: 2px solid transparent;
-  transition: border-color var(--transicao);
+  transition: background-color var(--transicao), border-color var(--transicao);
 }
-.cabecalho__nav a:hover { border-bottom-color: var(--dm-aqua); }
+
+.cabecalho__nav a:hover { background-color: rgba(0, 0, 0, 0.15); }
 
 .cabecalho__acoes { display: flex; gap: var(--e-3); flex-shrink: 0; }
 
