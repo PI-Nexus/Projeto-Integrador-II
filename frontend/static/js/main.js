@@ -16,6 +16,19 @@
     var formulario = document.getElementById('formulario');
     if (!formulario) return;
 
+    var campoUf = formulario.elements.uf;
+    var campoCep = formulario.elements.cep;
+    if (campoCep) {
+      campoCep.addEventListener('blur', consultarCep);
+      campoCep.addEventListener('change', consultarCep);
+    }
+
+    if (campoUf) {
+      campoUf.addEventListener('change', carregarLojasParceiras);
+      campoUf.addEventListener('input', carregarLojasParceiras);
+      if (campoUf.value) carregarLojasParceiras();
+    }
+
     formulario.addEventListener('submit', function (evento) {
       evento.preventDefault();
       aoEnviar(formulario);
@@ -27,6 +40,98 @@
     formulario.addEventListener('change', function (evento) {
       limparErro(evento.target);
     });
+  }
+
+  function consultarCep() {
+    var formulario = document.getElementById('formulario');
+    var campoCep = formulario && formulario.elements.cep;
+    var campoUf = formulario && formulario.elements.uf;
+    if (!campoCep || !campoUf) return;
+
+    var cep = campoCep.value.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+
+    var apiBase = window.API_BASE_URL || 'http://127.0.0.1:5000';
+    fetch(apiBase + '/consultar-cep/' + cep)
+      .then(function (resposta) {
+        if (!resposta.ok) throw new Error('CEP não encontrado.');
+        return resposta.json();
+      })
+      .then(function (endereco) {
+        if (!endereco.uf) throw new Error('UF não encontrada para este CEP.');
+
+        preencherCampo(formulario, 'logradouro', endereco.logradouro);
+        preencherCampo(formulario, 'bairro', endereco.bairro);
+        preencherCampo(formulario, 'cidade', endereco.cidade);
+        campoUf.value = endereco.uf.toUpperCase();
+        carregarLojasParceiras();
+      })
+      .catch(function () {
+        campoUf.value = '';
+        var lista = formulario && formulario.elements.loja;
+        if (lista) {
+          lista.replaceChildren();
+          var opcao = document.createElement('option');
+          opcao.value = '';
+          opcao.textContent = 'Informe um CEP válido primeiro';
+          lista.appendChild(opcao);
+        }
+      });
+  }
+
+  function preencherCampo(formulario, nome, valor) {
+    var campo = formulario.elements[nome];
+    if (campo && valor) campo.value = valor;
+  }
+
+  function carregarLojasParceiras() {
+    var formulario = document.getElementById('formulario');
+    var campoUf = formulario && formulario.elements.uf;
+    var lista = formulario && formulario.elements.loja;
+    if (!campoUf || !lista) return;
+
+    var uf = campoUf.value;
+    lista.replaceChildren();
+    var opcaoInicial = document.createElement('option');
+    opcaoInicial.value = '';
+    opcaoInicial.textContent = uf ? 'Carregando lojas...' : 'Selecione primeiro o estado';
+    lista.appendChild(opcaoInicial);
+    if (!uf) return;
+
+    var apiBase = window.API_BASE_URL || 'http://127.0.0.1:5000';
+    fetch(apiBase + '/filtrar-lojas-parceiras/uf/' + encodeURIComponent(uf))
+      .then(function (resposta) {
+        if (!resposta.ok) throw new Error('Não foi possível carregar as lojas.');
+        return resposta.json();
+      })
+      .then(function (dados) {
+        lista.replaceChildren();
+        if (!dados.lojas || dados.lojas.length === 0) {
+          var opcaoVazia = document.createElement('option');
+          opcaoVazia.value = '';
+          opcaoVazia.textContent = 'Nenhuma loja encontrada neste estado';
+          lista.appendChild(opcaoVazia);
+          return;
+        }
+
+        var opcaoInicial = document.createElement('option');
+        opcaoInicial.value = '';
+        opcaoInicial.textContent = 'Selecione uma loja';
+        lista.appendChild(opcaoInicial);
+        (dados.lojas || []).forEach(function (loja) {
+          var opcao = document.createElement('option');
+          opcao.value = loja.id;
+          opcao.textContent = loja.nome + ' — ' + loja.cidade + '/' + loja.uf;
+          lista.appendChild(opcao);
+        });
+      })
+      .catch(function () {
+        lista.replaceChildren();
+        var opcaoErro = document.createElement('option');
+        opcaoErro.value = '';
+        opcaoErro.textContent = 'Não foi possível carregar as lojas';
+        lista.appendChild(opcaoErro);
+      });
   }
 
   /* ===================================================== VALIDAÇÃO ==== */

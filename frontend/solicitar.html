@@ -35,6 +35,8 @@
 
   <!-- Máscaras de digitação: CPF, data de nascimento e celular. -->
   <script src="static/js/mascaras.js" defer></script>
+  <script src="static/js/util.js" defer></script>
+  <script src="static/js/main.js?v=5" defer></script>
 </head>
 
 <body>
@@ -249,11 +251,7 @@
       </fieldset>
 
       <!-- ============ ETAPA 4 · LOJA ============ -->
-      <!--
-        A busca usa <input list> + <datalist>: o navegador já entrega autocomplete nativo,
-        sem JavaScript. Na Sprint 2 o datalist é alimentado a partir de lojas.json e filtrado
-        pela UF do CEP quando o cartão escolhido for o Cartão Loja físico.
-      -->
+      <!-- A lista é preenchida pelo backend conforme o estado selecionado. -->
       <fieldset class="etapa" id="etapa-loja">
         <legend class="etapa__legenda">Etapa 4 · Sua loja</legend>
 
@@ -264,23 +262,12 @@
 
         <div class="campo">
           <label for="loja">Loja parceira</label>
-          <input type="text" id="loja" name="loja" list="lojas-parceiras" maxlength="120"
-                 autocomplete="off" placeholder="Digite o nome da loja"
-                 aria-describedby="ajuda-loja-campo">
-          <datalist id="lojas-parceiras">
-            <option value="Supermercado Bom Preço — São José dos Campos/SP"></option>
-            <option value="Supermercado Bom Preço — Taubaté/SP"></option>
-            <option value="Magazine Aurora — Campinas/SP"></option>
-            <option value="Magazine Aurora — Santos/SP"></option>
-            <option value="Casa &amp; Construção Vale — Jacareí/SP"></option>
-            <option value="Rede Farma Mais — Belo Horizonte/MG"></option>
-            <option value="Rede Farma Mais — Uberlândia/MG"></option>
-            <option value="Lojas Litoral — Rio de Janeiro/RJ"></option>
-            <option value="Mercado Sul — Porto Alegre/RS"></option>
-            <option value="Mercado Sul — Curitiba/PR"></option>
-          </datalist>
+            <select id="loja" name="loja"
+              aria-describedby="ajuda-loja-campo">
+            <option value="">Selecione primeiro o estado</option>
+          </select>
           <p class="campo__ajuda" id="ajuda-loja-campo">
-            No Cartão Loja, só aparecem lojas do mesmo estado do CEP que você informou.
+            No Cartão Loja, só aparecem lojas do estado selecionado.
             No Cartão Loja Digital, não há restrição de estado.
           </p>
         </div>

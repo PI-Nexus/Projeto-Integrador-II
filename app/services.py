@@ -92,3 +92,23 @@ def validar_cartao_loja(cep_cliente: str, uf_loja: str, eh_loja_digital: bool = 
             "uf_loja": uf_loja_normalizada,
             "motivo": f"Cartão físico disponível apenas para lojas do mesmo estado (Cliente: {uf_cliente}, Loja: {uf_loja_normalizada})."
         }
+
+
+def filtrar_lojas_parceiras(lojas, uf_alvo):
+    if not uf_alvo or not lojas:
+        return []
+
+    uf_normalizada = str(uf_alvo).strip().upper()
+    if not uf_normalizada:
+        return []
+
+    lojas_filtradas = []
+    for loja in lojas:
+        if not isinstance(loja, dict) or loja.get("eh_digital", False):
+            continue
+
+        uf_loja = loja.get("uf")
+        if uf_loja and str(uf_loja).strip().upper() == uf_normalizada:
+            lojas_filtradas.append(loja)
+
+    return lojas_filtradas

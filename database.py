@@ -1,15 +1,16 @@
 ##aqui vai ficar a conexão com o mysql
 import pymysql
+import os
 from contextlib import contextmanager
 
 @contextmanager
 def get_connection():
     conn = pymysql.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password="nexus",
-        database="db_cartoes"
+        host=os.getenv("MYSQL_HOST", "localhost"),
+        port=int(os.getenv("MYSQL_PORT", "3307")),
+        user=os.getenv("MYSQL_USER", "root"),
+        password=os.getenv("MYSQL_ROOT_PASSWORD", "nexus"),
+        database=os.getenv("MYSQL_DATABASE", "bd_analise")
     )
 
     try:

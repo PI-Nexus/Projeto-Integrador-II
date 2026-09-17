@@ -1,6 +1,7 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 from flask import Blueprint, request, jsonify
-from .services import consultar_cep, validar_cartao_loja
+from .services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras
+from .repository import listar_lojas_parceiras
 
 # criando o blueprint para centralizar as rotas da aplicação
 routes_bp = Blueprint('routes', __name__)
@@ -51,3 +52,53 @@ def rota_validar_cartao_loja():
         return jsonify(resultado_validacao), 400
 
     return jsonify(resultado_validacao), 200
+
+
+# filtrar Lojas Físicas: Retornar apenas as lojas físicas que pertençam ao mesmo estado  do CEP informado pelo cliente.
+@routes_bp.route('/filtrar-lojas-parceiras/<string:cep>', methods=['GET'])
+def filtrarLojasParceiras(cep):
+    
+    resultado_cep = consultar_cep(cep)
+
+    if not resultado_cep.get("sucesso"):
+        return jsonify(resultado_cep), 400
+    
+    uf_cliente = resultado_cep.get("uf")
+
+    todas_as_lojas = listar_lojas_parceiras()
+
+    lojas_encontradas = filtrar_lojas_parceiras(todas_as_lojas, uf_cliente)
+
+    return jsonify({
+        "sucesso": True,
+        "uf_cliente": uf_cliente,
+        "total": len(lojas_encontradas),
+        "lojas": lojas_encontradas
+    }), 200
+
+
+@routes_bp.route('/filtrar-lojas-parceiras/uf/<string:uf>', methods=['GET'])
+def filtrarLojasParceirasPorUf(uf):
+    """Retorna as lojas físicas ativas da UF selecionada no formulário."""
+    uf_normalizada = str(uf).strip().upper()
+    if len(uf_normalizada) != 2 or not uf_normalizada.isalpha():
+        return jsonify({
+            "sucesso": False,
+            "erro": "UF inválida."
+        }), 400
+
+    lojas_encontradas = filtrar_lojas_parceiras(
+        listar_lojas_parceiras(),
+        uf_normalizada
+    )
+
+    return jsonify({
+        "sucesso": True,
+        "uf": uf_normalizada,
+        "total": len(lojas_encontradas),
+        "lojas": lojas_encontradas
+    }), 200
+    
+        
+
+    
