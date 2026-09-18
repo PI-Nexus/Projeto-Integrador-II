@@ -7,6 +7,49 @@
 (function () {
   'use strict';
 
+
+  function enviarParaServidor(formulario) {
+    var botao = formulario.querySelector('.formulario__acoes .btn--primario') || formulario.querySelector('button[type="submit"]');
+    ativarCarregando(botao);
+  
+    var cepCliente = DMUtils.apenasDigitos(formulario.elements['cep'] ? formulario.elements['cep'].value : '');
+    var ufLoja = formulario.elements['uf'] ? formulario.elements['uf'].value : 'SP';
+    var ehLojaDigital = formulario.elements['tipo_cartao'] ? formulario.elements['tipo_cartao'].value === 'loja_digital' : false;
+  
+    fetch('/validar-cartao-loja', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cep_cliente: cepCliente,
+        uf_loja: ufLoja,
+        eh_loja_digital: ehLojaDigital
+      })
+    })
+    .then(function (resposta) {
+      return resposta.json().then(function (dados) {
+        return { ok: resposta.ok, dados: dados };
+      });
+    })
+    .then(function (res) {
+      if (res.ok && res.dados.sucesso) {
+        // Redireciona de acordo com o status retornado pelo backend (ou por regra local de teste)
+        var status = res.dados.status || 'analise'; // ex: 'aprovado', 'analise' ou 'negado'
+        window.location.href = '/' + status;
+      } else {
+        desativarCarregando(botao);
+        // Se for uma negação imediata da regra de validação, pode redirecionar para negado:
+        window.location.href = '/negado';
+      }
+    })
+    .catch(function () {
+      desativarCarregando(botao);
+      alert('Erro de comunicação com o servidor. Tente novamente.');
+    });
+  }
+
+
   var COR_ERRO = '#C62828';
   var ATRASO_SIMULADO_MS = 1200;
 
