@@ -3,37 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Solicitar cartão — DM</title>
+  <title>Solicitar cartão | DM</title>
   <meta name="description" content="Preencha seus dados e receba na hora o resultado da análise do seu cartão DM.">
   <meta name="robots" content="noindex">
 
-  <!--
-    SCRUM-29 · HTML semântico do wizard de solicitação.
-    Sem CSS e sem JavaScript nesta etapa.
-
-    O formulário é UM ÚNICO <form> com quatro <fieldset>. Assim ele funciona por completo sem
-    JavaScript: o usuário rola a página, preenche tudo e envia. Na Sprint 2 o JS transforma
-    cada fieldset em uma etapa navegável — sem precisar reescrever a marcação.
-
-    A validação aqui é a nativa do HTML (required, pattern, min, max, inputmode). O JS de
-    validação da Sprint 2 apenas complementa, com dígito verificador de CPF e consulta de CEP.
-
-    SCRUM-30/31 · Estilo aplicado sem alterar a marcação.
-
-    Máscaras · static/js/mascaras.js formata CPF, data de nascimento e celular durante a
-    digitação. Sem JS os campos continuam válidos: os patterns aceitam o valor com ou sem
-    pontuação e o placeholder mostra o formato esperado.
-  -->
-
+  <!-- Fonte oficial DM -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="./static/img/dm-favicon-32x-32x.ico">
 
-  <link rel="stylesheet" href="static/css/tokens.css">
-  <link rel="stylesheet" href="static/css/base.css">
-  <link rel="stylesheet" href="static/css/components.css">
+  <!-- Estilos mapeados pelo Flask -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 
   <!-- Máscaras de digitação: CPF, data de nascimento e celular. -->
+  <script src="{{ url_for('static', filename='js/mascaras.js') }}" defer></script>
+
   <script src="static/js/mascaras.js" defer></script>
   <script src="static/js/util.js" defer></script>
   <script src="static/js/main.js?v=5" defer></script>
@@ -43,8 +30,8 @@
   <a class="pular-link" href="#formulario">Pular para o formulário</a>
 
   <header class="cabecalho cabecalho--simples">
-    <a class="cabecalho__logo" href="index.html">
-      <img src="static/img/logo-dm.svg" width="32" height="34" alt="DM — voltar para a página inicial">
+    <a class="cabecalho__logo" href="{{ url_for('routes.home') }}">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM — voltar para a página inicial">
     </a>
     <p class="cabecalho__titulo">Solicitação de cartão</p>
   </header>
@@ -55,7 +42,7 @@
       São quatro etapas rápidas. Ao final, a gente analisa seus dados e mostra o resultado na hora.
     </p>
 
-    <!-- Indicador de progresso. Vira a barra de etapas quando o JS entrar. -->
+    <!-- Indicador de progresso -->
     <nav class="progresso" aria-label="Etapas da solicitação">
       <ol class="progresso__lista">
         <li class="progresso__item" aria-current="step"><a href="#etapa-cartao">1. Seu cartão</a></li>
@@ -148,9 +135,9 @@
 
         <div class="campo">
           <label for="renda">Renda mensal</label>
-          <input type="number" id="renda" name="renda" required min="0" step="0.01"
-                 inputmode="decimal" placeholder="0,00" aria-describedby="ajuda-renda">
-          <p class="campo__ajuda" id="ajuda-renda">Em reais, sem pontos. Usamos na análise de crédito.</p>
+          <input type="text" id="renda" name="renda" required
+                inputmode="decimal" placeholder="0,00" aria-describedby="ajuda-renda">
+          <p class="campo__ajuda" id="ajuda-renda">Em reais. Usamos na análise de crédito.</p>
         </div>
 
         <div class="campo campo--checkbox">
@@ -251,6 +238,7 @@
       </fieldset>
 
       <!-- ============ ETAPA 4 · LOJA ============ -->
+
       <!-- A lista é preenchida pelo backend conforme o estado selecionado. -->
       <fieldset class="etapa" id="etapa-loja">
         <legend class="etapa__legenda">Etapa 4 · Sua loja</legend>
@@ -296,7 +284,7 @@
         <p class="formulario__disclaimer"><small>*Sujeito à análise de crédito.</small></p>
 
         <div class="formulario__acoes">
-          <a class="btn btn--ghost" href="index.html">Voltar</a>
+          <a class="btn btn--ghost" href="{{ url_for('routes.home') }}">Voltar</a>
           <button class="btn btn--primario" type="submit">Enviar solicitação</button>
         </div>
       </fieldset>
