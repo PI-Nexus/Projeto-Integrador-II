@@ -58,6 +58,18 @@ def selectdb(
             result = cur.fetchall()
             return result
 
+
+def listar_lojas_parceiras() -> list[dict]:
+    """Retorna as lojas ativas no formato esperado pelos services."""
+    colunas = ("id", "nome", "cidade", "uf", "eh_digital")
+    registros = selectdb(
+        tab="lojas_parceiras",
+        col=colunas,
+        filter={"ativo": 1}
+    )
+
+    return [dict(zip(colunas, registro)) for registro in registros]
+
 #método para alterar valor na database
 #col = colunas a serem alteradas, filter = filtro do where
 #updatedb(tab="pessoa", col={"idade": 15 }, filter={"nome": "João"})

@@ -116,11 +116,11 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ### Sprint 1 — 33/35 pontos
 
-- #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
-- #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
-- #3 — Como cliente, quero preencher um formulário simples e intuitivo, para enviar os dados necessários à minha requisição. (5 pontos)
-- #4 — Como responsável pela análise de cartões, quero que o sistema aprove ou reprove automaticamente os clientes com base no cartão selecionado e nas regras de elegibilidade. (8 pontos)
-- #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
+- ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
+- ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
+- ✅ #3 — Como cliente, quero preencher um formulário simples e intuitivo, para enviar os dados necessários à minha requisição. (5 pontos)
+- ✅ #4 — Como responsável pela análise de cartões, quero que o sistema aprove ou reprove automaticamente os clientes com base no cartão selecionado e nas regras de elegibilidade. (8 pontos)
+- ✅ #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
 - #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
 - #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
 - #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)

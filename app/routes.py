@@ -1,6 +1,7 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
-from .services import consultar_cep, validar_cartao_loja
+from .services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras
+from .mock_lojas import listar_lojas_parceiras
 
 # Criando o blueprint ÚNICO para centralizar as rotas da aplicação
 routes_bp = Blueprint('routes', __name__)
@@ -37,16 +38,22 @@ def negado():
 
 @routes_bp.route('/api/solicitacoes', methods=['POST'])
 def processar_solicitacao():
-    renda_str = request.form.get('renda', '0')
-    e_colaborador = request.form.get('colaborador')
+    renda_raw = request.form.get('renda', '0')
+    e_colaborador = request.form.get('colaborador', '').lower()
+
+    # Tratamento para aceitar valores formatados (ex: R$ 3.000,00 ou 3000)
+    if isinstance(renda_raw, str):
+        renda_limpa = renda_raw.replace('R$', '').replace('.', '').replace(',', '.').strip()
+    else:
+        renda_limpa = renda_raw
 
     try:
-        renda = float(renda_str)
-    except ValueError:
+        renda = float(renda_limpa) if renda_limpa else 0.0
+    except (ValueError, TypeError):
         renda = 0.0
 
-    # Redirecionamentos para as funções do blueprint
-    if e_colaborador == 'sim' or renda >= 3000:
+    # Lógica de aprovação/análise/negação
+    if e_colaborador in ['sim', 'true', 'on'] or renda >= 3000:
         return redirect(url_for('routes.aprovado'))
     elif 1500 <= renda < 3000:
         return redirect(url_for('routes.analise'))
@@ -55,30 +62,20 @@ def processar_solicitacao():
 
 
 # ==============================================================================
-# 3. ENDPOINTS DE API (CEP E VALIDAÇÃO)
+# 3. ENDPOINTS DE API (CEP, LOJAS E VALIDAÇÃO)
 # ==============================================================================
 
 @routes_bp.route('/consultar-cep/<string:cep>', methods=['GET'])
 def rota_consultar_cep(cep):
-    """
-    Rota para o frontend preencher o endereço automaticamente pelo CEP.
-    Exemplo de chamada: GET /consultar-cep/01001000
-    """
     resultado = consultar_cep(cep)
-
     if not resultado.get("sucesso"):
         return jsonify(resultado), 400
-        
     return jsonify(resultado), 200
 
 
 @routes_bp.route('/validar-cartao-loja', methods=['POST'])
 def rota_validar_cartao_loja():
-    """
-    Rota para validar se o cliente pode solicitar o cartão de uma loja específica.
-    """
     dados = request.get_json(silent=True)
-
     if not dados or "cep_cliente" not in dados or "uf_loja" not in dados:
         return jsonify({
             "sucesso": False, 
@@ -90,8 +87,47 @@ def rota_validar_cartao_loja():
     eh_loja_digital = dados.get("eh_loja_digital", False)
 
     resultado_validacao = validar_cartao_loja(cep_cliente, uf_loja, eh_loja_digital)
-
     if not resultado_validacao.get("sucesso"):
         return jsonify(resultado_validacao), 400
 
     return jsonify(resultado_validacao), 200
+
+
+@routes_bp.route('/filtrar-lojas-parceiras/<string:cep>', methods=['GET'])
+def filtrarLojasParceiras(cep):
+    resultado_cep = consultar_cep(cep)
+    if not resultado_cep.get("sucesso"):
+        return jsonify(resultado_cep), 400
+    
+    uf_cliente = resultado_cep.get("uf")
+    todas_as_lojas = listar_lojas_parceiras()
+    lojas_encontradas = filtrar_lojas_parceiras(todas_as_lojas, uf_cliente)
+
+    return jsonify({
+        "sucesso": True,
+        "uf_cliente": uf_cliente,
+        "total": len(lojas_encontradas),
+        "lojas": lojas_encontradas
+    }), 200
+
+
+@routes_bp.route('/filtrar-lojas-parceiras/uf/<string:uf>', methods=['GET'])
+def filtrarLojasParceirasPorUf(uf):
+    uf_normalizada = str(uf).strip().upper()
+    if len(uf_normalizada) != 2 or not uf_normalizada.isalpha():
+        return jsonify({
+            "sucesso": False,
+            "erro": "UF inválida."
+        }), 400
+
+    lojas_encontradas = filtrar_lojas_parceiras(
+        listar_lojas_parceiras(),
+        uf_normalizada
+    )
+
+    return jsonify({
+        "sucesso": True,
+        "uf": uf_normalizada,
+        "total": len(lojas_encontradas),
+        "lojas": lojas_encontradas
+    }), 200
