@@ -52,13 +52,9 @@ def processar_solicitacao():
     except (ValueError, TypeError):
         renda = 0.0
 
-    # Lógica de aprovação/análise/negação
-    if e_colaborador in ['sim', 'true', 'on'] or renda >= 3000:
-        return redirect(url_for('routes.aprovado'))
-    elif 1500 <= renda < 3000:
-        return redirect(url_for('routes.analise'))
-    else:
-        return redirect(url_for('routes.negado'))
+
+    # Lógica de aprovação/análise/negação (retirada)
+
 
 
 # ==============================================================================
