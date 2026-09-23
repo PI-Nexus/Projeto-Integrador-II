@@ -63,6 +63,7 @@
 
   /* ---------- Movimento ---------- */
   --transicao: 180ms cubic-bezier(0.32, 0.72, 0, 1);
+  --transicao-transform: 150s ease;
 
   /* ---------- Altura do CTA (padrão DM) ---------- */
   --altura-btn: 48px;

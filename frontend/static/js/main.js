@@ -2,13 +2,42 @@
    MAIN — submit do formulário de solicitação (solicitar.html)
    ========================================================================== */
 
-
-   
 (function () {
   'use strict';
 
+  function enviarParaServidor(formulario) {
+    var botao = formulario.querySelector('.formulario__acoes .btn--primario') || formulario.querySelector('button[type="submit"]');
+    ativarCarregando(botao);
+
+    var dadosFormulario = new FormData(formulario);
+
+    fetch('/api/solicitacoes', {
+      method: 'POST',
+      body: dadosFormulario
+    })
+    .then(function (resposta) {
+      if (resposta.redirected) {
+        window.location.href = resposta.url;
+      } else {
+        return resposta.json().then(function (dados) {
+          if (dados && dados.redirect) {
+            window.location.href = dados.redirect;
+          } else if (dados && dados.status) {
+            window.location.href = '/' + dados.status;
+          } else {
+            window.location.href = '/analise';
+          }
+        });
+      }
+    })
+    .catch(function (erro) {
+      desativarCarregando(botao);
+      alert('Erro de comunicação com o servidor. Tente novamente.');
+      console.error('Erro no envio:', erro);
+    });
+  }
+
   var COR_ERRO = '#C62828';
-  var ATRASO_SIMULADO_MS = 1200;
 
   document.addEventListener('DOMContentLoaded', inicializar);
 
@@ -51,7 +80,7 @@
     var cep = campoCep.value.replace(/\D/g, '');
     if (cep.length !== 8) return;
 
-    var apiBase = window.API_BASE_URL || 'http://127.0.0.1:5000';
+    var apiBase = window.API_BASE_URL || '';
     fetch(apiBase + '/consultar-cep/' + cep)
       .then(function (resposta) {
         if (!resposta.ok) throw new Error('CEP não encontrado.');
@@ -98,7 +127,7 @@
     lista.appendChild(opcaoInicial);
     if (!uf) return;
 
-    var apiBase = window.API_BASE_URL || 'http://127.0.0.1:5000';
+    var apiBase = window.API_BASE_URL || '';
     fetch(apiBase + '/filtrar-lojas-parceiras/uf/' + encodeURIComponent(uf))
       .then(function (resposta) {
         if (!resposta.ok) throw new Error('Não foi possível carregar as lojas.');
@@ -204,7 +233,8 @@
       validar: function (formulario) {
         var valor = formulario.renda ? formulario.renda.value : '';
         if (!DMUtils.campoPreenchido(valor)) return 'Informe sua renda mensal.';
-        var numero = parseFloat(valor);
+        var limpo = valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+        var numero = parseFloat(limpo);
         if (isNaN(numero) || numero <= 0) return 'Informe uma renda maior que zero.';
         return '';
       }
@@ -289,7 +319,7 @@
       return;
     }
 
-    simularEnvio(formulario);
+    enviarParaServidor(formulario);
   }
 
   function campoDaRegra(formulario, id) {
@@ -297,15 +327,6 @@
   }
 
   /* ================================================ ESTADO DE ENVIO ==== */
-
-  function simularEnvio(formulario) {
-    var botao = formulario.querySelector('.formulario__acoes .btn--primario') || formulario.querySelector('button[type="submit"]');
-    ativarCarregando(botao);
-
-    window.setTimeout(function () {
-      exibirCardEmAnalise(formulario);
-    }, ATRASO_SIMULADO_MS);
-  }
 
   function ativarCarregando(botao) {
     if (!botao) return;
@@ -315,62 +336,20 @@
     botao.setAttribute('aria-busy', 'true');
   }
 
-  /* ============================================== CARD "EM ANÁLISE" ==== */
-
-  function exibirCardEmAnalise(formulario) {
-    var protocolo = gerarProtocolo();
-    var nomeCartao = rotuloDoCartao(formulario);
-    var emailDigitado = formulario.email ? formulario.email.value.trim() : '';
-
-    formulario.hidden = true;
-
-    var card = document.createElement('section');
-    card.className = 'resultado resultado--em-analise';
-    card.id = 'em-analise';
-    card.setAttribute('role', 'status');
-    card.setAttribute('aria-live', 'polite');
-    card.tabIndex = -1;
-
-    card.innerHTML =
-      '<h2>Sua solicitação está em análise</h2>' +
-      '<p class="resultado__mensagem">' +
-      'Recebemos seus dados e eles já estão sob consulta do nosso motor de crédito. ' +
-      'Isso é normal e não significa que foi negado.' +
-      '</p>' +
-      '<h3>O que acontece agora</h3>' +
-      '<ol class="resultado__passos">' +
-      '<li>Nosso motor de decisão analisa as informações que você enviou.</li>' +
-      '<li>Você recebe o resultado por e-mail assim que a análise terminar.</li>' +
-      '<li>Se precisarmos de algum documento extra, avisamos pelo mesmo e-mail.</li>' +
-      '</ol>' +
-      '<dl class="resultado__resumo">' +
-      '<dt>Protocolo</dt><dd>' + protocolo + '</dd>' +
-      '<dt>Cartão solicitado</dt><dd>' + nomeCartao + '</dd>' +
-      '<dt>E-mail de contato</dt><dd>' + escaparHtml(emailDigitado) + '</dd>' +
-      '</dl>';
-
-    formulario.insertAdjacentElement('afterend', card);
-    card.focus();
-  }
-
-  function rotuloDoCartao(formulario) {
-    var marcado = formulario.querySelector('input[name="tipo_cartao"]:checked');
-    if (!marcado) return '—';
-    var label = formulario.querySelector('label[for="' + marcado.id + '"]');
-    return label ? label.textContent.trim() : marcado.value;
-  }
-
-  function gerarProtocolo() {
-    return 'DM-' + Date.now().toString().slice(-8);
-  }
-
-  function escaparHtml(texto) {
-    var div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
+  function desativarCarregando(botao) {
+    if (!botao) return;
+    if (botao.dataset.textoOriginal) {
+      botao.textContent = botao.dataset.textoOriginal;
+    }
+    botao.disabled = false;
+    botao.removeAttribute('aria-busy');
   }
 
   /* ============================================== ERROS INLINE ==== */
+
+  function chaveDoCampo(elemento) {
+    return elemento.name || elemento.id;
+  }
 
   function mostrarErro(campo, mensagem, ehGrupo) {
     if (!campo) return;
@@ -384,31 +363,14 @@
       campo.setAttribute('aria-invalid', 'true');
     }
   }
-      // adicionar um helper e usar em vez de `el.id` nos dois lugares:
-
-    function chaveDoCampo(elemento) {
-
-    return elemento.name || elemento.id;
-
-    }
-
-    // obterOuCriarElementoErro:
-
-    var id = 'erro-' + chaveDoCampo(el);
-
-
-
-    // limparErro:
-
-    var elementoErro = document.getElementById('erro-' + chaveDoCampo(el));
-
-
 
   function limparErro(campo) {
     if (!campo) return;
     var el = campo instanceof NodeList || campo.length ? campo[0] : campo;
-    if (!el || !el.id) return;
-    var elementoErro = document.getElementById('erro-' + el.id);
+    if (!el) return;
+    var idChave = chaveDoCampo(el);
+    if (!idChave) return;
+    var elementoErro = document.getElementById('erro-' + idChave);
     if (elementoErro) elementoErro.textContent = '';
     if (typeof el.removeAttribute === 'function') {
       el.removeAttribute('aria-invalid');
@@ -417,7 +379,8 @@
 
   function obterOuCriarElementoErro(campo, ehGrupo) {
     var el = campo instanceof NodeList || campo.length ? campo[0] : campo;
-    var id = 'erro-' + el.id;
+    var idChave = chaveDoCampo(el);
+    var id = 'erro-' + idChave;
     var existente = document.getElementById(id);
     if (existente) return existente;
 
@@ -444,5 +407,5 @@
     }
     return campo.closest('.campo, .campo--checkbox') || campo;
   }
-  
+
 })();

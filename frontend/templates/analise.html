@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resultado da sua solicitação — DM</title>
+  <meta name="robots" content="noindex">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+
+<body>
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="{{ url_for('routes.home') }}">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM — voltar para a página inicial">
+    </a>
+    <p class="cabecalho__titulo">Resultado da solicitação</p>
+  </header>
+
+  <main id="conteudo">
+    <h1>Resultado da sua solicitação</h1>
+
+    <p class="resultado__anuncio" role="status" aria-live="polite"></p>
+
+    <!-- ==================== EM ANÁLISE ==================== -->
+    <section class="resultado resultado--em-analise" id="em-analise" aria-labelledby="em-analise-titulo">
+      <h2 id="em-analise-titulo">Sua solicitação está em análise</h2>
+      <p class="resultado__mensagem">
+        Recebemos seu pedido e ele está passando por uma análise mais detalhada.
+        Isso é normal e não significa que foi negado.
+      </p>
+
+      <h3>O que acontece agora</h3>
+      <ol class="resultado__passos">
+        <li>Nosso time analisa as informações que você enviou.</li>
+        <li>Você recebe o resultado por e-mail em até 48 horas.</li>
+        <li>Se precisarmos de algum documento, avisamos pelo mesmo e-mail.</li>
+      </ol>
+
+      <dl class="resultado__resumo">
+        <dt>Protocolo</dt>
+        <dd data-campo="protocolo">—</dd>
+        <dt>Cartão solicitado</dt>
+        <dd data-campo="cartao">—</dd>
+      </dl>
+
+      <a class="btn btn--primario" href="{{ url_for('routes.home') }}">Voltar para o início</a>
+    </section>
+  </main>
+
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">
+      Projeto acadêmico da FATEC São José dos Campos em parceria com a DM.
+      Os resultados exibidos aqui são simulados e não representam uma decisão de crédito real.
+    </p>
+  </footer>
+</body>
+</html>
