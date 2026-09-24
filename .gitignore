@@ -1,4 +1,6 @@
 __pycache__/
+__init__.py
 
 # Enviroment
 .env
+.venv

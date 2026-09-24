@@ -69,6 +69,21 @@
 .duvidas .btn--ghost:hover,
 .cartoes .btn--ghost:hover { background: rgb(32 42 208 / 0.08); }
 
+.config {
+  background: transparent;
+  color: var(--dm-branco);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-left: var(--e-4);
+}
+.config img {
+    filter: brightness(0) invert(1);
+    width: 20px;
+    height: 20px;
+}
+
 /* ================================================== FAIXA MULTICOLOR ==== */
 /*
   A assinatura da página. Na DM ela é só um divisor; aqui ela vira o elemento
