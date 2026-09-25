@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template
 from flask_cors import CORS
-from app.routes import routes_bp
+from routes import routes_bp
 
 # Mapeia os caminhos absolutos para as pastas frontend
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -23,4 +23,4 @@ if __name__ == '__main__':
     print("\n=============================================")
     print("      BACKEND RODANDO COM SUCESSO!           ")
     print("=============================================\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

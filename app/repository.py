@@ -1,6 +1,6 @@
 # Todas as consultas SQL (Lojas, Pré-qualificação, Cadastro)
 
-from database import get_connection
+from app.database import get_connection
 
 
 #método para inserção na database
