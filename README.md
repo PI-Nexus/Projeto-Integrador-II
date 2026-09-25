@@ -94,6 +94,27 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 # 🏗 Estrutura do Projeto
 
+```text
+Projeto-Integrador-II/
+├── docs/
+│   └── MVP/
+│       └── sp1.md                  # Documentação do MVP / Sprint 1
+├── app/
+│   ├── frontend/
+│   │   └── static/
+│   │       ├── css/
+│   │       │   ├── base.css        # Estilos globais e base
+│   │       │   ├── components.css  # Estilos dos componentes da interface
+│   │       │   └── tokens.css      # Variáveis de estilo e design tokens
+│   │       └── img/                # Recursos visuais e imagens do frontend
+│   ├── Dockerfile                  # Configuração do contentor Docker
+│   ├── __init__.py                 # Inicialização do módulo Python
+│   ├── app.py                      # Ponto de entrada e servidor da aplicação
+│   └── database.py                 # Configuração e conexão à base de dados
+├── .env.example                    # Modelo com exemplo das variáveis de ambiente
+├── .gitignore                      # Ficheiro de regras para ignorar ficheiros no Git
+└── README.md                       # Documentação principal do projeto
+
 ---
 
 # 📌 Backlog do Produto
@@ -114,23 +135,23 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ## 📋 Planejamento das Sprints
 
-### Sprint 1 — 33/35 pontos
+### Sprint 1 — 31/35 pontos
 
 - ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
 - ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
 - ✅ #3 — Como cliente, quero preencher um formulário simples e intuitivo, para enviar os dados necessários à minha requisição. (5 pontos)
 - ✅ #4 — Como responsável pela análise de cartões, quero que o sistema aprove ou reprove automaticamente os clientes com base no cartão selecionado e nas regras de elegibilidade. (8 pontos)
 - ✅ #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
-- #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
-- #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
-- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
+- ✅ #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
+- ✅ #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### Sprint 2 — 8/15 pontos
+### Sprint 2 — 10/15 pontos
 
+- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
 - #9 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
 - #10 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
@@ -150,8 +171,8 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
-| Sprint 1 | 35 pontos | 33 pontos |
-| Sprint 2 | 15 pontos | 8 pontos |
+| Sprint 1 | 35 pontos | 31 pontos |
+| Sprint 2 | 15 pontos | 10 pontos |
 | Sprint 3 | 15 pontos | 5 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
@@ -162,7 +183,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
-| 01                | 27/09/2026 | Em Andamento 🟡  | [MVP](MVP/sp1.md)  |
+| 01                | 27/09/2026 | Concluída ✅  | [MVP](MVP/sp1.md)  |
 | 02                | 25/10/2026 | a fazer  | [MVP](MVP/sp2.md)  |
 | 03                | 22/11/2026 | a fazer  | [MVP](MVP/sp3.md) |
 | Feira de Soluções | 03/12/2026 | a fazer  | [a fazer] |
