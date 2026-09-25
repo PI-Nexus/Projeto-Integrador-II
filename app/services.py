@@ -154,7 +154,11 @@ def filtrar_lojas_parceiras(lojas, uf_alvo):
 
     lojas_filtradas = []
     for loja in lojas:
-        if not isinstance(loja, dict) or loja.get("eh_digital", False):
+        if not isinstance(loja, dict):
+            continue
+
+        if loja.get("eh_digital", False):
+            lojas_filtradas.append(loja)
             continue
 
         uf_loja = loja.get("uf")

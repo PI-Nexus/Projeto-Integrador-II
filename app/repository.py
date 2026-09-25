@@ -138,7 +138,7 @@ def cadastrar_cliente(dados: dict, status: str):
     else:
         pass
 
-    #verifica se existe a cidade no banco, caso não tiver, registra
+    #verifica se existe a cidade no banco. Caso não exista, registra
     id_cidade = verificador(tab="cidade", col=("id_cidade", ), filter={"nome_cidade" : f"{dados["cidade"]}"})
 
     if id_cidade:
@@ -155,7 +155,6 @@ def cadastrar_cliente(dados: dict, status: str):
     val = (id_cliente, dados["cep"], dados["logradouro"], dados["numero"], id_cidade)
 
     #insere dados da solicitação
-    print(dados["tipo_cartao"])
     try:
         id_cartao = verificador(tab="cartao", col=("id_cartao", ), filter={"tipo_cartao" : f"{dados["tipo_cartao"]}"})[0]
     except Exception:
