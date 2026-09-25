@@ -114,6 +114,7 @@ Projeto-Integrador-II/
 ├── .env.example                    # Modelo com exemplo das variáveis de ambiente
 ├── .gitignore                      # Ficheiro de regras para ignorar ficheiros no Git
 └── README.md                       # Documentação principal do projeto
+```
 
 ---
 
