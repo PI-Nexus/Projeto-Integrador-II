@@ -6,6 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DATABASE}
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     ports:
       - "${PORT:-3308}:3306"
     volumes:
