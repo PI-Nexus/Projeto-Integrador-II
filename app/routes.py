@@ -1,7 +1,8 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao
 from mock_lojas import listar_lojas_parceiras
+from repository import cadastrar_cliente
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -34,21 +35,26 @@ def negado():
 # ==============================================================================
 @routes_bp.route('/api/solicitacoes', methods=['POST'])
 def processar_solicitacao():
-    renda_raw = request.form.get('renda', '0')
-    e_colaborador = request.form.get('colaborador', '').lower()
+    
 
-    if isinstance(renda_raw, str):
-        renda_limpa = renda_raw.replace('R$', '').replace('.', '').replace(',', '.').strip()
-    else:
-        renda_limpa = renda_raw
+    dados = request.form.to_dict()
+    dados = tratar_solicitacao(dados)
+    
+    
+    validacao = validar_cliente(dados["cpf"], dados["tipo_cartao"], dados["colaborador"], dados["matricula"], dados["renda"])
 
     try:
-        renda = float(renda_limpa) if renda_limpa else 0.0
-    except (ValueError, TypeError):
-        renda = 0.0
+        if validacao["sucesso"]:
+            if validacao["aprovado"]:
+                cadastrar_cliente(dados, "Aprovado")
+                return redirect(url_for('routes.aprovado'))
+            else:
+                cadastrar_cliente(dados, "Negado")
+                return redirect(url_for('routes.negado'))
+    except:
+        pass
 
-    # TODO: O Colega 2 irá inserir as regras de aprovação/análise/negação aqui.
-
+    cadastrar_cliente(dados, "Analise")
     return redirect(url_for('routes.analise'))
 
 
