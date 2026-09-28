@@ -1,3 +1,5 @@
+import hmac
+import os
 import requests
 from repository import selectdb
 from datetime import datetime
@@ -187,3 +189,8 @@ def tratar_solicitacao(dados: dict) -> dict:
         dados["renda"] = 0.0
 
     return dados
+
+def senha_admin_correta(senha: str) -> bool:
+    esperada = os.environ["ADMIN_PASSWORD"]
+    # compare_digest evita vazar informação pelo tempo de comparação
+    return hmac.compare_digest(senha.encode(), esperada.encode())

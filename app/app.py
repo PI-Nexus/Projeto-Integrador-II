@@ -9,6 +9,11 @@ template_dir = os.path.join(base_dir, 'frontend', 'templates')
 static_dir = os.path.join(base_dir, 'frontend', 'static')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app.secret_key = os.environ["FLASK_SECRET_KEY"]
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
 CORS(app)
 
 # Rota principal para carregar o index.html

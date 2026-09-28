@@ -696,3 +696,166 @@ main > h1 {
   object-position: 50% 25%;
   border-radius: var(--raio-card);
 }
+
+/* Rodapé sempre no fim da tela; o card fica centrado na área que sobra. */
+.pagina-login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.pagina-login main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.login {
+  flex: 1;
+  align-content: center;
+  background: var(--dm-lilas);
+}
+ 
+.login__card {
+  justify-self: center;
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--e-7) var(--e-6);
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-top: 8px solid var(--dm-azul);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+}
+ 
+.login__card h1 {
+  font-size: var(--texto-xg);
+  color: var(--dm-azul);
+  margin-bottom: var(--e-3);
+}
+ 
+.login__apoio {
+  font-size: var(--texto-p);
+  color: var(--dm-cinza-texto);
+}
+ 
+/* Erro do servidor: texto em tinta sobre fundo claro, com a borda dizendo o tom. */
+.login__erro {
+  margin-top: var(--e-5);
+  padding: var(--e-3) var(--e-4);
+  background: #FDECEC;
+  border-left: 4px solid #C62828;
+  border-radius: var(--raio-mini);
+  font-size: var(--texto-p);
+  font-weight: 600;
+  color: var(--dm-tinta);
+}
+ 
+/* Mesmo sinal do :user-invalid, mas vindo do servidor. */
+.campo input[aria-invalid="true"] { border-color: #C62828; }
+ 
+.login__card .btn {
+  width: 100%;
+  margin-top: var(--e-5);
+}
+ 
+@media (max-width: 30rem) {
+  .login__card { padding: var(--e-6) var(--e-5); }
+}
+
+/* Rodapé sempre no fim da tela, mesmo com poucas linhas. */
+.pagina-admin { min-height: 100dvh; display: flex; flex-direction: column; }
+.pagina-admin main { flex: 1; }
+ 
+/* No cabeçalho simples não há nav para empurrar o botão para a direita.
+   Fica fora de .cabecalho__acoes de propósito: ali o ghost some em telas estreitas. */
+.cabecalho__sair { margin-inline-start: auto; }
+ 
+/* ------------------------------------------------------------ título --- */
+.solicitacoes > h1 {
+  font-size: var(--texto-xg);
+  color: var(--dm-azul);
+  margin-bottom: var(--e-2);
+}
+.solicitacoes__total,
+.solicitacoes__vazio {
+  color: var(--dm-cinza-texto);
+  margin-bottom: var(--e-6);
+}
+.solicitacoes__vazio {
+  padding: var(--e-6);
+  background: var(--dm-lilas);
+  border-radius: var(--raio-card);
+  color: var(--dm-tinta);
+}
+ 
+/* ----------------------------------------------------------- tabela ---- */
+/* Rola dentro do próprio contêiner: a página nunca ganha barra horizontal. */
+.tabela-wrap {
+  overflow-x: auto;
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+}
+ 
+.tabela {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: var(--texto-p);
+}
+ 
+.tabela th,
+.tabela td {
+  padding: var(--e-3) var(--e-4);
+  text-align: left;
+  vertical-align: middle;
+}
+ 
+.tabela thead th {
+  background: var(--dm-lilas);
+  color: var(--dm-azul);
+  font-weight: 700;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--dm-azul);
+}
+ 
+.tabela tbody td { border-bottom: 1px solid var(--dm-cinza); }
+.tabela tbody tr:last-child td { border-bottom: 0; }
+.tabela tbody tr:hover { background: var(--dm-lilas); }
+ 
+/* Números alinhados à direita, com dígitos de largura fixa. */
+.tabela .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tabela td:nth-child(3),
+.tabela td:nth-child(7) { white-space: nowrap; }
+ 
+/* ----------------------------------------------------------- status ---- */
+/* Mesmas cores dos desfechos do formulário; texto sempre em tinta. */
+.status {
+  display: inline-block;
+  padding: var(--e-1) var(--e-3);
+  border-radius: var(--raio-pill);
+  background: var(--dm-cinza);
+  color: var(--dm-tinta);
+  font-size: var(--texto-pp);
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.status--aprovado   { background: var(--dm-verde); }
+.status--em-analise { background: var(--dm-amarelo); }
+.status--reprovado  { background: var(--dm-coral); }
+ 
+/* Texto só para leitor de tela (o "—" visual não diz nada em voz alta). */
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
