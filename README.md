@@ -34,7 +34,8 @@ processo.
 * [📊 Registro das Sprints](#-registro-das-sprints)
 * [⚡ DoR - Definition of Ready](#-dor---definition-of-ready)
 * [🏆 DoD - Definition of Done](#-dod---definition-of-done)
-* [📖 Manual do Usuário](#-manual-do-usuário)
+* [📖 Manual do Usuário](docs/Manual%20do%20Usu%C3%A1rio.md)
+* [🛠️ Manual de Instalação](docs/Manual%20de%20Instala%C3%A7%C3%A3o.md)
 
 ## 🎯 Objetivo do Projeto
 
@@ -94,27 +95,29 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 # 🏗 Estrutura do Projeto
 
-```text
-Projeto-Integrador-II/
-├── docs/
-│   └── MVP/
-│       └── sp1.md                  # Documentação do MVP / Sprint 1
-├── app/
-│   ├── frontend/
-│   │   └── static/
-│   │       ├── css/
-│   │       │   ├── base.css        # Estilos globais e base
-│   │       │   ├── components.css  # Estilos dos componentes da interface
-│   │       │   └── tokens.css      # Variáveis de estilo e design tokens
-│   │       └── img/                # Recursos visuais e imagens do frontend
-│   ├── Dockerfile                  # Configuração do contentor Docker
-│   ├── __init__.py                 # Inicialização do módulo Python
-│   ├── app.py                      # Ponto de entrada e servidor da aplicação
-│   └── database.py                 # Configuração e conexão à base de dados
-├── .env.example                    # Modelo com exemplo das variáveis de ambiente
-├── .gitignore                      # Ficheiro de regras para ignorar ficheiros no Git
-└── README.md                       # Documentação principal do projeto
 ```
+Projeto-Integrador-II/
+├── app/                        # Aplicação Flask
+│   ├── app.py                  # Cria o Flask, registra as rotas e inicia o servidor (porta 5000)
+│   ├── routes.py               # Páginas HTML e endpoints (solicitações, CEP e lojas)
+│   ├── services.py             # Regras de negócio (ViaCEP, salário mínimo, pré-qualificação)
+│   ├── repository.py           # Acesso ao MySQL e cadastro da solicitação
+│   ├── database.py             # Conexão com o banco (variáveis DB_*)
+│   ├── mock_lojas.py           # Catálogo de lojas parceiras exibido no formulário
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── frontend/
+│       ├── templates/          # index, solicita, aprovado, analise e negado
+│       └── static/             # css (tokens, base, components), js (main, mascaras, util) e img
+├── mysql/
+│   ├── schema_cartoes.sql      # Criação do banco e das tabelas
+│   └── seed_dados_iniciais.sql # Estados, tipos de cartão e lojas parceiras
+├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio da DM
+├── docker-compose.yml          # MySQL + aplicação em containers
+└── .env.example                # Modelo das variáveis de ambiente
+```
+
+**Fluxo da aplicação:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
 
 ---
 
@@ -195,7 +198,7 @@ Projeto-Integrador-II/
 
 - User Stories com **Critérios de Aceitação** definidos;
 - Subtarefas divididas **a partir das US** no Jira;
-- **Diagrama de Rotas** do bot (comandos e fluxos de conversa) mapeado;
+- **Diagrama de Rotas** do site (páginas e endpoints Flask) mapeado;
 - Ambiente de desenvolvimento configurado com **Dotenv** e dependências do **requirements.txt** documentadas;
 - Repositório no **GitHub** com branch da US criada e rastreável ao card do **Jira**.
 
@@ -213,4 +216,4 @@ Projeto-Integrador-II/
 
 ---
 
-📖 Manual do Usuário: [Clique aqui para abrir o manual](docs/Manual%20do%20Usuário.md)
+📖🛠️ Manual do Usuário e de Instalação: [Clique aqui para abrir os manuais do Usuário e de Instalação](docs/Manual%20do%20Usu%C3%A1rio.md)
