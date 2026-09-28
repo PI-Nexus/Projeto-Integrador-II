@@ -34,7 +34,8 @@ processo.
 * [📊 Registro das Sprints](#-registro-das-sprints)
 * [⚡ DoR - Definition of Ready](#-dor---definition-of-ready)
 * [🏆 DoD - Definition of Done](#-dod---definition-of-done)
-* [📖 Manual do Usuário](#-manual-do-usuário)
+* [📖 Manual do Usuário](docs/Manual%20do%20Usu%C3%A1rio.md)
+* [🛠️ Manual de Instalação](docs/Manual%20de%20Instala%C3%A7%C3%A3o.md)
 
 ## 🎯 Objetivo do Projeto
 
@@ -94,6 +95,30 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 # 🏗 Estrutura do Projeto
 
+```
+Projeto-Integrador-II/
+├── app/                        # Aplicação Flask
+│   ├── app.py                  # Cria o Flask, registra as rotas e inicia o servidor (porta 5000)
+│   ├── routes.py               # Páginas HTML e endpoints (solicitações, CEP e lojas)
+│   ├── services.py             # Regras de negócio (ViaCEP, salário mínimo, pré-qualificação)
+│   ├── repository.py           # Acesso ao MySQL e cadastro da solicitação
+│   ├── database.py             # Conexão com o banco (variáveis DB_*)
+│   ├── mock_lojas.py           # Catálogo de lojas parceiras exibido no formulário
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── frontend/
+│       ├── templates/          # index, solicita, aprovado, analise e negado
+│       └── static/             # css (tokens, base, components), js (main, mascaras, util) e img
+├── mysql/
+│   ├── schema_cartoes.sql      # Criação do banco e das tabelas
+│   └── seed_dados_iniciais.sql # Estados, tipos de cartão e lojas parceiras
+├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio da DM
+├── docker-compose.yml          # MySQL + aplicação em containers
+└── .env.example                # Modelo das variáveis de ambiente
+```
+
+**Fluxo da aplicação:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
+
 ---
 
 # 📌 Backlog do Produto
@@ -114,23 +139,23 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ## 📋 Planejamento das Sprints
 
-### Sprint 1 — 33/35 pontos
+### Sprint 1 — 31/35 pontos
 
 - ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
 - ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
 - ✅ #3 — Como cliente, quero preencher um formulário simples e intuitivo, para enviar os dados necessários à minha requisição. (5 pontos)
 - ✅ #4 — Como responsável pela análise de cartões, quero que o sistema aprove ou reprove automaticamente os clientes com base no cartão selecionado e nas regras de elegibilidade. (8 pontos)
 - ✅ #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
-- #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
-- #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
-- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
+- ✅ #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
+- ✅ #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### Sprint 2 — 8/15 pontos
+### Sprint 2 — 10/15 pontos
 
+- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
 - #9 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
 - #10 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
@@ -150,8 +175,8 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
-| Sprint 1 | 35 pontos | 33 pontos |
-| Sprint 2 | 15 pontos | 8 pontos |
+| Sprint 1 | 35 pontos | 31 pontos |
+| Sprint 2 | 15 pontos | 10 pontos |
 | Sprint 3 | 15 pontos | 5 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
@@ -162,7 +187,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
-| 01                | 27/09/2026 | Em Andamento 🟡  | [MVP](MVP/sp1.md)  |
+| 01                | 27/09/2026 | Concluída ✅  | [MVP](MVP/sp1.md)  |
 | 02                | 25/10/2026 | a fazer  | [MVP](MVP/sp2.md)  |
 | 03                | 22/11/2026 | a fazer  | [MVP](MVP/sp3.md) |
 | Feira de Soluções | 03/12/2026 | a fazer  | [a fazer] |
@@ -173,7 +198,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 - User Stories com **Critérios de Aceitação** definidos;
 - Subtarefas divididas **a partir das US** no Jira;
-- **Diagrama de Rotas** do bot (comandos e fluxos de conversa) mapeado;
+- **Diagrama de Rotas** do site (páginas e endpoints Flask) mapeado;
 - Ambiente de desenvolvimento configurado com **Dotenv** e dependências do **requirements.txt** documentadas;
 - Repositório no **GitHub** com branch da US criada e rastreável ao card do **Jira**.
 
@@ -191,4 +216,4 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ---
 
-📖 Manual do Usuário: [Clique aqui para abrir o manual](docs/Manual%20do%20Usuário.md)
+📖🛠️ Manual do Usuário e de Instalação: [Clique aqui para abrir os manuais do Usuário e de Instalação](docs/Manual%20do%20Usu%C3%A1rio.md)
