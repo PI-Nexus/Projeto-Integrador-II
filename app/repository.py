@@ -161,3 +161,37 @@ def cadastrar_cliente(dados: dict, status: str):
         raise RuntimeError("Cartão não existe na db")
     
     insertdb(tab="solicitacao_cartao", col=("id_cliente", "id_cartao", "id_loja", "status"), val=(id_cliente, id_cartao, f"{dados["loja"]}", status))
+
+
+def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
+    """
+    Solicitações de cartão com dados do cliente e da loja, da mais nova
+    para a mais antiga. Sem valores vindos do usuário na string SQL:
+    o único parâmetro (limite) vai por %s.
+ 
+    INNER JOIN em cliente: id_cliente é NOT NULL, toda solicitação tem cliente.
+    LEFT JOIN em loja: id_loja pode ser NULL, e a solicitação continua na lista
+    (nome_loja vem como None).
+ 
+    Ajuste o nome da tabela/coluna da loja se for diferente de loja.nome_loja.
+    """
+    query = """
+        SELECT s.id_solicitacao,
+               c.nome_cliente,
+               c.cpf_cliente,
+               c.renda_mensal,
+               s.id_cartao,
+               l.nome_loja,
+               s.data_solicitacao,
+               s.status
+        FROM solicitacao_cartao AS s
+        INNER JOIN cliente AS c ON c.id_cliente = s.id_cliente
+        LEFT JOIN loja AS l ON l.id_loja = s.id_loja
+        ORDER BY s.data_solicitacao DESC, s.id_solicitacao DESC
+        LIMIT %s
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (limite,))
+            colunas = [d[0] for d in cur.description]
+            return [dict(zip(colunas, linha)) for linha in cur.fetchall()]

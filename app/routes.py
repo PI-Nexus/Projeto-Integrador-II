@@ -1,8 +1,8 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao
+from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta
 from mock_lojas import listar_lojas_parceiras
-from repository import cadastrar_cliente
+from repository import cadastrar_cliente, listar_solicitacoes_dashboard
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -28,6 +28,30 @@ def analise():
 @routes_bp.route('/negado', methods=['GET'])
 def negado():
     return render_template('negado.html')
+
+@routes_bp.route("/admin", methods=["GET", "POST"])
+def admin():
+    erro = None
+
+    if request.method == "POST":
+        if senha_admin_correta(request.form.get("senha", "")):
+            session.clear()
+            session["admin"] = True
+            return redirect(url_for("routes.admin"))  # evita reenvio do POST no F5
+        erro = "Senha incorreta."
+
+    if not session.get("admin"):
+        return render_template("admin_login.html", erro=erro)
+
+    return render_template(
+        "admin.html",
+        solicitacoes=listar_solicitacoes_dashboard(),)
+
+
+@routes_bp.route("/admin/logout", methods=["POST"])
+def admin_logout():
+    session.clear()
+    return redirect(url_for("routes.admin"))
 
 
 # ==============================================================================
@@ -127,3 +151,11 @@ def filtrarLojasParceirasPorUf(uf):
         "total": len(lojas_encontradas),
         "lojas": lojas_encontradas
     }), 200
+
+@routes_bp.app_template_filter("brl")
+def brl(valor):
+    """1234.5 -> R$ 1.234,50"""
+    if valor is None:
+        return "—"
+    texto = f"{valor:,.2f}"  # 1,234.50
+    return "R$ " + texto.replace(",", "_").replace(".", ",").replace("_", ".")
