@@ -1,8 +1,8 @@
 import hmac
 import os
 import requests
-from repository import selectdb
-from datetime import datetime
+from repository import selectdb, listar_lojas_parceiras
+from datetime import datetime, date
 import re
 
 
@@ -105,7 +105,8 @@ def validar_cliente(cpf_cliente: str, tipo_cartao: str, e_colab: str, dm_cod: st
         if tipo_cartao == "dm_visa":
 
             #Verifica se o cliente está cadastrado no banco
-            result = selectdb(tab="cliente", col=("id_cliente", ), filter={"cpf_cliente": cpf_cliente, "colaborador_dm": dm_cod})
+            result = selectdb(tab="colaborador", col=("matricula",),
+                  filter={"cpf": cpf_cliente, "matricula": dm_cod, "ativo": 1})
 
             if len(result) > 0:
                 return {
@@ -128,11 +129,12 @@ def validar_cliente(cpf_cliente: str, tipo_cartao: str, e_colab: str, dm_cod: st
     #verifica clientes normais
     else:
         #Pega salário minímo atual
-        resposta = requests.get("https://api.bcb.gov.br/dados/serie/bcdata.sgs.1619/dados/ultimos/1")
-        dados = resposta.json()
-
-        salario_minimo = float(dados[0]["valor"])
-        #valor 24/09/2026 = R$ 1621
+        resposta = requests.get(
+            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1619/dados/ultimos/1?formato=json",
+            timeout=5,
+        )
+        resposta.raise_for_status()
+        salario_minimo = float(resposta.json()[0]["valor"])
 
         if renda / salario_minimo >= 1.5:
             return {
@@ -170,25 +172,57 @@ def filtrar_lojas_parceiras(lojas, uf_alvo):
     return lojas_filtradas
 
 def tratar_solicitacao(dados: dict) -> dict:
-    renda_raw = dados.get("renda") or 0
     dados["colaborador"] = (dados.get("colaborador") or "").lower()
-    data = dados.get("nascimento")
+    dados["matricula"] = (dados.get("matricula") or "").strip() if dados["colaborador"] else ""
 
-    dados["cpf"] = re.sub(r"\D", "", dados["cpf"])
-    dados["celular"] = re.sub(r"\D", "", dados["celular"])
-    dados["nascimento"] = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
-
-    if isinstance(renda_raw, str):
-        renda_limpa = renda_raw.replace('R$', '').replace('.', '').replace(',', '.').strip()
-    else:
-        renda_limpa = renda_raw
+    dados["cpf"] = re.sub(r"\D", "", dados.get("cpf", ""))
+    dados["celular"] = re.sub(r"\D", "", dados.get("celular", ""))
+    dados["cep"] = re.sub(r"\D", "", dados.get("cep", ""))
 
     try:
-        dados["renda"] = float(renda_limpa) if renda_limpa else 0.0
-    except (ValueError, TypeError):
+        nasc = datetime.strptime(dados.get("nascimento", ""), "%d/%m/%Y").date()
+    except ValueError:
+        raise ValueError("Data de nascimento inválida.")
+    hoje = date.today()
+    idade = hoje.year - nasc.year - ((hoje.month, hoje.day) < (nasc.month, nasc.day))
+    if idade < 18:
+        raise ValueError("É necessário ter 18 anos ou mais.")
+    dados["nascimento"] = nasc.isoformat()
+
+    renda = str(dados.get("renda") or "0").replace("R$", "").strip()
+    renda = renda.replace(".", "").replace(",", ".")
+    try:
+        dados["renda"] = float(renda)
+    except ValueError:
         dados["renda"] = 0.0
 
+    if len(dados["cpf"]) != 11:
+        raise ValueError("CPF inválido.")
+    if dados["colaborador"] and not dados["matricula"]:
+        raise ValueError("Informe a matrícula DM.")
+
+    # dm_visa não usa loja; os cartões de loja exigem uma
+    if dados.get("tipo_cartao") not in ("dm_visa", "loja", "loja_digital"):
+        raise ValueError("Tipo de cartão inválido.")
+    elif dados.get("tipo_cartao") == "dm_visa":
+        dados["loja"] = ""
+    elif not dados.get("loja"):
+        raise ValueError("Selecione uma loja parceira.")
+
     return dados
+
+def validar_loja_do_cartao(dados: dict) -> None:
+    tipo = dados["tipo_cartao"]
+    if tipo == "dm_visa":
+        return
+    lojas = {str(l["id"]): l for l in listar_lojas_parceiras()}
+    loja = lojas.get(str(dados.get("loja")))
+    if not loja:
+        raise ValueError("Loja inválida.")
+    if tipo == "loja" and (loja["eh_digital"] or loja["uf"] != dados["uf"]):
+        raise ValueError("Cartão Loja só está disponível para lojas físicas do seu estado.")
+    if tipo == "loja_digital" and not loja["eh_digital"]:
+        raise ValueError("Selecione uma loja digital.")
 
 def senha_admin_correta(senha: str) -> bool:
     esperada = os.environ["ADMIN_PASSWORD"]

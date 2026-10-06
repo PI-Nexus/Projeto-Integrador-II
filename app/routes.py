@@ -1,9 +1,12 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
+import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta
-from mock_lojas import listar_lojas_parceiras
-from repository import cadastrar_cliente, listar_solicitacoes_dashboard
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao
+from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao
+import requests
+import logging
 
+log = logging.getLogger(__name__)
 routes_bp = Blueprint('routes', __name__)
 
 # ==============================================================================
@@ -17,17 +20,21 @@ def home():
 def solicitar():
     return render_template('solicita.html')
 
+def _solicitacao_atual():
+    id_sol = session.get("ultima_solicitacao")
+    return buscar_solicitacao(id_sol) if id_sol else None
+
 @routes_bp.route('/aprovado', methods=['GET'])
 def aprovado():
-    return render_template('aprovado.html')
+    return render_template('aprovado.html', solicitacao=_solicitacao_atual())
 
 @routes_bp.route('/analise', methods=['GET'])
 def analise():
-    return render_template('analise.html')
+    return render_template('analise.html', solicitacao=_solicitacao_atual())
 
 @routes_bp.route('/negado', methods=['GET'])
 def negado():
-    return render_template('negado.html')
+    return render_template('negado.html', solicitacao=_solicitacao_atual())
 
 @routes_bp.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -59,28 +66,34 @@ def admin_logout():
 # ==============================================================================
 @routes_bp.route('/api/solicitacoes', methods=['POST'])
 def processar_solicitacao():
-    
-
-    dados = request.form.to_dict()
-    dados = tratar_solicitacao(dados)
-    
-    
-    validacao = validar_cliente(dados["cpf"], dados["tipo_cartao"], dados["colaborador"], dados["matricula"], dados["renda"])
+    try:
+        dados = tratar_solicitacao(request.form.to_dict())
+        validar_loja_do_cartao(dados)          # <- aqui
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
 
     try:
-        if validacao["sucesso"]:
-            if validacao["aprovado"]:
-                cadastrar_cliente(dados, "Aprovado")
-                return redirect(url_for('routes.aprovado'))
-            else:
-                cadastrar_cliente(dados, "Negado")
-                return redirect(url_for('routes.negado'))
-    except:
-        pass
+        validacao = validar_cliente(dados["cpf"], dados["tipo_cartao"],
+                                    dados["colaborador"], dados["matricula"], dados["renda"])
+    except (requests.RequestException, ValueError, KeyError, IndexError):
+        log.exception("Falha ao validar cliente; enviando para análise")
+        validacao = {"sucesso": False}
 
-    cadastrar_cliente(dados, "Analise")
-    return redirect(url_for('routes.analise'))
+    if validacao.get("sucesso") and "aprovado" in validacao:
+        status = "Aprovado" if validacao["aprovado"] else "Negado"
+    else:
+        status = "Analise"
 
+    try:
+        id_solicitacao = cadastrar_cliente(dados, status)
+    except pymysql.err.IntegrityError as e:
+        if e.args[0] == 1062:
+            return jsonify({"erro": "Já existe um cadastro com este CPF ou matrícula."}), 409
+        raise
+
+    session["ultima_solicitacao"] = id_solicitacao
+    destino = {"Aprovado": "aprovado", "Negado": "negado", "Analise": "analise"}[status]
+    return redirect(url_for(f"routes.{destino}"))
 
 # ==============================================================================
 # 3. ENDPOINTS DE API - CEP E LOJAS (O que o Colega 1 fez)

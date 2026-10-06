@@ -36,8 +36,3 @@ LOJAS_PARCEIRAS = [
     {"id": 32, "nome": "Tocantins Magazine", "cidade": "Palmas", "uf": "TO", "eh_digital": False},
     {"id": 33, "nome": "Loja Digital Parceira", "cidade": "Nacional", "uf": "BR", "eh_digital": True},
 ]
-
-
-def listar_lojas_parceiras():
-    """Retorna uma copia do mock para evitar alteracoes acidentais no catalogo."""
-    return [loja.copy() for loja in LOJAS_PARCEIRAS]
