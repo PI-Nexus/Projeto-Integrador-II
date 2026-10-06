@@ -1,5 +1,15 @@
 # 📌 LandingPage de Captação e Pré Qualificação de Clientes
 
+<p align="center">
+  <img src="">
+</p>
+
+## 🎥 Demonstração
+
+[![ - Demonstração]()]()
+
+> 🔗 [Clique para assistir no YouTube]()
+
 ## 📚 Tema do Semestre
 
 Aplicação Web com Banco de Dados
@@ -89,7 +99,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 [![Jira Software](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white)](https://www.atlassian.com/software/jira)
 [![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
-[![Visual Studio Code](https://img.shields.io/badge/VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
+[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 
 ---
 
@@ -97,24 +107,21 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ```
 Projeto-Integrador-II/
-├── app/                        # Aplicação Flask
-│   ├── app.py                  # Cria o Flask, registra as rotas e inicia o servidor (porta 5000)
-│   ├── routes.py               # Páginas HTML e endpoints (solicitações, CEP e lojas)
-│   ├── services.py             # Regras de negócio (ViaCEP, salário mínimo, pré-qualificação)
-│   ├── repository.py           # Acesso ao MySQL e cadastro da solicitação
-│   ├── database.py             # Conexão com o banco (variáveis DB_*)
-│   ├── mock_lojas.py           # Catálogo de lojas parceiras exibido no formulário
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── frontend/
-│       ├── templates/          # index, solicita, aprovado, analise e negado
-│       └── static/             # css (tokens, base, components), js (main, mascaras, util) e img
+├── app/                        # Aplicação Flask principal
+│   ├── app.py                  # Inicialização do servidor Flask
+│   ├── routes.py               # Definição das rotas e endpoints
+│   ├── services.py             # Regras de negócio da aplicação
+│   ├── repository.py           # Acesso e operações no banco de dados
+│   ├── database.py             # Conexão com o MySQL
+│   ├── requirements.txt        # Dependências Python
+│   ├── Dockerfile              # Containerização do serviço Web
+│   └── frontend/               # Camada de apresentação
+│       ├── templates/          # Páginas HTML
+│       └── static/             # Arquivos estáticos (CSS, JS e imagens)
 ├── mysql/
-│   ├── schema_cartoes.sql      # Criação do banco e das tabelas
-│   └── seed_dados_iniciais.sql # Estados, tipos de cartão e lojas parceiras
-├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio da DM
-├── docker-compose.yml          # MySQL + aplicação em containers
-└── .env.example                # Modelo das variáveis de ambiente
+│   └── schema_cartoes.sql      # Estrutura do banco de dados e tabelas
+├── docker-compose.yml          # Subida integrada do app e do MySQL
+└── .env.example                # Modelo de variáveis de ambiente
 ```
 
 **Fluxo da aplicação:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
@@ -132,14 +139,14 @@ Projeto-Integrador-II/
 | 5   | Alta      | Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições.     | 5          | 1      |
 | 6   | Alta      | Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica.     | 3          | 1      |
 | 7   | Alta      | Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização.     | 2          | 1      |
-| 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 2      |
+| 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 1      |
 | 9   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
 | 10   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
 | 11   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
 
 ## 📋 Planejamento das Sprints
 
-### Sprint 1 — 31/35 pontos
+### Sprint 1 — 33/35 pontos
 
 - ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
 - ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
@@ -148,14 +155,15 @@ Projeto-Integrador-II/
 - ✅ #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
 - ✅ #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
 - ✅ #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
+- ✅ #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### Sprint 2 — 10/15 pontos
+### Sprint 2 — 8/15 pontos
 
-- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
+
 - #9 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
 - #10 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
@@ -175,8 +183,8 @@ Projeto-Integrador-II/
 
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
-| Sprint 1 | 35 pontos | 31 pontos |
-| Sprint 2 | 15 pontos | 10 pontos |
+| Sprint 1 | 35 pontos | 33 pontos |
+| Sprint 2 | 15 pontos | 8 pontos |
 | Sprint 3 | 15 pontos | 5 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
@@ -187,10 +195,10 @@ Projeto-Integrador-II/
 
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
-| 01                | 27/09/2026 | Concluída ✅  | [MVP](MVP/sp1.md)  |
-| 02                | 25/10/2026 | a fazer  | [MVP](MVP/sp2.md)  |
-| 03                | 22/11/2026 | a fazer  | [MVP](MVP/sp3.md) |
-| Feira de Soluções | 03/12/2026 | a fazer  | [a fazer] |
+| 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
+| 02                | 25/10/2026 | Em andamento 🟡 | [MVP](MVP/sp2.md)  |
+| 03                | 22/11/2026 | a fazer | [MVP](MVP/sp3.md) |
+| Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
 
 ---
 
@@ -216,4 +224,6 @@ Projeto-Integrador-II/
 
 ---
 
-📖🛠️ Manual do Usuário e de Instalação: [Clique aqui para abrir os manuais do Usuário e de Instalação](docs/Manual%20do%20Usu%C3%A1rio.md)
+📖 Manual do Usuário: [Clique aqui para abrir o Manual do Usuário](docs/Manual%20do%20Usu%C3%A1rio.md)
+
+🛠️ Manual de Instalação: [Clique aqui para abrir o Manual de Instalação](docs/Manual%20de%20Instalação.md)

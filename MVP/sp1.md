@@ -86,7 +86,7 @@ Será desenvolvida uma aplicação Web em Python (Flask) com interface gráfica 
 
 | Sprint | Entregas Principais | Estado |
 |---|---|---|
-| 01 | Landing Page, formulário, aprovação automática e regras de elegibilidade (US1 a US7) | Em Andamento 🟡 |
+| 01 | Landing Page, formulário, aprovação automática e regras de elegibilidade (US1 a US7) | Concluída ✅ |
 
 ---
 
@@ -116,5 +116,5 @@ Será desenvolvida uma aplicação Web em Python (Flask) com interface gráfica 
 
 ## 📂 Anexos / Evidências
 
-**Vídeo de Demonstração:**\
+**Vídeo de Demonstração**\
 Confira o website em funcionamento:
