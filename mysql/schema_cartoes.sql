@@ -26,12 +26,22 @@ CREATE TABLE cidade (
     id_cidade    INT AUTO_INCREMENT PRIMARY KEY,
     nome_cidade  VARCHAR(150) NOT NULL,
     id_estado    INT NOT NULL,
+    UNIQUE KEY uq_cidade_estado (nome_cidade, id_estado),
     CONSTRAINT fk_cidade_estado
         FOREIGN KEY (id_estado) REFERENCES estado(id_estado)
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE INDEX idx_cidade_estado ON cidade(id_estado);
+
+-- ---------------------------------------------------------------------
+-- Tabela: Colaborador
+-- ---------------------------------------------------------------------
+CREATE TABLE colaborador (
+    matricula  VARCHAR(20) PRIMARY KEY,
+    cpf        CHAR(11) NOT NULL UNIQUE,
+    ativo      TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------------
 -- Tabela: cliente
@@ -44,6 +54,7 @@ CREATE TABLE cliente (
     telefone_cliente    VARCHAR(20),
     email_cliente       VARCHAR(150),
     colaborador_dm      TINYINT(1) NOT NULL DEFAULT 0,
+    matricula_dm        VARCHAR(20) NULL UNIQUE,
     renda_mensal        DECIMAL(10,2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -78,6 +89,7 @@ CREATE TABLE loja (
     status_loja     VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
     id_cidade       INT NOT NULL,
     descricao_loja  TEXT,
+    eh_digital      TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_loja_cidade
         FOREIGN KEY (id_cidade) REFERENCES cidade(id_cidade)
         ON UPDATE CASCADE ON DELETE RESTRICT

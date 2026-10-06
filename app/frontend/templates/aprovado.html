@@ -46,9 +46,9 @@
         <dt>Protocolo</dt>
         <dd data-campo="protocolo">—</dd>
         <dt>Cartão solicitado</dt>
-        <dd data-campo="cartao">—</dd>
+        <dd data-campo="cartao">{{ solicitacao.nome_cartao if solicitacao else '—' }}</dd>
         <dt>Loja</dt>
-        <dd data-campo="loja">—</dd>
+        <dd data-campo="loja">{{ (solicitacao.nome_loja if solicitacao else None) or '—' }}</dd>
       </dl>
 
       <a class="btn btn--primario" href="{{ url_for('routes.home') }}">Voltar para o início</a>

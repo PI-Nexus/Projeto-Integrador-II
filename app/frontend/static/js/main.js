@@ -18,17 +18,18 @@
     .then(function (resposta) {
       if (resposta.redirected) {
         window.location.href = resposta.url;
-      } else {
-        return resposta.json().then(function (dados) {
-          if (dados && dados.redirect) {
-            window.location.href = dados.redirect;
-          } else if (dados && dados.status) {
-            window.location.href = '/' + dados.status;
-          } else {
-            window.location.href = '/analise';
-          }
-        });
+        return;
       }
+      return resposta.json().catch(function () { return {}; }).then(function (dados) {
+        if (!resposta.ok) {
+          desativarCarregando(botao);
+          alert((dados && dados.erro) || 'Não foi possível enviar sua solicitação. Tente novamente.');
+          return;
+        }
+        if (dados && dados.redirect) window.location.href = dados.redirect;
+        else if (dados && dados.status) window.location.href = '/' + dados.status;
+        else window.location.href = '/analise';
+      });
     })
     .catch(function (erro) {
       desativarCarregando(botao);

@@ -84,6 +84,12 @@
     return texto;
   };
 
+  var formatarCEP = function (d) {
+    var texto = d.slice(0, 5);
+    if (d.length > 5) texto += "-" + d.slice(5, 8);
+    return texto;
+  }
+
   /* ================================ VALIDAÇÃO DA DATA DE NASCIMENTO ==== */
 
   var IDADE_MINIMA = 18;
@@ -149,6 +155,7 @@
     aplicarMascara(document.getElementById('cpf'), formatarCpf, 11);
     aplicarMascara(document.getElementById('nascimento'), formatarData, 8);
     aplicarMascara(document.getElementById('celular'), formatarCelular, 11);
+    aplicarMascara(document.getElementById('cep'), formatarCEP, 8)
 
     validarNascimento(document.getElementById('nascimento'));
   });
