@@ -1,4 +1,4 @@
-# 📌 LandingPage de Captação e Pré Qualificação de Clientes
+# 📌 Landing Page de Captação e Pré Qualificação de Clientes DM
 
 <p align="center">
   <img src="">
@@ -34,7 +34,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 # 📝 Descrição do Desafio
 
-Desenvolver uma landing Page para captação com experiência simples e intuitiva para o usuário, 
+Desenvolver uma landing page para captação com experiência simples e intuitiva para o usuário, 
 garantindo que todas as regras de aprovação, reprovação e seleção de loja sejam aplicadas 
 corretamente conforme o tipo de cliente e cartão solicitado.
 
@@ -76,14 +76,14 @@ Aplicação Web com Banco de Dados
 
 ## 🧰 Tecnologias Utilizadas
 
-### 🎨 FrontEnd
+### 🎨 Front-End
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
-### 🖥️ BackEnd
+### 🖥️ Back-End
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
@@ -197,7 +197,7 @@ Projeto-Integrador-II/
 |-------------------|------------|----------|-----------|
 | 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
 | 02                | 25/10/2026 | Em andamento 🟡 | [MVP](MVP/sp2.md)  |
-| 03                | 22/11/2026 | a fazer | [MVP](MVP/sp3.md) |
+| 03                | 22/11/2026 | a fazer | [a fazer] |
 | Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
 
 ---
