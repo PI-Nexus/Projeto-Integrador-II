@@ -1,14 +1,14 @@
 # 📌 Landing Page de Captação e Pré Qualificação de Clientes DM
 
 <p align="center">
-  <img src="">
+  <img src="docs/img/dm-fundo.jpg">
 </p>
 
 ## 🎥 Demonstração
 
-[![Demonstração]()]()
+[![Demonstração]()](https://youtu.be/9zSZ0oM3F0M)
 
-> 🔗 [Clique para assistir no YouTube]()
+> 🔗 [Clique para assistir no YouTube](https://youtu.be/9zSZ0oM3F0M)
 
 # 📑 Índice
 
