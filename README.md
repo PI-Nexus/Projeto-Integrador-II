@@ -140,9 +140,10 @@ Projeto-Integrador-II/
 | 6   | Alta      | Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica.     | 3          | 1      |
 | 7   | Alta      | Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização.     | 2          | 1      |
 | 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 1      |
-| 9   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
-| 10   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
-| 11   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
+| 9   | Média      | Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar.     | 5          | 2      |
+| 10   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
+| 11   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
+| 12   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
 
 ## 📋 Planejamento das Sprints
 
@@ -161,11 +162,12 @@ Projeto-Integrador-II/
 
 ---
 
-### Sprint 2 — 8/15 pontos
+### Sprint 2 — 13/15 pontos
 
 
-- #9 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
-- #10 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
+- ✅ #9 — Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar. (5 pontos)
+- ✅ #10 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
+- ✅ #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
 **Dentro da capacidade planejada.**
 
@@ -173,7 +175,7 @@ Projeto-Integrador-II/
 
 ### Sprint 3 — 5/15 pontos
 
-- #11 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
+- #12 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
 
 **Dentro da capacidade planejada.**
 
@@ -184,7 +186,7 @@ Projeto-Integrador-II/
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
 | Sprint 1 | 35 pontos | 33 pontos |
-| Sprint 2 | 15 pontos | 8 pontos |
+| Sprint 2 | 15 pontos | 13 pontos |
 | Sprint 3 | 15 pontos | 5 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
@@ -196,7 +198,7 @@ Projeto-Integrador-II/
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
 | 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
-| 02                | 25/10/2026 | Em andamento 🟡 | [MVP](MVP/sp2.md)  |
+| 02                | 25/10/2026 | Concluída ✅ | [MVP](MVP/sp2.md)  |
 | 03                | 22/11/2026 | a fazer | [a fazer] |
 | Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
 
