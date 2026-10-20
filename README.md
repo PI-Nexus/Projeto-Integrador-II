@@ -109,15 +109,18 @@ Aplicação Web com Banco de Dados
 Projeto-Integrador-II/
 ├── app/                        # Aplicação Flask principal
 │   ├── app.py                  # Inicialização do servidor Flask
-│   ├── routes.py               # Definição das rotas e endpoints
+│   ├── routes.py               # Definição das rotas e endpoints (inclui /admin)
 │   ├── services.py             # Regras de negócio da aplicação
 │   ├── repository.py           # Acesso e operações no banco de dados
 │   ├── database.py             # Conexão com o MySQL
+│   ├── mock_lojas.py           # Catálogo de lojas parceiras
 │   ├── requirements.txt        # Dependências Python
 │   ├── Dockerfile              # Containerização do serviço Web
 │   └── frontend/               # Camada de apresentação
-│       ├── templates/          # Páginas HTML
+│       ├── templates/          # Páginas HTML (landing, formulário, resultados e admin)
 │       └── static/             # Arquivos estáticos (CSS, JS e imagens)
+├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio
+├── MVP/                        # Registro das sprints
 ├── mysql/
 │   └── schema_cartoes.sql      # Estrutura do banco de dados e tabelas
 ├── docker-compose.yml          # Subida integrada do app e do MySQL
