@@ -21,6 +21,7 @@ Os cartões disponíveis são:
 * **Clientes de lojas parceiras:** Pessoas que desejam o cartão da sua loja preferida (Cartão Loja).
 * **Clientes que preferem o digital:** Pessoas que querem um cartão sem versão física e sem restrição de estado (Cartão Loja Digital).
 * **Colaboradores da DM:** Funcionários que possuem regras próprias de aprovação.
+* **Administradores:** Pessoas responsáveis por cadastrar parceiros e vendedores e acompanhar as solicitações no painel administrativo (veja a [seção 5](#5-painel-administrativo)).
 
 #### Dores que o site atende
 
@@ -101,11 +102,11 @@ Selecione uma das três opções: `Cartão DM Visa`, `Cartão Loja` ou `Cartão 
 
 **Etapa 4 · Sua loja**
 
-* **Loja parceira:** escolha uma loja na lista. Ela mostra as lojas do **estado selecionado** e também a **loja digital** (que não tem restrição de estado).
-* **Vendedor que te atendeu** *(opcional)*: se alguém da loja te ajudou, informe o nome ou o código.
+* **Loja parceira:** escolha uma loja na lista. Ela mostra as lojas do **estado selecionado** e também as **lojas digitais** (que não têm restrição de estado e aparecem com o aviso de que não há cartão físico). Parceiros recém-cadastrados no painel administrativo aparecem aqui imediatamente.
+* **Vendedor que te atendeu** *(opcional)*: se alguém da loja te ajudou, informe o nome ou o código. O vendedor só é aceito se pertencer à loja escolhida, e o pedido fica registrado com essa atribuição. Se ninguém te atendeu, deixe em branco.
 * Para **Cartão Loja** e **Cartão Loja Digital**, escolher a loja é **obrigatório**.
 
-> 💡 **Dica:** mesmo no **Cartão DM Visa**, selecione uma loja da lista para que o envio seja concluído com sucesso (veja [Limitações conhecidas](#6-limitações-conhecidas-desta-versão)).
+> 💡 **Dica:** no **Cartão DM Visa**, escolher a loja é opcional: o pedido pode ser enviado sem selecionar loja e é avaliado da mesma forma em qualquer estado.
 
 **Confirmação**
 
@@ -176,13 +177,64 @@ O resultado depende do seu perfil e do cartão escolhido:
 
 | Cartão | Regra |
 |---|---|
-| **DM Visa** | Pode ser solicitado de **qualquer estado** |
+| **DM Visa** | Pode ser solicitado de **qualquer estado**, sem exigir a escolha de uma loja |
 | **Cartão Loja** | Só permite escolher lojas do **mesmo estado do CEP** informado |
 | **Cartão Loja Digital** | **Sem restrição de estado**. Não é emitido cartão físico |
 
 ---
 
-### 5. Dúvidas e problemas comuns
+### 5. Painel administrativo
+
+Esta seção é voltada ao **administrador** da DM. O painel permite incluir novos parceiros e vendedores sem depender da equipe de desenvolvimento nem de acesso direto ao banco de dados.
+
+---
+
+#### 5.1 Acessando o painel
+
+1. Acesse `http://localhost:5000/admin` (ou o endereço do site seguido de `/admin`).
+2. Informe a **senha de administrador**, definida na variável `ADMIN_PASSWORD` durante a instalação (veja o [Manual de Instalação](Manual%20de%20Instalação.md)).
+
+Sem a senha, o acesso às telas do painel é bloqueado. Todos os administradores usam a mesma senha.
+
+---
+
+#### 5.2 Acompanhando as solicitações
+
+O painel lista as solicitações recebidas, com o resultado da pré-qualificação de cada uma (**Aprovado**, **Em análise** ou **Não aprovado**) e a coluna **Vendedor**, que mostra quem atendeu o cliente (vazia quando o pedido foi feito sem vendedor).
+
+---
+
+#### 5.3 Cadastrando um parceiro
+
+Use o formulário de cadastro de parceiros e preencha:
+
+| Campo | O que informar | Observações |
+|---|---|---|
+| Nome | Nome do estabelecimento | Obrigatório |
+| CNPJ | CNPJ do parceiro | Obrigatório. É validado e **não pode repetir** um CNPJ já cadastrado |
+| Cidade / UF | Localização do parceiro | Obrigatório |
+| Tipo | **Físico** ou **Digital** | Obrigatório |
+| Descrição | Texto de apresentação do parceiro | — |
+
+Depois de salvar, o parceiro aparece na lista de parceiros cadastrados e já fica disponível na **Etapa 4** do formulário do cliente:
+
+* **Parceiro físico:** aparece apenas para clientes do **mesmo estado**.
+* **Parceiro digital:** aparece para **todos os estados**, com o aviso de que não há cartão físico.
+
+Se algum dado estiver incorreto ou o CNPJ já estiver cadastrado, o painel mostra uma mensagem explicando o problema e o parceiro não é gravado.
+
+---
+
+#### 5.4 Cadastrando um vendedor
+
+Use o formulário de cadastro de vendedores e informe o **nome**, o **código do vendedor** e o **parceiro** ao qual ele está vinculado (o parceiro precisa já estar cadastrado).
+
+* O vendedor é **opcional** no pedido do cliente: pedidos sem vendedor continuam sendo registrados normalmente.
+* Quando o cliente informa um vendedor na Etapa 4, ele só é aceito se pertencer à loja escolhida. Nesse caso o pedido fica gravado com essa atribuição e o vendedor aparece na lista de solicitações do painel.
+
+---
+
+### 6. Dúvidas e problemas comuns
 
 | Situação | O que fazer |
 |---|---|
@@ -192,24 +244,28 @@ O resultado depende do seu perfil e do cartão escolhido:
 | Lista de lojas mostra *"Informe um CEP válido primeiro"* | Digite um CEP válido ou selecione o estado manualmente |
 | *"Nenhuma loja encontrada neste estado"* | Escolha outro estado, o Cartão DM Visa ou o Cartão Loja Digital |
 | Alerta *"Erro de comunicação com o servidor"* | Verifique sua conexão e tente novamente. Se persistir, confirme com a equipe que o servidor está em execução |
-| Tela de erro ao enviar | Veja as [Limitações conhecidas](#6-limitações-conhecidas-desta-versão) |
+| O vendedor informado não foi aceito | O vendedor precisa pertencer à loja escolhida. Confira o nome ou o código, ou deixe o campo em branco (ele é opcional) |
+| Painel: acesso bloqueado | Informe a senha de administrador (`ADMIN_PASSWORD`). Se não souber qual é, consulte quem instalou o sistema |
+| Painel: CNPJ rejeitado ao cadastrar parceiro | Confira se o CNPJ é válido e se o parceiro já não consta na lista de parceiros cadastrados |
+| Tela de erro ao enviar | Veja as [Limitações conhecidas](#7-limitações-conhecidas-desta-versão) |
 
 ---
 
-### 6. Limitações conhecidas desta versão
+### 7. Limitações conhecidas desta versão
 
-Este manual descreve a **Sprint 1** do projeto. Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
+Este manual descreve as **Sprints 1 e 2** do projeto. Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
 
 * **Um CPF, uma solicitação:** enviar novamente o mesmo CPF retorna erro do servidor.
-* **Loja no Cartão DM Visa:** apesar de a Etapa 4 indicar que pode ser pulada, o envio sem loja selecionada retorna erro. Selecione uma loja da lista.
 * **Aprovação automática de colaborador:** como o CPF do colaborador já precisa existir na base, o envio dessa combinação ainda pode retornar erro do servidor em vez de abrir a tela *Aprovado*.
-* **Dados ainda não gravados:** o endereço e o vendedor informados ainda não são salvos no banco de dados (previsto para a Sprint 2).
+* **Endereço não gravado:** o endereço informado ainda não é salvo no banco de dados.
 * **Resumo nas telas de resultado:** os campos *Protocolo*, *Cartão solicitado* e *Loja* aparecem com "—".
-* **Lojas de demonstração:** a lista de lojas parceiras vem de um catálogo fixo de 33 lojas usado para desenvolvimento.
+* **Cadastro de parceiros um a um:** no painel administrativo não há importação em lote (por exemplo, via CSV), o que pesa para redes com muitas unidades.
+* **Sem edição ou exclusão:** o painel permite apenas cadastrar e listar parceiros e vendedores.
+* **Senha única de administrador:** o acesso ao painel usa uma única senha compartilhada, sem usuários ou perfis individuais.
 
 ---
 
-### 7. Observações
+### 8. Observações
 
 * O servidor precisa estar **em execução** para o site responder.
 * O tempo de resposta pode levar alguns segundos, pois o site consulta serviços externos (CEP e salário mínimo).
