@@ -47,13 +47,15 @@ cp .env.example .env
 copy .env.example .env
 ```
 
-Abra o `.env` e preencha as **três** variáveis:
+Abra o `.env` e preencha as **cinco** variáveis (se `ADMIN_PASSWORD` e `FLASK_SECRET_KEY` não estiverem no `.env.example`, acrescente-as):
 
 | Variável | O que informar | Exemplo |
 |---|---|---|
 | `MYSQL_ROOT_PASSWORD` | Senha do usuário `root` do MySQL (a mesma será usada pela aplicação) | `MinhaSenha@123` |
 | `DATABASE` | Nome do banco de dados. **Use `db_cartoes`**, pois é o nome criado pelo script `mysql/schema_cartoes.sql` | `db_cartoes` |
 | `PORT` | Porta do seu computador que será ligada ao MySQL do container. **Troque o texto de exemplo por um número** | `3308` |
+| `ADMIN_PASSWORD` | Senha de acesso ao painel administrativo (`/admin`) | `SenhaDoAdmin@123` |
+| `FLASK_SECRET_KEY` | Chave secreta usada pelo Flask para proteger a sessão de login do painel. Use um texto longo e aleatório | `troque-por-um-texto-longo-e-aleatorio` |
 
 Exemplo de `.env` pronto:
 
@@ -61,6 +63,14 @@ Exemplo de `.env` pronto:
 MYSQL_ROOT_PASSWORD=MinhaSenha@123
 DATABASE=db_cartoes
 PORT=3308
+ADMIN_PASSWORD=SenhaDoAdmin@123
+FLASK_SECRET_KEY=troque-por-um-texto-longo-e-aleatorio
+```
+
+Para gerar uma chave aleatória para o `FLASK_SECRET_KEY`, execute:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
 > ⚠️ O arquivo `.env` contém senha e **não deve ser enviado ao GitHub** (já está no `.gitignore`).
@@ -167,23 +177,31 @@ Na execução manual, a aplicação **não lê o arquivo `.env` automaticamente*
 | `DB_USER` | Não | `root` | Usuário do MySQL |
 | `DB_NAME` | Não | `db_cartoes` | Nome do banco de dados |
 | `DB_PORT` | Não | `3306` | Porta do MySQL (use `3308` se estiver usando o MySQL do Docker) |
+| `ADMIN_PASSWORD` | Sim, para usar o painel `/admin` | — | Senha de acesso ao painel administrativo |
+| `FLASK_SECRET_KEY` | Sim, para usar o painel `/admin` | — | Chave secreta do Flask (texto longo e aleatório), usada na sessão de login do painel |
 
 **Linux / macOS:**
 ```bash
 export DB_PASSWORD='MinhaSenha@123'
 export DB_PORT=3306
+export ADMIN_PASSWORD='SenhaDoAdmin@123'
+export FLASK_SECRET_KEY='troque-por-um-texto-longo-e-aleatorio'
 ```
 
 **Windows (PowerShell):**
 ```powershell
 $env:DB_PASSWORD = "MinhaSenha@123"
 $env:DB_PORT = "3306"
+$env:ADMIN_PASSWORD = "SenhaDoAdmin@123"
+$env:FLASK_SECRET_KEY = "troque-por-um-texto-longo-e-aleatorio"
 ```
 
 **Windows (CMD):**
 ```cmd
 set DB_PASSWORD=MinhaSenha@123
 set DB_PORT=3306
+set ADMIN_PASSWORD=SenhaDoAdmin@123
+set FLASK_SECRET_KEY=troque-por-um-texto-longo-e-aleatorio
 ```
 
 #### Passo 4: Execução da Aplicação
@@ -196,6 +214,27 @@ python app/app.py
 
 ---
 
+### Atualizando uma instalação anterior (da Sprint 1 para a Sprint 2)
+
+A Sprint 2 alterou o banco de dados: foi criada a tabela `vendedor` e a tabela `solicitacao_cartao` ganhou a coluna `id_vendedor` (opcional, ligada a `vendedor`). Se você já tinha o banco criado com a versão da Sprint 1, o `schema_cartoes.sql` não é executado de novo sozinho, então é preciso recriar o banco.
+
+> ⚠️ **Atenção:** os passos abaixo **apagam todos os dados** do banco (solicitações já enviadas, parceiros cadastrados etc.).
+
+1. Atualize o código (`git pull`) e confira se o seu `.env` já tem `ADMIN_PASSWORD` e `FLASK_SECRET_KEY`.
+2. Recrie o banco:
+   * **Docker:** execute `docker compose down -v` e repita os passos 1 e 2 da Opção 1.
+   * **Manual:** apague o banco e rode os dois scripts novamente:
+
+```bash
+mysql -u root -p -e "DROP DATABASE db_cartoes;"
+mysql -u root -p < mysql/schema_cartoes.sql
+mysql -u root -p < mysql/seed_dados_iniciais.sql
+```
+
+Em instalações novas não é preciso fazer nada: o `schema_cartoes.sql` já cria as tabelas atualizadas.
+
+---
+
 ## 3. Acesso ao Sistema
 
 Após a inicialização do servidor (via Docker ou execução local):
@@ -203,6 +242,7 @@ Após a inicialização do servidor (via Docker ou execução local):
 1. Abra seu navegador de preferência.
 2. Acesse a URL: **`http://localhost:5000`** (a porta da aplicação é fixa; a variável `PORT` do `.env` refere-se somente ao MySQL).
 3. A landing page deve ser exibida. Clique em **`Peça seu cartão`** para abrir o formulário de solicitação.
+4. Para acessar o painel administrativo, abra `http://localhost:5000/admin` e informe a senha definida em `ADMIN_PASSWORD`.
 
 **Verificação rápida**
 
@@ -212,8 +252,9 @@ Após a inicialização do servidor (via Docker ou execução local):
 | `http://localhost:5000/solicitar` | Formulário de solicitação |
 | `http://localhost:5000/consultar-cep/12245000` | JSON com o endereço do CEP (`"sucesso": true`) |
 | `http://localhost:5000/filtrar-lojas-parceiras/uf/SP` | JSON com as lojas de SP e a loja digital |
+| `http://localhost:5000/admin` | Painel administrativo, protegido por senha (`ADMIN_PASSWORD`); sem a senha, o acesso é bloqueado |
 
-Para aprender a usar o site, consulte o [Manual do Usuário](Manual%20do%20Usuário.md).
+Para aprender a usar o site e o painel administrativo, consulte o [Manual do Usuário](Manual%20do%20Usuário.md).
 
 ---
 
@@ -229,3 +270,5 @@ Para aprender a usar o site, consulte o [Manual do Usuário](Manual%20do%20Usuá
 | `Access denied for user 'root'` ou `Unknown database` | Senha divergente ou `DATABASE` diferente de `db_cartoes` | Confira o `.env`. Se mudou a senha depois da primeira execução do Docker, rode `docker compose down -v` e suba novamente |
 | Erro 500 (*Internal Server Error*) ao enviar o formulário | Dados iniciais não carregados, CPF já utilizado em outro envio, ou MySQL fora do ar | Execute o `seed_dados_iniciais.sql`; teste com outro CPF; confira se o MySQL está saudável |
 | CEP não preenche o endereço / erro ao enviar como não colaborador | Sem Internet ou serviço externo (ViaCEP, Banco Central) indisponível | Verifique a conexão e tente novamente |
+| `/admin` bloqueia o acesso, não aceita a senha ou dá erro ao entrar | `ADMIN_PASSWORD` ou `FLASK_SECRET_KEY` ausentes ou diferentes do que você digitou | Confira o `.env` (Docker) ou as variáveis do terminal (execução manual). No Docker, depois de alterar o `.env`, execute `docker compose down` e `docker compose up --build` |
+| `Unknown column 'id_vendedor'` ou `Table 'db_cartoes.vendedor' doesn't exist` | Banco criado com a versão da Sprint 1 | Recrie o banco, conforme [Atualizando uma instalação anterior](#atualizando-uma-instalação-anterior-da-sprint-1-para-a-sprint-2) |
