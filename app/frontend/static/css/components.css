@@ -788,30 +788,34 @@ main > h1 {
   color: var(--dm-tinta);
 }
  
-/* ----------------------------------------------------------- tabela ---- */
 /* Rola dentro do próprio contêiner: a página nunca ganha barra horizontal. */
+/* ----------------------------------------------------------- tabela ---- */
+
 .tabela-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   background: var(--dm-branco);
   border: 1px solid var(--dm-cinza);
   border-radius: var(--raio-card);
   box-shadow: var(--sombra-card);
 }
- 
+
 .tabela {
   width: 100%;
-  min-width: 46rem;
+  min-width: 62rem;
   border-collapse: collapse;
+  table-layout: auto;
   font-size: var(--texto-p);
 }
- 
+
 .tabela th,
 .tabela td {
   padding: var(--e-3) var(--e-4);
   text-align: left;
   vertical-align: middle;
 }
- 
+
 .tabela thead th {
   background: var(--dm-lilas);
   color: var(--dm-azul);
@@ -819,19 +823,38 @@ main > h1 {
   white-space: nowrap;
   border-bottom: 2px solid var(--dm-azul);
 }
- 
-.tabela tbody td { border-bottom: 1px solid var(--dm-cinza); }
-.tabela tbody tr:last-child td { border-bottom: 0; }
-.tabela tbody tr:hover { background: var(--dm-lilas); }
- 
-/* Números alinhados à direita, com dígitos de largura fixa. */
+
+.tabela tbody td {
+  border-bottom: 1px solid var(--dm-cinza);
+}
+
+.tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela tbody tr:hover {
+  background: var(--dm-lilas);
+}
+
+/* Números alinhados à direita */
 .tabela .num {
-  text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+/* CPF e data não devem quebrar em várias linhas */
+.tabela th:nth-child(3),
 .tabela td:nth-child(3),
-.tabela td:nth-child(7) { white-space: nowrap; }
+.tabela th:nth-child(7),
+.tabela td:nth-child(7) {
+  white-space: nowrap;
+}
+
+/* Espaço adequado para o nome do cartão */
+.tabela th:nth-child(5),
+.tabela td:nth-child(5) {
+  min-width: 7.5rem;
+}
  
 /* ----------------------------------------------------------- status ---- */
 /* Mesmas cores dos desfechos do formulário; texto sempre em tinta. */
