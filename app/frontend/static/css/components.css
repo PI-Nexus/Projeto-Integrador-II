@@ -765,6 +765,278 @@ main > h1 {
 /* Rodapé sempre no fim da tela, mesmo com poucas linhas. */
 .pagina-admin { min-height: 100dvh; display: flex; flex-direction: column; }
 .pagina-admin main { flex: 1; }
+
+
+/* ===== Resumo do painel administrativo ===== */
+
+.resumo-admin {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--e-4);
+  margin: var(--e-5) 0;
+}
+
+.resumo-admin__card {
+  min-width: 0;
+  padding: var(--e-4);
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-top: 4px solid var(--dm-azul);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+}
+
+.resumo-admin__card--analise {
+  border-top-color: #D99A17;
+}
+
+.resumo-admin__card--aprovadas {
+  border-top-color: #27845B;
+}
+
+.resumo-admin__card--negadas {
+  border-top-color: #C94A4A;
+}
+
+.resumo-admin__rotulo {
+  display: block;
+  margin-bottom: var(--e-2);
+  color: var(--dm-cinza-texto);
+  font-size: var(--texto-p);
+}
+
+.resumo-admin__valor {
+  display: block;
+  color: var(--dm-tinta);
+  font-size: 1.8rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+/* ===== Linhas clicáveis ===== */
+
+.linha-solicitacao {
+  cursor: pointer;
+}
+
+.linha-solicitacao:focus-visible {
+  outline: 3px solid var(--dm-azul);
+  outline-offset: -3px;
+}
+
+.linha-solicitacao:hover td {
+  background: var(--dm-lilas);
+}
+
+
+/* ===== Modal de detalhes ===== */
+
+.modal-solicitacao {
+  width: min(680px, calc(100% - 32px));
+  max-width: 680px;
+  max-height: 85dvh;
+  padding: 0;
+  overflow: auto;
+  color: var(--dm-tinta);
+  background: var(--dm-branco);
+  border: 1px solid var(--dm-cinza);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-alta);
+}
+
+.modal-solicitacao::backdrop {
+  background: rgb(15 23 42 / 55%);
+  backdrop-filter: blur(3px);
+}
+
+/* Cabeçalho */
+.modal-solicitacao__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: 24px 28px;
+  background: var(--dm-branco);
+  border-bottom: 1px solid var(--dm-cinza);
+}
+
+.modal-solicitacao__identificador {
+  display: inline-block;
+  margin-bottom: var(--e-1);
+  color: var(--dm-cinza-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.modal-solicitacao__cabecalho h2 {
+  margin: 0;
+  color: var(--dm-tinta);
+  font-size: 1.4rem;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+/* Botão de fechar */
+.modal-solicitacao__fechar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--dm-cinza-texto);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.modal-solicitacao__fechar:hover {
+  color: var(--dm-azul);
+  background: #F1F5F9;
+  border-color: var(--dm-cinza);
+}
+
+.modal-solicitacao__fechar:focus-visible {
+  outline: 2px solid var(--dm-azul);
+  outline-offset: 2px;
+}
+
+/* Conteúdo */
+.modal-solicitacao__conteudo {
+  display: grid;
+  gap: 24px;
+  padding: 28px;
+  background: #F8FAFC;
+}
+
+.modal-solicitacao__secao {
+  min-width: 0;
+}
+
+.modal-solicitacao__secao h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin: 0 0 var(--e-3);
+  color: var(--dm-tinta);
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+/* Blocos de informações */
+.detalhes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.detalhes-grid > div {
+  min-width: 0;
+  padding: 16px;
+  background: var(--dm-branco);
+  border: 1px solid #E2E8F0;
+  border-radius: var(--raio-mini);
+  transition: border-color 0.2s ease;
+}
+
+.detalhes-grid > div:hover {
+  border-color: #CBD5E1;
+}
+
+/* Nome do cliente em destaque */
+#detalheNome {
+  font-size: 1rem;
+}
+
+/* Rótulos */
+
+.detalhes-grid dt {
+  margin-bottom: 6px;
+  color: var(--dm-cinza-texto);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Valores */
+.detalhes-grid dd {
+  margin: 0;
+  color: var(--dm-tinta);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+#blocoMatricula[hidden] {
+  display: none;
+}
+
+/* Status dentro do modal */
+#detalheStatus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Rodapé */
+.modal-solicitacao__rodape {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 28px;
+  background: var(--dm-branco);
+  border-top: 1px solid var(--dm-cinza);
+}
+
+/* Responsividade */
+@media (max-width: 760px) {
+  .modal-solicitacao {
+    width: calc(100% - 24px);
+    max-height: 90dvh;
+  }
+
+  .modal-solicitacao__cabecalho {
+    padding: 20px;
+  }
+
+  .modal-solicitacao__cabecalho h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-solicitacao__conteudo {
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .modal-solicitacao__rodape {
+    padding: 16px 20px;
+  }
+
+  .detalhes-grid {
+    gap: 10px;
+  }
+
+  .detalhes-grid > div {
+    padding: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .detalhes-grid {
+    grid-template-columns: 1fr;
+  }
+}
  
 /* No cabeçalho simples não há nav para empurrar o botão para a direita.
    Fica fora de .cabecalho__acoes de propósito: ali o ghost some em telas estreitas. */
@@ -817,7 +1089,7 @@ main > h1 {
 }
 
 .tabela thead th {
-  background: var(--dm-lilas);
+  background: var(--dm-cinza);
   color: var(--dm-azul);
   font-weight: 700;
   white-space: nowrap;

@@ -199,12 +199,14 @@ def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
  
     Ajuste o nome da tabela/coluna da loja se for diferente de loja.nome_loja.
     """
-    
+
     query = """
         SELECT s.id_solicitacao,
                c.nome_cliente,
                c.cpf_cliente,
                c.renda_mensal,
+               c.colaborador_dm,
+               c.matricula_dm,
                s.id_cartao,
                ca.nome_cartao,
                l.nome_loja,

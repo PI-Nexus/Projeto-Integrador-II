@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,20 +16,21 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 </head>
+
 <body class="pagina-admin">
   <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
- 
+
   <header class="cabecalho cabecalho--simples">
     <a class="cabecalho__logo" href="/">
       <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM – página inicial">
     </a>
     <span class="cabecalho__titulo">Área administrativa</span>
- 
+
     <form class="cabecalho__sair" method="POST" action="{{ url_for('routes.admin_logout') }}">
       <button class="btn btn--ghost" type="submit">Sair</button>
     </form>
   </header>
- 
+
   <div class="faixa-multicolor" aria-hidden="true">
     <div class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></div>
     <div class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></div>
@@ -36,18 +38,55 @@
     <div class="faixa-multicolor__bloco faixa-multicolor__bloco--aqua"></div>
     <div class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></div>
   </div>
- 
+
   <main id="conteudo">
     <section class="solicitacoes">
       <h1>Solicitações de cartão</h1>
- 
+
+      {% set resumo = namespace(total=0, analise=0, aprovadas=0, negadas=0) %}
+      {% for s in solicitacoes %}
+      {% set resumo.total = resumo.total + 1 %}
+      {% set status_atual = s.status|string|lower|replace(' ', '_') %}
+      {% if status_atual in ['analise', 'em_analise', 'em_análise'] %}
+      {% set resumo.analise = resumo.analise + 1 %}
+      {% elif status_atual == 'aprovado' %}
+      {% set resumo.aprovadas = resumo.aprovadas + 1 %}
+      {% elif status_atual in ['negado', 'reprovado'] %}
+      {% set resumo.negadas = resumo.negadas + 1 %}
+      {% endif %}
+      {% endfor %}
+
+      <div class="resumo-admin" aria-label="Resumo das solicitações">
+        <article class="resumo-admin__card">
+          <span class="resumo-admin__rotulo">Total de solicitações</span>
+          <strong class="resumo-admin__valor">{{ resumo.total }}</strong>
+        </article>
+
+        <article class="resumo-admin__card resumo-admin__card--analise">
+          <span class="resumo-admin__rotulo">Em análise</span>
+          <strong class="resumo-admin__valor">{{ resumo.analise }}</strong>
+        </article>
+
+        <article class="resumo-admin__card resumo-admin__card--aprovadas">
+          <span class="resumo-admin__rotulo">Aprovadas</span>
+          <strong class="resumo-admin__valor">{{ resumo.aprovadas }}</strong>
+        </article>
+
+        <article class="resumo-admin__card resumo-admin__card--negadas">
+          <span class="resumo-admin__rotulo">Negadas</span>
+          <strong class="resumo-admin__valor">{{ resumo.negadas }}</strong>
+        </article>
+      </div>
+
+
       {% if solicitacoes %}
       <p class="solicitacoes__total">
-        {{ solicitacoes|length }} {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}, da mais recente para a mais antiga.
+        {{ solicitacoes|length }} {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}, da mais recente
+        para a mais antiga.
       </p>
- 
+
       {% set rotulos = {'EM_ANALISE': 'Em análise', 'APROVADO': 'Aprovado', 'REPROVADO': 'Reprovado'} %}
- 
+
       <div class="tabela-wrap" role="region" aria-label="Tabela de solicitações de cartão" tabindex="0">
         <table class="tabela">
           <thead>
@@ -62,9 +101,17 @@
               <th scope="col">Status</th>
             </tr>
           </thead>
+
           <tbody>
             {% for s in solicitacoes %}
-            <tr>
+            <tr class="linha-solicitacao" tabindex="0" role="button"
+              aria-label="Ver detalhes da solicitação {{ s.id_solicitacao }}" data-id="{{ s.id_solicitacao }}"
+              data-nome="{{ s.nome_cliente|e }}" data-cpf="{{ s.cpf_cliente|e }}"
+              data-renda="{{ s.renda_mensal|brl|e }}" data-cartao="{{ s.nome_cartao|e }}"
+              data-loja="{{ (s.nome_loja or 'Sem loja')|e }}"
+              data-data="{{ s.data_solicitacao.strftime('%d/%m/%Y às %H:%M') }}" data-status="{{ s.status|e }}"
+              data-colaborador="{{ 'Sim' if s.colaborador_dm else 'Não' }}"
+              data-matricula="{{ s.matricula_dm or '' }}">
               <td class="num">{{ s.id_solicitacao }}</td>
               <td>{{ s.nome_cliente }}</td>
               <td>{{ s.cpf_cliente }}</td>
@@ -72,30 +119,124 @@
               <td>{{ s.nome_cartao }}</td>
               <td>
                 {% if s.nome_loja %}
-                  {{ s.nome_loja }}
+                {{ s.nome_loja }}
                 {% else %}
-                  <span aria-hidden="true">—</span><span class="so-leitor">Sem loja</span>
+                <span aria-hidden="true">—</span>
+                <span class="so-leitor">Sem loja</span>
                 {% endif %}
               </td>
               <td>
-                <time datetime="{{ s.data_solicitacao.isoformat() }}">{{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</time>
+                <time datetime="{{ s.data_solicitacao.isoformat() }}">
+                  {{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}
+                </time>
               </td>
               <td>
-                <span class="status status--{{ s.status|lower|replace('_', '-') }}">{{ rotulos.get(s.status, s.status) }}</span>
+                {% set rotulos = {
+                'EM_ANALISE': 'Em análise',
+                'ANALISE': 'Em análise',
+                'APROVADO': 'Aprovado',
+                'NEGADO': 'Negado',
+                'REPROVADO': 'Reprovado'
+                } %}
+                <span class="status status--{{ s.status|lower|replace('_', '-') }}">
+                  {{ rotulos.get(s.status|upper, s.status) }}
+                </span>
               </td>
             </tr>
             {% endfor %}
           </tbody>
+
         </table>
       </div>
       {% else %}
-      <p class="solicitacoes__vazio">Nenhuma solicitação ainda. Elas aparecem aqui assim que alguém enviar o formulário.</p>
+      <p class="solicitacoes__vazio">Nenhuma solicitação ainda. Elas aparecem aqui assim que alguém enviar o formulário.
+      </p>
       {% endif %}
     </section>
+
+    <!-- MODAL -->
+    <dialog class="modal-solicitacao" id="modalSolicitacao" aria-labelledby="modalTitulo">
+      <div class="modal-solicitacao__cabecalho">
+        <div>
+          <span class="modal-solicitacao__identificador" id="modalIdentificador">Solicitação</span>
+          <h2 id="modalTitulo">Detalhes da solicitação</h2>
+        </div>
+
+        <button type="button" class="modal-solicitacao__fechar" id="fecharModal" aria-label="Fechar detalhes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+
+      </div>
+
+      <div class="modal-solicitacao__conteudo">
+        <section class="modal-solicitacao__secao">
+          <h3>Dados do cliente</h3>
+          <dl class="detalhes-grid">
+            <div>
+              <dt>Nome completo</dt>
+              <dd id="detalheNome">—</dd>
+            </div>
+            <div>
+              <dt>CPF</dt>
+              <dd id="detalheCpf">—</dd>
+            </div>
+            <div>
+              <dt>Renda mensal</dt>
+              <dd id="detalheRenda">—</dd>
+            </div>
+
+            <div>
+              <dt>Vínculo com a DM</dt>
+              <dd>
+                <span id="detalheColaborador" class="status">—</span>
+              </dd>
+            </div>
+            <div id="blocoMatricula" hidden>
+              <dt>Matrícula</dt>
+              <dd id="detalheMatricula">—</dd>
+            </div>
+
+          </dl>
+        </section>
+
+        <section class="modal-solicitacao__secao">
+          <h3>Dados do pedido</h3>
+          <dl class="detalhes-grid">
+            <div>
+              <dt>Cartão solicitado</dt>
+              <dd id="detalheCartao">—</dd>
+            </div>
+            <div>
+              <dt>Loja</dt>
+              <dd id="detalheLoja">—</dd>
+            </div>
+            <div>
+              <dt>Data da solicitação</dt>
+              <dd id="detalheData">—</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd><span id="detalheStatus" class="status">—</span></dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <div class="modal-solicitacao__rodape">
+        <button type="button" class="btn btn--primary" id="botaoFecharModal">Fechar</button>
+      </div>
+    </dialog>
+
   </main>
- 
+
   <footer class="rodape rodape--simples">
     <p class="rodape__aviso">Acesso restrito a administradores.</p>
   </footer>
 </body>
+<script src="../static/js/main.js"></script>
+
 </html>
