@@ -1,25 +1,14 @@
-# 📌 LandingPage de Captação e Pré Qualificação de Clientes
+# 📌 Landing Page de Captação e Pré Qualificação de Clientes DM
 
-## 📚 Tema do Semestre
+<p align="center">
+  <img src="docs/img/banner_dm_landingpage.png">
+</p>
 
-Aplicação Web com Banco de Dados
+## 🎥 Demonstração
 
-## 📖 Conhecimentos Ensinados
+[![Demonstração](docs/img/dm_fundo.png/)](https://youtu.be/9zSZ0oM3F0M)
 
-- Levantamento de requisitos;
-- Documentação de software (User Stories, Wireframes e etc);
-- Implementar Web usando Linguagem de Programação Python;
-- Planejar e Implementar Modelo de dados Relacional;
-- Utilizar banco de dados relacional MySQL.
-
-# 📝 Descrição do Desafio
-
-Desenvolver uma landing Page para captação com experiência simples e intuitiva para o usuário, 
-garantindo que todas as regras de aprovação, reprovação e seleção de loja sejam aplicadas 
-corretamente conforme o tipo de cliente e cartão solicitado.
-
-A aplicação deve verificar se o cliente é pré qualificado nas nossas bases para encaminhar o 
-processo.
+> 🔗 [Clique para assistir no YouTube](https://youtu.be/9zSZ0oM3F0M)
 
 # 📑 Índice
 
@@ -43,6 +32,15 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 - Uma página que seja atrativa e intuitiva para os usuários que siga a identidade visual da empresa parceira;
 - Um sistema de aprovação e reprovação automática seguindo as regras da empresa parceira
 
+# 📝 Descrição do Desafio
+
+Desenvolver uma landing page para captação com experiência simples e intuitiva para o usuário, 
+garantindo que todas as regras de aprovação, reprovação e seleção de loja sejam aplicadas 
+corretamente conforme o tipo de cliente e cartão solicitado.
+
+A aplicação deve verificar se o cliente é pré qualificado nas nossas bases para encaminhar o 
+processo.
+
 # 👥 Equipe
 |    Função     | Nome                                  |                                                                                                                                                      LinkedIn & GitHub                                                                                                                                                      |                                                                                                
 | :-----------: | :------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -62,18 +60,30 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 - Prof. Jean Carlos Lourenço Costa
 - Prof. Claudio Etelvino de Lima
 
+## 📚 Tema do Semestre
+
+Aplicação Web com Banco de Dados
+
+## 📖 Conhecimentos Ensinados
+
+- Levantamento de requisitos;
+- Documentação de software (User Stories, Wireframes e etc);
+- Implementar Web usando Linguagem de Programação Python;
+- Planejar e Implementar Modelo de dados Relacional;
+- Utilizar banco de dados relacional MySQL.
+
 ---
 
 ## 🧰 Tecnologias Utilizadas
 
-### 🎨 FrontEnd
+### 🎨 Front-End
 
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
-### 🖥️ BackEnd
+### 🖥️ Back-End
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
@@ -89,7 +99,7 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 [![Jira Software](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white)](https://www.atlassian.com/software/jira)
 [![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
-[![Visual Studio Code](https://img.shields.io/badge/VS%20Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
+[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 
 ---
 
@@ -97,24 +107,24 @@ O objetivo do projeto é desenvolver uma landing page para captação de cliente
 
 ```
 Projeto-Integrador-II/
-├── app/                        # Aplicação Flask
-│   ├── app.py                  # Cria o Flask, registra as rotas e inicia o servidor (porta 5000)
-│   ├── routes.py               # Páginas HTML e endpoints (solicitações, CEP e lojas)
-│   ├── services.py             # Regras de negócio (ViaCEP, salário mínimo, pré-qualificação)
-│   ├── repository.py           # Acesso ao MySQL e cadastro da solicitação
-│   ├── database.py             # Conexão com o banco (variáveis DB_*)
-│   ├── mock_lojas.py           # Catálogo de lojas parceiras exibido no formulário
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── frontend/
-│       ├── templates/          # index, solicita, aprovado, analise e negado
-│       └── static/             # css (tokens, base, components), js (main, mascaras, util) e img
+├── app/                        # Aplicação Flask principal
+│   ├── app.py                  # Inicialização do servidor Flask
+│   ├── routes.py               # Definição das rotas e endpoints (inclui /admin)
+│   ├── services.py             # Regras de negócio da aplicação
+│   ├── repository.py           # Acesso e operações no banco de dados
+│   ├── database.py             # Conexão com o MySQL
+│   ├── mock_lojas.py           # Catálogo de lojas parceiras
+│   ├── requirements.txt        # Dependências Python
+│   ├── Dockerfile              # Containerização do serviço Web
+│   └── frontend/               # Camada de apresentação
+│       ├── templates/          # Páginas HTML (landing, formulário, resultados e admin)
+│       └── static/             # Arquivos estáticos (CSS, JS e imagens)
+├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio
+├── MVP/                        # Registro das sprints
 ├── mysql/
-│   ├── schema_cartoes.sql      # Criação do banco e das tabelas
-│   └── seed_dados_iniciais.sql # Estados, tipos de cartão e lojas parceiras
-├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio da DM
-├── docker-compose.yml          # MySQL + aplicação em containers
-└── .env.example                # Modelo das variáveis de ambiente
+│   └── schema_cartoes.sql      # Estrutura do banco de dados e tabelas
+├── docker-compose.yml          # Subida integrada do app e do MySQL
+└── .env.example                # Modelo de variáveis de ambiente
 ```
 
 **Fluxo da aplicação:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
@@ -132,14 +142,15 @@ Projeto-Integrador-II/
 | 5   | Alta      | Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições.     | 5          | 1      |
 | 6   | Alta      | Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica.     | 3          | 1      |
 | 7   | Alta      | Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização.     | 2          | 1      |
-| 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 2      |
-| 9   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
-| 10   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
-| 11   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
+| 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 1      |
+| 9   | Média      | Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar.     | 5          | 2      |
+| 10   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
+| 11   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
+| 12   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
 
 ## 📋 Planejamento das Sprints
 
-### Sprint 1 — 31/35 pontos
+### Sprint 1 — 33/35 pontos
 
 - ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
 - ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
@@ -148,16 +159,18 @@ Projeto-Integrador-II/
 - ✅ #5 — Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições. (5 pontos)
 - ✅ #6 — Como parceiro, quero que apenas clientes do mesmo estado da minha loja possam requisitar cartões com restrição geográfica. (3 pontos)
 - ✅ #7 — Como parceiro, quero permitir que clientes requisitem meu cartão digital independentemente de sua localização. (2 pontos)
+- ✅ #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### Sprint 2 — 10/15 pontos
+### Sprint 2 — 13/15 pontos
 
-- #8 — Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente. (2 pontos)
-- #9 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
-- #10 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
+
+- ✅ #9 — Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar. (5 pontos)
+- ✅ #10 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
+- ✅ #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
 **Dentro da capacidade planejada.**
 
@@ -165,7 +178,7 @@ Projeto-Integrador-II/
 
 ### Sprint 3 — 5/15 pontos
 
-- #11 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
+- #12 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
 
 **Dentro da capacidade planejada.**
 
@@ -175,8 +188,8 @@ Projeto-Integrador-II/
 
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
-| Sprint 1 | 35 pontos | 31 pontos |
-| Sprint 2 | 15 pontos | 10 pontos |
+| Sprint 1 | 35 pontos | 33 pontos |
+| Sprint 2 | 15 pontos | 13 pontos |
 | Sprint 3 | 15 pontos | 5 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
@@ -187,10 +200,10 @@ Projeto-Integrador-II/
 
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
-| 01                | 27/09/2026 | Concluída ✅  | [MVP](MVP/sp1.md)  |
-| 02                | 25/10/2026 | a fazer  | [MVP](MVP/sp2.md)  |
-| 03                | 22/11/2026 | a fazer  | [MVP](MVP/sp3.md) |
-| Feira de Soluções | 03/12/2026 | a fazer  | [a fazer] |
+| 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
+| 02                | 25/10/2026 | Concluída ✅ | [MVP](MVP/sp2.md)  |
+| 03                | 22/11/2026 | a fazer | [a fazer] |
+| Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
 
 ---
 
@@ -216,4 +229,6 @@ Projeto-Integrador-II/
 
 ---
 
-📖🛠️ Manual do Usuário e de Instalação: [Clique aqui para abrir os manuais do Usuário e de Instalação](docs/Manual%20do%20Usu%C3%A1rio.md)
+📖 Manual do Usuário: [Clique aqui para abrir o Manual do Usuário](docs/Manual%20do%20Usu%C3%A1rio.md)
+
+🛠️ Manual de Instalação: [Clique aqui para abrir o Manual de Instalação](docs/Manual%20de%20Instalação.md)

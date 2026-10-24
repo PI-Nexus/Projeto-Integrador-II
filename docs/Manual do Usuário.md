@@ -21,6 +21,7 @@ Os cartões disponíveis são:
 * **Clientes de lojas parceiras:** Pessoas que desejam o cartão da sua loja preferida (Cartão Loja).
 * **Clientes que preferem o digital:** Pessoas que querem um cartão sem versão física e sem restrição de estado (Cartão Loja Digital).
 * **Colaboradores da DM:** Funcionários que possuem regras próprias de aprovação.
+* **Administradores:** Pessoas responsáveis por cadastrar parceiros e vendedores e acompanhar as solicitações no painel administrativo (veja a [seção 5](#5-painel-administrativo)).
 
 #### Dores que o site atende
 
@@ -101,11 +102,11 @@ Selecione uma das três opções: `Cartão DM Visa`, `Cartão Loja` ou `Cartão 
 
 **Etapa 4 · Sua loja**
 
-* **Loja parceira:** escolha uma loja na lista. Ela mostra as lojas do **estado selecionado** e também a **loja digital** (que não tem restrição de estado).
-* **Vendedor que te atendeu** *(opcional)*: se alguém da loja te ajudou, informe o nome ou o código.
+* **Loja parceira:** escolha uma loja na lista. Ela mostra as lojas do **estado selecionado** e também as **lojas digitais** (que não têm restrição de estado e aparecem com o aviso de que não há cartão físico). Parceiros recém-cadastrados no painel administrativo aparecem aqui imediatamente.
+* **Vendedor que te atendeu** *(opcional)*: se alguém da loja te ajudou, informe o nome ou o código. O vendedor só é aceito se pertencer à loja escolhida, e o pedido fica registrado com essa atribuição. Se ninguém te atendeu, deixe em branco.
 * Para **Cartão Loja** e **Cartão Loja Digital**, escolher a loja é **obrigatório**.
 
-> 💡 **Dica:** mesmo no **Cartão DM Visa**, selecione uma loja da lista para que o envio seja concluído com sucesso (veja [Limitações conhecidas](#6-limitações-conhecidas-desta-versão)).
+> 💡 **Dica:** no **Cartão DM Visa**, escolher a loja é opcional: o pedido pode ser enviado sem selecionar loja e é avaliado da mesma forma em qualquer estado.
 
 **Confirmação**
 
@@ -176,13 +177,64 @@ O resultado depende do seu perfil e do cartão escolhido:
 
 | Cartão | Regra |
 |---|---|
-| **DM Visa** | Pode ser solicitado de **qualquer estado** |
+| **DM Visa** | Pode ser solicitado de **qualquer estado**, sem exigir a escolha de uma loja |
 | **Cartão Loja** | Só permite escolher lojas do **mesmo estado do CEP** informado |
 | **Cartão Loja Digital** | **Sem restrição de estado**. Não é emitido cartão físico |
 
 ---
 
-### 5. Dúvidas e problemas comuns
+### 5. Painel administrativo
+
+Esta seção é voltada ao **administrador** da DM. O painel permite incluir novos parceiros e vendedores sem depender da equipe de desenvolvimento nem de acesso direto ao banco de dados.
+
+---
+
+#### 5.1 Acessando o painel
+
+1. Acesse `http://localhost:5000/admin` (ou o endereço do site seguido de `/admin`).
+2. Informe a **senha de administrador**, definida na variável `ADMIN_PASSWORD` durante a instalação (veja o [Manual de Instalação](Manual%20de%20Instalação.md)).
+
+Sem a senha, o acesso às telas do painel é bloqueado. Todos os administradores usam a mesma senha.
+
+---
+
+#### 5.2 Acompanhando as solicitações
+
+O painel lista as solicitações recebidas, com o resultado da pré-qualificação de cada uma (**Aprovado**, **Em análise** ou **Não aprovado**) e a coluna **Vendedor**, que mostra quem atendeu o cliente (vazia quando o pedido foi feito sem vendedor).
+
+---
+
+#### 5.3 Cadastrando um parceiro
+
+Use o formulário de cadastro de parceiros e preencha:
+
+| Campo | O que informar | Observações |
+|---|---|---|
+| Nome | Nome do estabelecimento | Obrigatório |
+| CNPJ | CNPJ do parceiro | Obrigatório. É validado e **não pode repetir** um CNPJ já cadastrado |
+| Cidade / UF | Localização do parceiro | Obrigatório |
+| Tipo | **Físico** ou **Digital** | Obrigatório |
+| Descrição | Texto de apresentação do parceiro | — |
+
+Depois de salvar, o parceiro aparece na lista de parceiros cadastrados e já fica disponível na **Etapa 4** do formulário do cliente:
+
+* **Parceiro físico:** aparece apenas para clientes do **mesmo estado**.
+* **Parceiro digital:** aparece para **todos os estados**, com o aviso de que não há cartão físico.
+
+Se algum dado estiver incorreto ou o CNPJ já estiver cadastrado, o painel mostra uma mensagem explicando o problema e o parceiro não é gravado.
+
+---
+
+#### 5.4 Cadastrando um vendedor
+
+Use o formulário de cadastro de vendedores e informe o **nome**, o **código do vendedor** e o **parceiro** ao qual ele está vinculado (o parceiro precisa já estar cadastrado).
+
+* O vendedor é **opcional** no pedido do cliente: pedidos sem vendedor continuam sendo registrados normalmente.
+* Quando o cliente informa um vendedor na Etapa 4, ele só é aceito se pertencer à loja escolhida. Nesse caso o pedido fica gravado com essa atribuição e o vendedor aparece na lista de solicitações do painel.
+
+---
+
+### 6. Dúvidas e problemas comuns
 
 | Situação | O que fazer |
 |---|---|
@@ -192,259 +244,29 @@ O resultado depende do seu perfil e do cartão escolhido:
 | Lista de lojas mostra *"Informe um CEP válido primeiro"* | Digite um CEP válido ou selecione o estado manualmente |
 | *"Nenhuma loja encontrada neste estado"* | Escolha outro estado, o Cartão DM Visa ou o Cartão Loja Digital |
 | Alerta *"Erro de comunicação com o servidor"* | Verifique sua conexão e tente novamente. Se persistir, confirme com a equipe que o servidor está em execução |
-| Tela de erro ao enviar | Veja as [Limitações conhecidas](#6-limitações-conhecidas-desta-versão) |
+| O vendedor informado não foi aceito | O vendedor precisa pertencer à loja escolhida. Confira o nome ou o código, ou deixe o campo em branco (ele é opcional) |
+| Painel: acesso bloqueado | Informe a senha de administrador (`ADMIN_PASSWORD`). Se não souber qual é, consulte quem instalou o sistema |
+| Painel: CNPJ rejeitado ao cadastrar parceiro | Confira se o CNPJ é válido e se o parceiro já não consta na lista de parceiros cadastrados |
+| Tela de erro ao enviar | Veja as [Limitações conhecidas](#7-limitações-conhecidas-desta-versão) |
 
 ---
 
-### 6. Limitações conhecidas desta versão
+### 7. Limitações conhecidas desta versão
 
-Este manual descreve a **Sprint 1** do projeto. Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
+Este manual descreve as **Sprints 1 e 2** do projeto. Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
 
 * **Um CPF, uma solicitação:** enviar novamente o mesmo CPF retorna erro do servidor.
-* **Loja no Cartão DM Visa:** apesar de a Etapa 4 indicar que pode ser pulada, o envio sem loja selecionada retorna erro. Selecione uma loja da lista.
 * **Aprovação automática de colaborador:** como o CPF do colaborador já precisa existir na base, o envio dessa combinação ainda pode retornar erro do servidor em vez de abrir a tela *Aprovado*.
-* **Dados ainda não gravados:** o endereço e o vendedor informados ainda não são salvos no banco de dados (previsto para a Sprint 2).
+* **Endereço não gravado:** o endereço informado ainda não é salvo no banco de dados.
 * **Resumo nas telas de resultado:** os campos *Protocolo*, *Cartão solicitado* e *Loja* aparecem com "—".
-* **Lojas de demonstração:** a lista de lojas parceiras vem de um catálogo fixo de 33 lojas usado para desenvolvimento.
+* **Cadastro de parceiros um a um:** no painel administrativo não há importação em lote (por exemplo, via CSV), o que pesa para redes com muitas unidades.
+* **Sem edição ou exclusão:** o painel permite apenas cadastrar e listar parceiros e vendedores.
+* **Senha única de administrador:** o acesso ao painel usa uma única senha compartilhada, sem usuários ou perfis individuais.
 
 ---
 
-### 7. Observações
+### 8. Observações
 
 * O servidor precisa estar **em execução** para o site responder.
 * O tempo de resposta pode levar alguns segundos, pois o site consulta serviços externos (CEP e salário mínimo).
 * Os prazos exibidos nas telas de resultado (48 horas, 90 dias) e as mensagens de e-mail/SMS são **ilustrativos**: o envio de cartão, e-mail e SMS está fora do escopo deste projeto.
-
----
-
-# 🛠️ Manual de Instalação
-
-## 1. Configuração do Ambiente
-
-### 1.1 Requisitos
-
-Para executar a aplicação localmente é necessário possuir os seguintes pré-requisitos instalados em sua máquina:
-
-* **Conexão com a Internet** (a aplicação consulta o [ViaCEP](https://viacep.com.br) e a API do Banco Central em tempo de execução, além de carregar a fonte do Google Fonts);
-* [Git](https://git-scm.com/downloads) para clonar o repositório, ou uma ferramenta para extrair arquivos `.zip`;
-* [Docker](https://www.docker.com/) e **Docker Compose** *(recomendado: sobe o banco e a aplicação já configurados)*;
-* Para a **instalação manual/local** (sem Docker):
-  * [Python 3.12](https://www.python.org/downloads/) ou superior *(o container usa Python 3.14; versões anteriores à 3.12 não executam o código)*;
-  * Servidor [MySQL](https://www.mysql.com/downloads/) 8 ou superior em execução.
-
-**Portas utilizadas**
-
-| Serviço | Porta | Observação |
-|---|---|---|
-| Aplicação web (Flask) | `5000` | Fixa. Acesse em `http://localhost:5000` |
-| MySQL (no Docker) | `3308` no seu computador → `3306` no container | Definida pela variável `PORT` do `.env` |
-
----
-
-### 1.2 Obtenção do Código Fonte
-
-Faça o download e extração do arquivo `.zip` ou clone o repositório através do terminal executando o comando:
-
-```bash
-git clone https://github.com/PI-Nexus/Projeto-Integrador-II.git
-cd Projeto-Integrador-II
-```
-
----
-
-### 1.3 Variáveis de Ambiente (.env)
-
-Crie o arquivo `.env` a partir do modelo `.env.example` disponibilizado na raiz do projeto:
-
-**No Linux / macOS:**
-```bash
-cp .env.example .env
-```
-
-**No Windows (CMD / PowerShell):**
-```cmd
-copy .env.example .env
-```
-
-Abra o `.env` e preencha as **três** variáveis:
-
-| Variável | O que informar | Exemplo |
-|---|---|---|
-| `MYSQL_ROOT_PASSWORD` | Senha do usuário `root` do MySQL (a mesma será usada pela aplicação) | `MinhaSenha@123` |
-| `DATABASE` | Nome do banco de dados. **Use `db_cartoes`**, pois é o nome criado pelo script `mysql/schema_cartoes.sql` | `db_cartoes` |
-| `PORT` | Porta do seu computador que será ligada ao MySQL do container. **Troque o texto de exemplo por um número** | `3308` |
-
-Exemplo de `.env` pronto:
-
-```env
-MYSQL_ROOT_PASSWORD=MinhaSenha@123
-DATABASE=db_cartoes
-PORT=3308
-```
-
-> ⚠️ O arquivo `.env` contém senha e **não deve ser enviado ao GitHub** (já está no `.gitignore`).
-
----
-
-## 2. Instalação e Execução
-
-O projeto pode ser executado de duas maneiras: via **Docker Compose** (método automatizado) ou **Manual/Local** (configurando Python e MySQL diretamente no sistema operacional).
-
-Em ambos os casos, ao final é necessário carregar os **dados iniciais** do banco (passo obrigatório, explicado em cada opção).
-
----
-
-### Opção 1: Execução via Docker Compose (Recomendado)
-
-Esta forma inicializa automaticamente o banco de dados MySQL (criando as tabelas) e a aplicação Flask em containers isolados.
-
-#### Passo 1: Subir os containers
-
-1. Garanta que o Docker esteja em execução.
-2. Na pasta raiz do projeto (com o `.env` já configurado), execute:
-
-```bash
-docker compose up --build
-```
-
-> Em instalações mais antigas do Docker, o comando é `docker-compose up --build`.
-
-3. Aguarde o término do build. A aplicação só inicia depois que o MySQL estiver saudável (*healthy*); na primeira execução isso pode levar alguns segundos. Você verá a mensagem **"BACKEND RODANDO COM SUCESSO!"** no terminal.
-
-#### Passo 2: Carregar os dados iniciais (uma única vez)
-
-O script `schema_cartoes.sql` cria apenas as tabelas. É preciso cadastrar os estados, os tipos de cartão e as lojas parceiras, senão o envio do formulário retorna erro. Com os containers em execução, abra **outro terminal** na raiz do projeto:
-
-**Linux / macOS / Git Bash:**
-```bash
-docker exec -i mysql-cartoes sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" db_cartoes' < mysql/seed_dados_iniciais.sql
-```
-
-**Windows PowerShell** (substitua `SUA_SENHA` pela senha do `.env`):
-```powershell
-Get-Content mysql/seed_dados_iniciais.sql -Raw | docker exec -i mysql-cartoes mysql -uroot -pSUA_SENHA db_cartoes
-```
-
-> Alternativa: abra o arquivo `mysql/seed_dados_iniciais.sql` no MySQL Workbench ou DBeaver, conectado em `localhost` na porta definida em `PORT`, e execute-o.
-
-Se o comando retornar erro de *duplicate entry*, os dados já foram carregados antes — não é preciso repetir.
-
-#### Encerrando
-
-* Para parar: `Ctrl + C` ou, em outro terminal, `docker compose down`.
-* Os dados do banco ficam guardados em um volume (`mysql_data`) e **permanecem** entre execuções.
-* Para **apagar tudo e recomeçar do zero** (por exemplo, para trocar a senha do banco): `docker compose down -v` e depois repita os passos 1 e 2.
-
----
-
-### Opção 2: Instalação Manual e Execução Local
-
-Caso prefira rodar a aplicação diretamente na sua máquina:
-
-#### Passo 1: Criação da Base de Dados e dados iniciais
-
-1. Com o MySQL em execução, acesse-o (via MySQL Workbench, DBeaver ou terminal).
-2. Execute, **nesta ordem**, os dois scripts SQL:
-
-```bash
-mysql -u root -p < mysql/schema_cartoes.sql
-mysql -u root -p < mysql/seed_dados_iniciais.sql
-```
-
-O primeiro cria o banco `db_cartoes` e suas tabelas; o segundo carrega os estados, os tipos de cartão e as lojas parceiras. Execute o segundo **apenas uma vez**.
-
-#### Passo 2: Instalação das Dependências do Python
-
-1. Crie e ative um ambiente virtual (`venv`):
-
-**Linux / macOS:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-**Windows:**
-```cmd
-python -m venv venv
-.\venv\Scripts\activate
-```
-
-2. Instale as dependências listadas no arquivo `requirements.txt`:
-
-```bash
-pip install -r app/requirements.txt
-```
-
-#### Passo 3: Configurar as variáveis de ambiente da aplicação
-
-Na execução manual, a aplicação **não lê o arquivo `.env` automaticamente**: as variáveis precisam estar definidas no terminal em que o servidor será iniciado. Elas são diferentes das usadas pelo Docker:
-
-| Variável | Obrigatória | Padrão | Descrição |
-|---|---|---|---|
-| `DB_PASSWORD` | **Sim** | — | Senha do usuário do MySQL |
-| `DB_HOST` | Não | `localhost` | Endereço do servidor MySQL |
-| `DB_USER` | Não | `root` | Usuário do MySQL |
-| `DB_NAME` | Não | `db_cartoes` | Nome do banco de dados |
-| `DB_PORT` | Não | `3306` | Porta do MySQL (use `3308` se estiver usando o MySQL do Docker) |
-
-**Linux / macOS:**
-```bash
-export DB_PASSWORD='MinhaSenha@123'
-export DB_PORT=3306
-```
-
-**Windows (PowerShell):**
-```powershell
-$env:DB_PASSWORD = "MinhaSenha@123"
-$env:DB_PORT = "3306"
-```
-
-**Windows (CMD):**
-```cmd
-set DB_PASSWORD=MinhaSenha@123
-set DB_PORT=3306
-```
-
-#### Passo 4: Execução da Aplicação
-
-Na raiz do repositório, com o ambiente virtual ativo e as variáveis definidas, inicie o servidor:
-
-```bash
-python app/app.py
-```
-
----
-
-## 3. Acesso ao Sistema
-
-Após a inicialização do servidor (via Docker ou execução local):
-
-1. Abra seu navegador de preferência.
-2. Acesse a URL: **`http://localhost:5000`** (a porta da aplicação é fixa; a variável `PORT` do `.env` refere-se somente ao MySQL).
-3. A landing page deve ser exibida. Clique em **`Peça seu cartão`** para abrir o formulário de solicitação.
-
-**Verificação rápida**
-
-| Endereço | O que deve acontecer |
-|---|---|
-| `http://localhost:5000/` | Landing page com os três cartões |
-| `http://localhost:5000/solicitar` | Formulário de solicitação |
-| `http://localhost:5000/consultar-cep/12245000` | JSON com o endereço do CEP (`"sucesso": true`) |
-| `http://localhost:5000/filtrar-lojas-parceiras/uf/SP` | JSON com as lojas de SP e a loja digital |
-
-Para aprender a usar o site, consulte o [Manual do Usuário](Manual%20do%20Usuário.md).
-
----
-
-## 4. Solução de Problemas
-
-| Sintoma | Causa provável | Solução |
-|---|---|---|
-| Erro de porta inválida (*invalid port*) ao subir o Docker | `PORT` no `.env` ainda com o texto de exemplo (`PortaDeSuaEscolha`) | Substitua por um número, por exemplo `3308` |
-| `Bind for 0.0.0.0:3308 failed` | A porta escolhida em `PORT` já está em uso | Informe outro número livre no `.env` |
-| `Bind for 0.0.0.0:5000 failed` / porta 5000 ocupada | Outro programa usa a porta 5000 (no macOS, o *AirPlay Receiver*) | Encerre o programa que usa a porta 5000 (no macOS: *Ajustes do Sistema → Geral → AirDrop e Handoff → Receptor AirPlay*, desative) |
-| `RuntimeError: MYSQL_ROOT_PASSWORD não foi configurada no ambiente` | Na execução manual, `DB_PASSWORD` não está definida no terminal | Defina `DB_PASSWORD` (Passo 3 da Opção 2). A mensagem cita outro nome de variável, mas é a `DB_PASSWORD` que falta |
-| `SyntaxError` ao iniciar em `repository.py` | Python anterior à 3.12 | Instale o Python 3.12 ou superior |
-| `Access denied for user 'root'` ou `Unknown database` | Senha divergente ou `DATABASE` diferente de `db_cartoes` | Confira o `.env`. Se mudou a senha depois da primeira execução do Docker, rode `docker compose down -v` e suba novamente |
-| Erro 500 (*Internal Server Error*) ao enviar o formulário | Dados iniciais não carregados, CPF já utilizado em outro envio, ou MySQL fora do ar | Execute o `seed_dados_iniciais.sql`; teste com outro CPF; confira se o MySQL está saudável |
-| CEP não preenche o endereço / erro ao enviar como não colaborador | Sem Internet ou serviço externo (ViaCEP, Banco Central) indisponível | Verifique a conexão e tente novamente |
