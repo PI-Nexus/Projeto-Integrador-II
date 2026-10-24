@@ -9,12 +9,18 @@
     return texto.replace(/\D/g, '');
   };
 
-  var posicaoDoDigito = function (texto, quantidade) {
+  /* CNPJ alfanumérico (Receita Federal, a partir de jul/2026): dígitos e letras A-Z. */
+  var apenasAlfanumericos = function (texto) {
+    return texto.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+  };
+
+  /* "significativo" é a regex do que conta como caractere digitado (dígito, ou dígito/letra). */
+  var posicaoDoDigito = function (texto, quantidade, significativo) {
     if (quantidade === 0) return 0;
 
     var vistos = 0;
     for (var i = 0; i < texto.length; i++) {
-      if (/\d/.test(texto[i])) {
+      if (significativo.test(texto[i])) {
         vistos++;
         if (vistos === quantidade) return i + 1;
       }
@@ -22,23 +28,31 @@
     return texto.length;
   };
 
-  var aplicarMascara = function (campo, formatar, maxDigitos) {
+  /*
+    alfanumerico = false (padrão): só dígitos contam (CPF, data, celular, CEP).
+    alfanumerico = true: dígitos e letras contam, e as letras viram maiúsculas
+    (CNPJ alfanumérico).
+  */
+  var aplicarMascara = function (campo, formatar, maxCaracteres, alfanumerico) {
     if (!campo) return;
 
+    var limpar = alfanumerico ? apenasAlfanumericos : apenasDigitos;
+    var significativo = alfanumerico ? /[0-9A-Za-z]/ : /\d/;
+
     var montar = function (valor) {
-      return formatar(apenasDigitos(valor).slice(0, maxDigitos));
+      return formatar(limpar(valor).slice(0, maxCaracteres));
     };
 
-    var escrever = function (texto, digitosAntesDoCursor) {
+    var escrever = function (texto, caracteresAntesDoCursor) {
       campo.value = texto;
-      var cursor = posicaoDoDigito(texto, digitosAntesDoCursor);
+      var cursor = posicaoDoDigito(texto, caracteresAntesDoCursor, significativo);
       campo.setSelectionRange(cursor, cursor);
     };
 
     campo.addEventListener('input', function () {
       var cursor = campo.selectionStart;
-      var digitosAntes = apenasDigitos(campo.value.slice(0, cursor)).length;
-      escrever(montar(campo.value), digitosAntes);
+      var caracteresAntes = limpar(campo.value.slice(0, cursor)).length;
+      escrever(montar(campo.value), caracteresAntes);
     });
 
     campo.addEventListener('keydown', function (evento) {
@@ -46,12 +60,12 @@
 
       var inicio = campo.selectionStart;
       if (inicio !== campo.selectionEnd || inicio === 0) return;
-      if (/\d/.test(campo.value[inicio - 1])) return;
+      if (significativo.test(campo.value[inicio - 1])) return;
 
       evento.preventDefault();
 
-      var antes = apenasDigitos(campo.value.slice(0, inicio)).slice(0, -1);
-      var depois = apenasDigitos(campo.value.slice(inicio));
+      var antes = limpar(campo.value.slice(0, inicio)).slice(0, -1);
+      var depois = limpar(campo.value.slice(inicio));
       escrever(montar(antes + depois), antes.length);
     });
 
@@ -87,6 +101,15 @@
   var formatarCEP = function (d) {
     var texto = d.slice(0, 5);
     if (d.length > 5) texto += "-" + d.slice(5, 8);
+    return texto;
+  }
+
+  var formatarCNPJ = function (d) {
+    var texto = d.slice(0, 2);
+    if (d.length > 2) texto += "." + d.slice(2, 5);
+    if (d.length > 5) texto += "." + d.slice(5, 8);
+    if (d.length > 8) texto += "/" + d.slice(8, 12);
+    if (d.length > 12) texto += "-" + d.slice(12, 14);
     return texto;
   }
 
@@ -155,7 +178,9 @@
     aplicarMascara(document.getElementById('cpf'), formatarCpf, 11);
     aplicarMascara(document.getElementById('nascimento'), formatarData, 8);
     aplicarMascara(document.getElementById('celular'), formatarCelular, 11);
-    aplicarMascara(document.getElementById('cep'), formatarCEP, 8)
+    aplicarMascara(document.getElementById('cep'), formatarCEP, 8);
+    // CNPJ alfanumérico: o último argumento (true) libera letras A-Z além dos dígitos
+    aplicarMascara(document.getElementById('cnpj_loja'), formatarCNPJ, 14, true);
 
     validarNascimento(document.getElementById('nascimento'));
   });

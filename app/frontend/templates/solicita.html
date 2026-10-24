@@ -18,12 +18,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 
-  <!-- Máscaras de digitação: CPF, data de nascimento e celular. -->
-  <script src="{{ url_for('static', filename='js/mascaras.js') }}" defer></script>
-
-  <script src="static/js/mascaras.js" defer></script>
-  <script src="static/js/util.js" defer></script>
-  <script src="static/js/main.js?v=5" defer></script>
 </head>
 
 <body>
@@ -138,24 +132,6 @@
           <input type="text" id="renda" name="renda" required
                 inputmode="numeric" placeholder="0,00" aria-describedby="ajuda-renda">
           <p class="campo__ajuda" id="ajuda-renda">Em reais. Usamos na análise de crédito.</p>
-        </div>
-
-        <div class="campo campo--checkbox">
-          <input type="checkbox" id="colaborador" name="colaborador" value="sim"
-                 aria-describedby="ajuda-colaborador">
-          <label for="colaborador">Sou colaborador da DM</label>
-          <p class="campo__ajuda" id="ajuda-colaborador">
-            Colaboradores da DM têm regras próprias de aprovação. Marque apenas se for o seu caso.
-          </p>
-        </div>
-
-        <div class="campo" id="campo-matricula">
-          <label for="matricula">Matrícula DM</label>
-          <input type="text" id="matricula" name="matricula" maxlength="20"
-                 autocomplete="off" aria-describedby="ajuda-matricula">
-          <p class="campo__ajuda" id="ajuda-matricula">
-            Preencha apenas se você marcou a opção acima.
-          </p>
         </div>
       </fieldset>
 
@@ -298,5 +274,8 @@
       Não envie dados reais nesta página — ela é um exercício didático.
     </p>
   </footer>
+  <script src="{{ url_for('static', filename='js/util.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/mascaras.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro
 from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao
 import requests
 import logging
@@ -74,7 +74,7 @@ def processar_solicitacao():
 
     try:
         validacao = validar_cliente(dados["cpf"], dados["tipo_cartao"],
-                                    dados["colaborador"], dados["matricula"], dados["renda"])
+                                    dados["renda"])
     except (requests.RequestException, ValueError, KeyError, IndexError):
         log.exception("Falha ao validar cliente; enviando para análise")
         validacao = {"sucesso": False}
@@ -88,12 +88,24 @@ def processar_solicitacao():
         id_solicitacao = cadastrar_cliente(dados, status)
     except pymysql.err.IntegrityError as e:
         if e.args[0] == 1062:
-            return jsonify({"erro": "Já existe um cadastro com este CPF ou matrícula."}), 409
+            return jsonify({"erro": "Já existe um cadastro com este CPF."}), 409
         raise
 
     session["ultima_solicitacao"] = id_solicitacao
     destino = {"Aprovado": "aprovado", "Negado": "negado", "Analise": "analise"}[status]
     return redirect(url_for(f"routes.{destino}"))
+
+@routes_bp.route('/api/adicao', methods=['POST'])
+def adicionar_parceiro():
+    try:
+        dados = cadastro_parceiro(request.form.to_dict())
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
+    except Exception as e:
+        log.exception("Erro ao cadastrar loja parceira")
+        return jsonify({"erro": "Não foi possível cadastrar a loja."}), 500
+
+    return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
 
 # ==============================================================================
 # 3. ENDPOINTS DE API - CEP E LOJAS (O que o Colega 1 fez)

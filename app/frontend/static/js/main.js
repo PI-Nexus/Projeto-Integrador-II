@@ -241,17 +241,6 @@
       }
     },
     {
-      id: 'matricula',
-      validar: function (formulario) {
-        var colaborador = formulario.colaborador ? formulario.colaborador.checked : false;
-        var valor = formulario.matricula ? formulario.matricula.value.trim() : '';
-        if (colaborador && !DMUtils.campoPreenchido(valor)) {
-          return 'Informe sua matrícula DM — obrigatória para colaboradores.';
-        }
-        return '';
-      }
-    },
-    {
       id: 'cep',
       validar: function (formulario) {
         var campo = formulario.cep;
@@ -447,14 +436,6 @@ function abrirDetalhes(linha) {
 
   campoColaborador.className = 'status ' +
     (colaborador ? 'status--aprovado' : 'status--em-analise');
-
-  const blocoMatricula = document.getElementById('blocoMatricula');
-
-  document.getElementById('detalheMatricula').textContent =
-    dados.matricula || 'Não informada';
-
-  blocoMatricula.hidden = !colaborador;
-
 
   const statusOriginal = dados.status;
   const statusNormalizado = statusOriginal.toLowerCase()

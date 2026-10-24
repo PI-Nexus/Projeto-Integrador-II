@@ -93,6 +93,7 @@
             <tr>
               <th scope="col" class="num">Nº</th>
               <th scope="col">Cliente</th>
+              <th scope="col">Colaborador</th>
               <th scope="col">CPF</th>
               <th scope="col" class="num">Renda mensal</th>
               <th scope="col" class="num">Cartão</th>
@@ -110,10 +111,10 @@
               data-renda="{{ s.renda_mensal|brl|e }}" data-cartao="{{ s.nome_cartao|e }}"
               data-loja="{{ (s.nome_loja or 'Sem loja')|e }}"
               data-data="{{ s.data_solicitacao.strftime('%d/%m/%Y às %H:%M') }}" data-status="{{ s.status|e }}"
-              data-colaborador="{{ 'Sim' if s.colaborador_dm else 'Não' }}"
-              data-matricula="{{ s.matricula_dm or '' }}">
+              data-colaborador="{{ 'Sim' if s.ativo else 'Não' }}">
               <td class="num">{{ s.id_solicitacao }}</td>
               <td>{{ s.nome_cliente }}</td>
+              <td>{{ "Sim" if s.ativo == 1 else "Não" }}</td>
               <td>{{ s.cpf_cliente }}</td>
               <td class="num">{{ s.renda_mensal|brl }}</td>
               <td>{{ s.nome_cartao }}</td>
@@ -145,7 +146,6 @@
             </tr>
             {% endfor %}
           </tbody>
-
         </table>
       </div>
       {% else %}
@@ -195,11 +195,6 @@
                 <span id="detalheColaborador" class="status">—</span>
               </dd>
             </div>
-            <div id="blocoMatricula" hidden>
-              <dt>Matrícula</dt>
-              <dd id="detalheMatricula">—</dd>
-            </div>
-
           </dl>
         </section>
 
@@ -230,13 +225,77 @@
         <button type="button" class="btn btn--primary" id="botaoFecharModal">Fechar</button>
       </div>
     </dialog>
-
+    <section class="form">
+      <h1>Adição de parceiros</h1>
+      <form class="formulario" id="adicao" action="/api/adicao" method="post">
+        <div class="campo">
+          <label for="nome_loja">Nome da Loja</label>
+          <input type="text" id="nome_loja" name="nome_loja" maxlength="120" required
+          autocomplete="off" placeholder="Nome da Loja" aria-describedby="ajuda_nome">
+          <p class="campo__ajuda" id="ajuda_nome">Aqui deve ser escrito o nome da loja a ser adicionada</p>
+        </div>
+        <div class="campo">
+          <label for="cnpj_loja">CNPJ da Loja</label>
+          <input type="text" id="cnpj_loja" name="cnpj_loja" maxlength="18" required
+          placeholder="00.000.000/0000-00" aria-describedby="ajuda_cnpj">
+          <p class="campo__ajuda" id="ajuda_cnpj">Aqui é necessário o CNPJ da loja a ser adicionada</p>
+        </div>
+        <div class="campo campo--checkbox">
+          <label for="eh_digital">A loja é digital?</label>
+          <input type="checkbox" id="eh_digital" name="eh_digital" value="1">
+        </div>
+        <div class="campo">
+          <label for="uf">Estado</label>
+          <select id="uf" name="uf" required>
+            <option value="">Selecione</option>
+            <option value="AC">Acre</option>
+            <option value="AL">Alagoas</option>
+            <option value="AP">Amapá</option>
+            <option value="AM">Amazonas</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+            <option value="DF">Distrito Federal</option>
+            <option value="ES">Espírito Santo</option>
+            <option value="GO">Goiás</option>
+            <option value="MA">Maranhão</option>
+            <option value="MT">Mato Grosso</option>
+            <option value="MS">Mato Grosso do Sul</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="PA">Pará</option>
+            <option value="PB">Paraíba</option>
+            <option value="PR">Paraná</option>
+            <option value="PE">Pernambuco</option>
+            <option value="PI">Piauí</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RN">Rio Grande do Norte</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="RO">Rondônia</option>
+            <option value="RR">Roraima</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="SP">São Paulo</option>
+            <option value="SE">Sergipe</option>
+            <option value="TO">Tocantins</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="cidade_loja">Cidade</label>
+          <input type="text" id="cidade_loja" name="cidade_loja" maxlength="120" required
+          placeholder="São Paulo" aria-describedby="ajuda_cidade">
+          <p class="campo__ajuda" id="ajuda_cidade">Aqui deve ser informada a cidade em que a loja está situada</p>
+        </div>
+        <div class="formulario__acoes">
+          <button class="btn btn--ghost" type="button" id="clear_btn">Limpar</button>
+          <button class="btn btn--primario" type="submit">Cadastrar Loja</button>
+        </div>
+      </form>
+    </section>
   </main>
-
   <footer class="rodape rodape--simples">
     <p class="rodape__aviso">Acesso restrito a administradores.</p>
   </footer>
+  <script src="{{ url_for('static', filename='js/mascaras.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/parceiros.js') }}"></script>
 </body>
-<script src="../static/js/main.js"></script>
-
 </html>

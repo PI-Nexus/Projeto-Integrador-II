@@ -90,8 +90,6 @@ def verificador(
 
 
 def cadastrar_cliente(dados: dict, status: str) -> int:
-    eh_colab = 1 if dados["colaborador"] else 0
-    matricula = (dados.get("matricula") or None) if eh_colab else None
     id_loja = int(dados["loja"]) if dados.get("loja") else None
 
     # Abre a conexão com o banco
@@ -109,12 +107,11 @@ def cadastrar_cliente(dados: dict, status: str) -> int:
                 cur.execute(
                     """INSERT INTO cliente
                        (nome_cliente, cpf_cliente, data_nasc_cliente, telefone_cliente,
-                        email_cliente, colaborador_dm, matricula_dm, renda_mensal)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                        email_cliente, renda_mensal)
+                       VALUES (%s, %s, %s, %s, %s, %s)""",
                     (
                         dados["nome"], dados["cpf"], dados["nascimento"],
-                        dados["celular"], dados["email"], eh_colab,
-                        matricula, dados["renda"]
+                        dados["celular"], dados["email"], dados["renda"]
                     ),
                 )
                 id_cliente = cur.lastrowid
@@ -203,10 +200,9 @@ def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
     query = """
         SELECT s.id_solicitacao,
                c.nome_cliente,
+               col.ativo,
                c.cpf_cliente,
                c.renda_mensal,
-               c.colaborador_dm,
-               c.matricula_dm,
                s.id_cartao,
                ca.nome_cartao,
                l.nome_loja,
@@ -214,6 +210,7 @@ def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
                s.status
         FROM solicitacao_cartao AS s
         INNER JOIN cliente AS c ON c.id_cliente = s.id_cliente
+        LEFT JOIN colaborador as col ON col.cpf = c.cpf_cliente
         INNER JOIN cartao AS ca ON ca.id_cartao = s.id_cartao
         LEFT JOIN loja AS l ON l.id_loja = s.id_loja
         ORDER BY s.data_solicitacao DESC, s.id_solicitacao DESC

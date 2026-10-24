@@ -1,10 +1,15 @@
+from cmath import log
+import pymysql
 import hmac
 import os
 import requests
+import logging
+from database import get_connection
 from repository import selectdb, listar_lojas_parceiras
 from datetime import datetime, date
 import re
 
+log = logging.getLogger(__name__)
 
 def consultar_cep(cep: str) -> dict:
     """
@@ -98,55 +103,51 @@ def validar_cartao_loja(cep_cliente: str, uf_loja: str, eh_loja_digital: bool = 
             "motivo": f"Cartão físico disponível apenas para lojas do mesmo estado (Cliente: {uf_cliente}, Loja: {uf_loja_normalizada})."
         }
 
-def validar_cliente(cpf_cliente: str, tipo_cartao: str, e_colab: str, dm_cod: str, renda: float) -> dict:
-    #Verifica colaboradores DM
-    if e_colab:
-
-        if tipo_cartao == "dm_visa":
-
-            #Verifica se o cliente está cadastrado no banco
-            result = selectdb(tab="colaborador", col=("matricula",),
-                  filter={"cpf": cpf_cliente, "matricula": dm_cod, "ativo": 1})
-
-            if len(result) > 0:
-                return {
-                    "sucesso": True,
-                    "aprovado": True
-                }
-
-            #Foi verificado, porém não está registrado como colaborador        
-            return {
-                "sucesso": False,
-                "erro": "Cliente não é um colaborador dm"
-            }
-
-        else:
-            #verificação para cartão loja
-            return {
-                "sucesso": True,
-                "aprovado": False #Colaborador DM utiliza apenas o cartão DM
-            }
-    #verifica clientes normais
-    else:
-        #Pega salário minímo atual
-        resposta = requests.get(
-            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1619/dados/ultimos/1?formato=json",
-            timeout=5,
+def validar_cliente(cpf_cliente: str, tipo_cartao: str, renda: float) -> dict:
+    # Verifica colaboradores DM
+    if tipo_cartao == "dm_visa":
+        result = selectdb(
+            tab="colaborador",
+            col=("cpf",),
+            filter={"cpf": cpf_cliente, "ativo": 1}
         )
-        resposta.raise_for_status()
-        salario_minimo = float(resposta.json()[0]["valor"])
 
-        if renda / salario_minimo >= 1.5:
+        if result:
             return {
                 "sucesso": True,
-                "elegivel": True,
-                "motivo": "Cumpre requerimentos para análise"
+                "aprovado": True,
+                "motivo": "Colaborador ativo encontrado"
             }
-        else:
-            return {
-                "sucesso": True,
-                "aprovado": False
-            }
+
+        return {
+            "sucesso": True,
+            "aprovado": False,
+            "motivo": "CPF não encontrado entre os colaboradores ativos"
+        }
+
+    # Verifica os demais cartões
+    resposta = requests.get(
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1619/dados/ultimos/1?formato=json",
+        timeout=5
+    )
+    resposta.raise_for_status()
+
+    salario_minimo = float(resposta.json()[0]["valor"])
+
+    if renda / salario_minimo >= 1.5:
+        return {
+            "sucesso": True,
+            "elegivel": True,
+            "aprovado": False,
+            "motivo": "Cumpre os requisitos para análise"
+        }
+
+    return {
+        "sucesso": True,
+        "elegivel": False,
+        "aprovado": False,
+        "motivo": "Renda inferior ao mínimo exigido"
+    }
 
 def filtrar_lojas_parceiras(lojas, uf_alvo):
     if not uf_alvo or not lojas:
@@ -172,8 +173,6 @@ def filtrar_lojas_parceiras(lojas, uf_alvo):
     return lojas_filtradas
 
 def tratar_solicitacao(dados: dict) -> dict:
-    dados["colaborador"] = (dados.get("colaborador") or "").lower()
-    dados["matricula"] = (dados.get("matricula") or "").strip() if dados["colaborador"] else ""
 
     dados["cpf"] = re.sub(r"\D", "", dados.get("cpf", ""))
     dados["celular"] = re.sub(r"\D", "", dados.get("celular", ""))
@@ -198,8 +197,6 @@ def tratar_solicitacao(dados: dict) -> dict:
 
     if len(dados["cpf"]) != 11:
         raise ValueError("CPF inválido.")
-    if dados["colaborador"] and not dados["matricula"]:
-        raise ValueError("Informe a matrícula DM.")
 
     # dm_visa não usa loja; os cartões de loja exigem uma
     if dados.get("tipo_cartao") not in ("dm_visa", "loja", "loja_digital"):
@@ -228,3 +225,89 @@ def senha_admin_correta(senha: str) -> bool:
     esperada = os.environ["ADMIN_PASSWORD"]
     # compare_digest evita vazar informação pelo tempo de comparação
     return hmac.compare_digest(senha.encode(), esperada.encode())
+
+def cadastro_parceiro(dados: dict) -> None:
+    nome = dados.get("nome_loja", "").strip()
+    cnpj = re.sub(r"\D", "", dados.get("cnpj_loja", ""))
+    cidade = dados.get("cidade_loja", "").strip()
+    uf = dados.get("uf", "").strip().upper()
+
+    # O checkbox envia "1" quando marcado e não envia nada quando desmarcado.
+    eh_digital = dados.get("eh_digital") == "1"
+
+    if not nome:
+        raise ValueError("Nome da loja é obrigatório.")
+
+    if not cnpj:
+        raise ValueError("CNPJ da loja é obrigatório.")
+
+    if not eh_digital and not cidade:
+        raise ValueError("Cidade da loja é obrigatória.")
+
+    if not eh_digital and len(uf) != 2:
+        raise ValueError("Estado da loja inválido.")
+
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                # Procura a cidade dentro do estado selecionado.
+                cur.execute(
+                    """
+                    SELECT c.id_cidade
+                    FROM cidade c
+                    JOIN estado e ON e.id_estado = c.id_estado
+                    WHERE UPPER(c.nome_cidade) = %s
+                      AND UPPER(e.uf) = %s
+                    LIMIT 1
+                    """,
+                    (cidade.upper(), uf)
+                )
+
+                resultado = cur.fetchone()
+
+                if resultado:
+                    id_cidade = resultado[0]
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO cidade (nome_cidade, id_estado)
+                        VALUES (
+                            %s,
+                            (SELECT id_estado
+                             FROM estado
+                             WHERE uf = %s)
+                        )
+                        """,
+                        (cidade.capitalize(), uf)
+                    )
+
+                    id_cidade = cur.lastrowid
+
+                if eh_digital:
+                    cur.execute(
+                        """
+                        INSERT INTO loja
+                            (nome_loja, cnpj_loja, id_cidade, eh_digital)
+                        VALUES (%s, %s, (SELECT id_cidade FROM cidade WHERE nome_cidade = %s), %s)
+                        """,
+                        (nome, cnpj, cidade, 1)
+                    )
+
+                else:
+                    cur.execute(
+                        """
+                        INSERT INTO loja
+                            (nome_loja, cnpj_loja, id_cidade, eh_digital)
+                        VALUES (%s, %s, %s, %s)
+                        """,
+                        (nome, cnpj, id_cidade, 0)
+                    )
+
+    except pymysql.err.IntegrityError as e:
+        if e.args[0] == 1062:
+            raise ValueError("Já existe uma loja cadastrada com esse CNPJ.")
+        raise
+
+    except Exception:
+        log.exception("Erro ao cadastrar parceiro")
+        raise

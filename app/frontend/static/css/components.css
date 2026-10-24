@@ -1142,8 +1142,8 @@ main > h1 {
   white-space: nowrap;
 }
 .status--aprovado   { background: var(--dm-verde); }
-.status--em-analise { background: var(--dm-amarelo); }
-.status--reprovado  { background: var(--dm-coral); }
+.status--analise { background: var(--dm-amarelo); }
+.status--negado  { background: #C94A4A; }
  
 /* Texto só para leitor de tela (o "—" visual não diz nada em voz alta). */
 .so-leitor {
