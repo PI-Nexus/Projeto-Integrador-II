@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel Administrativo</title>
+  <meta name="description" content="Painel Administrativo">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="./static/img/dm-favicon-32x-32x.ico">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+<body class="pagina-admin">
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+ 
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="/">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM – página inicial">
+    </a>
+    <span class="cabecalho__titulo">Área administrativa</span>
+ 
+    <form class="cabecalho__sair" method="POST" action="{{ url_for('routes.admin_logout') }}">
+      <button class="btn btn--ghost" type="submit">Sair</button>
+    </form>
+  </header>
+ 
+  <div class="faixa-multicolor" aria-hidden="true">
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--amarelo"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--aqua"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></div>
+  </div>
+ 
+  <main id="conteudo">
+    <section class="solicitacoes">
+      <h1>Solicitações de cartão</h1>
+ 
+      {% if solicitacoes %}
+      <p class="solicitacoes__total">
+        {{ solicitacoes|length }} {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}, da mais recente para a mais antiga.
+      </p>
+ 
+      {% set rotulos = {'EM_ANALISE': 'Em análise', 'APROVADO': 'Aprovado', 'REPROVADO': 'Reprovado'} %}
+ 
+      <div class="tabela-wrap" role="region" aria-label="Tabela de solicitações de cartão" tabindex="0">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th scope="col" class="num">Nº</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">CPF</th>
+              <th scope="col" class="num">Renda mensal</th>
+              <th scope="col" class="num">Cartão</th>
+              <th scope="col">Loja</th>
+              <th scope="col">Data</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in solicitacoes %}
+            <tr>
+              <td class="num">{{ s.id_solicitacao }}</td>
+              <td>{{ s.nome_cliente }}</td>
+              <td>{{ s.cpf_cliente }}</td>
+              <td class="num">{{ s.renda_mensal|brl }}</td>
+              <td class="num">{{ s.id_cartao }}</td>
+              <td>
+                {% if s.nome_loja %}
+                  {{ s.nome_loja }}
+                {% else %}
+                  <span aria-hidden="true">—</span><span class="so-leitor">Sem loja</span>
+                {% endif %}
+              </td>
+              <td>
+                <time datetime="{{ s.data_solicitacao.isoformat() }}">{{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</time>
+              </td>
+              <td>
+                <span class="status status--{{ s.status|lower|replace('_', '-') }}">{{ rotulos.get(s.status, s.status) }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="solicitacoes__vazio">Nenhuma solicitação ainda. Elas aparecem aqui assim que alguém enviar o formulário.</p>
+      {% endif %}
+    </section>
+  </main>
+ 
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">Acesso restrito a administradores.</p>
+  </footer>
+</body>
+</html>

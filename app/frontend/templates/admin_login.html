@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Administrativo</title>
+  <meta name="description" content="Painel Administrativo">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="./static/img/dm-favicon-32x-32x.ico">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+<body class="pagina-login">
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+ 
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="/">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM – página inicial">
+    </a>
+    <span class="cabecalho__titulo">Área administrativa</span>
+  </header>
+ 
+  <div class="faixa-multicolor" aria-hidden="true">
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--amarelo"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--aqua"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></div>
+  </div>
+ 
+  <main id="conteudo">
+    <section class="login">
+      <form class="login__card" method="POST" action="{{ url_for('routes.admin') }}">
+        <h1>Acesso administrativo</h1>
+        <p class="login__apoio">Digite a senha para ver as solicitações de cartão.</p>
+ 
+        {% if erro %}
+        <p class="login__erro" id="erro-senha" role="alert">{{ erro }} Confira e tente novamente.</p>
+        {% endif %}
+ 
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" required autofocus
+                 autocomplete="current-password"
+                 {% if erro %}aria-invalid="true" aria-describedby="erro-senha"{% endif %}>
+        </div>
+ 
+        <button class="btn btn--primario" type="submit">Entrar</button>
+      </form>
+    </section>
+  </main>
+ 
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">Acesso restrito a administradores.</p>
+  </footer>
+</body>
+</html>
