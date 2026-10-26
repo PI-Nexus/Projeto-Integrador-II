@@ -454,11 +454,11 @@ function abrirDetalhes(linha) {
 
   campos.status.className = 'status';
   if (['analise', 'em_analise'].includes(statusNormalizado)) {
-    campos.status.classList.add('status--em-analise');
+    campos.status.classList.add('status--analise');
   } else if (statusNormalizado === 'aprovado') {
     campos.status.classList.add('status--aprovado');
   } else if (['negado', 'reprovado'].includes(statusNormalizado)) {
-    campos.status.classList.add('status--reprovado');
+    campos.status.classList.add('status--negado');
   }
 
   modal.showModal();
