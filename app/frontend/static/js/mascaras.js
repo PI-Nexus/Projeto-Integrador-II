@@ -181,7 +181,9 @@
     aplicarMascara(document.getElementById('cep'), formatarCEP, 8);
     // CNPJ alfanumérico: o último argumento (true) libera letras A-Z além dos dígitos
     aplicarMascara(document.getElementById('cnpj_loja'), formatarCNPJ, 14, true);
-
+    aplicarMascara(document.getElementById('vendedor_cpf'), formatarCpf, 11);
+    aplicarMascara(document.getElementById('vendedor_tel'), formatarCelular, 11);
+    
     validarNascimento(document.getElementById('nascimento'));
   });
 })();

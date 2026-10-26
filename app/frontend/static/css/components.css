@@ -831,7 +831,7 @@ main > h1 {
 
 /* ===== Modal de detalhes ===== */
 
-.modal-solicitacao {
+.modal-modelo {
   width: min(680px, calc(100% - 32px));
   max-width: 680px;
   max-height: 85dvh;
@@ -844,13 +844,13 @@ main > h1 {
   box-shadow: var(--sombra-alta);
 }
 
-.modal-solicitacao::backdrop {
+.modal-modelo::backdrop {
   background: rgb(15 23 42 / 55%);
   backdrop-filter: blur(3px);
 }
 
 /* Cabeçalho */
-.modal-solicitacao__cabecalho {
+.modal-modelo__cabecalho {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -860,7 +860,7 @@ main > h1 {
   border-bottom: 1px solid var(--dm-cinza);
 }
 
-.modal-solicitacao__identificador {
+.modal-modelo__identificador {
   display: inline-block;
   margin-bottom: var(--e-1);
   color: var(--dm-cinza-texto);
@@ -869,7 +869,7 @@ main > h1 {
   letter-spacing: 0.02em;
 }
 
-.modal-solicitacao__cabecalho h2 {
+.modal-modelo__cabecalho h2 {
   margin: 0;
   color: var(--dm-tinta);
   font-size: 1.4rem;
@@ -878,7 +878,7 @@ main > h1 {
 }
 
 /* Botão de fechar */
-.modal-solicitacao__fechar {
+.modal-modelo__fechar {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -896,30 +896,37 @@ main > h1 {
     border-color 0.2s ease;
 }
 
-.modal-solicitacao__fechar:hover {
+.modal-modelo__fechar:hover {
   color: var(--dm-azul);
   background: #F1F5F9;
   border-color: var(--dm-cinza);
 }
 
-.modal-solicitacao__fechar:focus-visible {
+.modal-modelo__fechar:focus-visible {
   outline: 2px solid var(--dm-azul);
   outline-offset: 2px;
 }
 
 /* Conteúdo */
-.modal-solicitacao__conteudo {
+
+.modal-Vformulario {
+  max-width: var(--largura-conteudo);
+  margin-inline: auto;
+  padding-inline: var(--esp-borda);
+}
+
+.modal-modelo__conteudo {
   display: grid;
   gap: 24px;
   padding: 28px;
   background: #F8FAFC;
 }
 
-.modal-solicitacao__secao {
+.modal-modelo__secao {
   min-width: 0;
 }
 
-.modal-solicitacao__secao h3 {
+.modal-modelo__secao h3 {
   display: flex;
   align-items: center;
   gap: var(--e-2);
@@ -991,7 +998,7 @@ main > h1 {
 }
 
 /* Rodapé */
-.modal-solicitacao__rodape {
+.modal-modelo__rodape {
   display: flex;
   justify-content: flex-end;
   padding: 16px 28px;
@@ -999,27 +1006,136 @@ main > h1 {
   border-top: 1px solid var(--dm-cinza);
 }
 
+/* Seção de vendedores */
+
+.vendedor-header {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#adicionarVend_btn {
+  min-height: 28px;
+  padding: 0 var(--e-3);
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 260px), 1fr)
+  );
+  gap: 16px;
+}
+
+.estado-vazio {
+  grid-column: 1 / -1;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.estado-vazio p {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.estado-vazio span {
+  color: var(--texto-secundario);
+  font-size: 13px;
+}
+
+.card-vendedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px;
+  background: white;
+}
+
+.card-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+}
+
+.card-nome {
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.card-info {
+  font-size: 13px;
+  color: var(--texto-secundario);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  margin-bottom: 5px;
+}
+
+.card-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--borda);
+  padding-top: 12px;
+  margin-top: 14px;
+}
+
+.btn-pequeno {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-remover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 /* Responsividade */
 @media (max-width: 760px) {
-  .modal-solicitacao {
+  .modal-modelo {
     width: calc(100% - 24px);
     max-height: 90dvh;
   }
 
-  .modal-solicitacao__cabecalho {
+  .modal-modelo__cabecalho {
     padding: 20px;
   }
 
-  .modal-solicitacao__cabecalho h2 {
+  .modal-modelo__cabecalho h2 {
     font-size: 1.2rem;
   }
 
-  .modal-solicitacao__conteudo {
+  .modal-modelo__conteudo {
     gap: 20px;
     padding: 20px;
   }
 
-  .modal-solicitacao__rodape {
+  .modal-modelo__rodape {
     padding: 16px 20px;
   }
 

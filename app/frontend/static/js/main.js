@@ -403,6 +403,7 @@
 // MODAL EM ADMIN 
 const modal = document.getElementById('modalSolicitacao');
 const linhas = document.querySelectorAll('.linha-solicitacao');
+const modalV = document.getElementById('modalVendedor');
 
 const campos = {
   id: document.getElementById('modalIdentificador'),
@@ -475,14 +476,37 @@ linhas.forEach((linha) => {
   });
 });
 
-document.getElementById('fecharModal')
-  .addEventListener('click', () => modal.close());
+// Modal vendedor
+document.getElementById('adicionarVend_btn')
+  .addEventListener('click', () => modalV.showModal());
 
-document.getElementById('botaoFecharModal')
-  .addEventListener('click', () => modal.close());
+
+// Ações gerais de modal
+document.querySelectorAll('.fecharModal')
+  .forEach( btn => {
+    btn.addEventListener('click', () => {
+      modal.close();
+      modalV.close();
+    });
+  })
+
+document.querySelectorAll('.botaoFecharModal')
+  .forEach( btn => {
+    btn.addEventListener('click', () => {
+      modal.close();
+      modalV.close();
+    });
+  })
+
 
 modal.addEventListener('click', (evento) => {
   if (evento.target === modal) {
     modal.close();
+  }
+});
+
+modalV.addEventListener('click', (evento) => {
+  if (evento.target === modalV) {
+    modalV.close();
   }
 });

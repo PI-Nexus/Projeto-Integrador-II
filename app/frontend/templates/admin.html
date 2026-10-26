@@ -155,14 +155,14 @@
     </section>
 
     <!-- MODAL -->
-    <dialog class="modal-solicitacao" id="modalSolicitacao" aria-labelledby="modalTitulo">
-      <div class="modal-solicitacao__cabecalho">
+    <dialog class="modal-modelo" id="modalSolicitacao" aria-labelledby="modalTitulo">
+      <div class="modal-modelo__cabecalho">
         <div>
-          <span class="modal-solicitacao__identificador" id="modalIdentificador">Solicitação</span>
+          <span class="modal-modelo__identificador" id="modalIdentificador">Solicitação</span>
           <h2 id="modalTitulo">Detalhes da solicitação</h2>
         </div>
 
-        <button type="button" class="modal-solicitacao__fechar" id="fecharModal" aria-label="Fechar detalhes">
+        <button type="button" class="modal-modelo__fechar fecharModal" aria-label="Fechar detalhes">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M18 6 6 18" />
@@ -172,8 +172,8 @@
 
       </div>
 
-      <div class="modal-solicitacao__conteudo">
-        <section class="modal-solicitacao__secao">
+      <div class="modal-modelo__conteudo">
+        <section class="modal-modelo__secao">
           <h3>Dados do cliente</h3>
           <dl class="detalhes-grid">
             <div>
@@ -198,7 +198,7 @@
           </dl>
         </section>
 
-        <section class="modal-solicitacao__secao">
+        <section class="modal-modelo__secao">
           <h3>Dados do pedido</h3>
           <dl class="detalhes-grid">
             <div>
@@ -221,10 +221,69 @@
         </section>
       </div>
 
-      <div class="modal-solicitacao__rodape">
-        <button type="button" class="btn btn--primary" id="botaoFecharModal">Fechar</button>
+      <div class="modal-modelo__rodape">
+        <button type="button" class="btn btn--primary botaoFecharModal" >Fechar</button>
       </div>
     </dialog>
+
+
+    <!-- Modal vendedor -->
+    <dialog class="modal-modelo" id="modalVendedor">
+      <div class="modal-modelo__cabecalho">
+
+        <div>
+          <span class="modal-modelo__identificador" id="modalVIdentificador">Registro</span>
+          <h2 id="modalVTitulo">Cadastro de vendedores</h2>
+        </div>
+
+        <button type="button" class="modal-modelo__fechar fecharModal" aria-label="Fechar detalhes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+
+      </div>
+
+      <div class="modal-modelo__conteudo">
+        <section class="modal-modelo__secao">
+          <h3>Dados do Vendedor</h3>
+          <form class="modal-Vformulario" id="Vformulario">
+            <div class="campo">
+              <label for="vendedor_nome">Nome</label>
+              <input type="text" id="vendedor_nome" name="vendedor_nome" required minlength="5" maxlength="120"
+                 autocomplete="name" placeholder="Como está no seu documento">
+            </div>
+            <div class="campo">
+              <label for="vendedor_codigo">Código</label>
+              <input type="text" id="vendedor_codigo" name="vendedor_codigo" placeholder="1234">
+            </div>
+            <div class="campo">
+              <label for="vendedor_cpf">CPF</label>
+              <input type="text" id="vendedor_cpf" name="vendedor_cpf" required inputmode="numeric"
+                      pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" maxlength="14"
+                      autocomplete="off" placeholder="000.000.000-00">
+            </div>
+            <div class="campo">
+              <label for="vendedor_email">Email</label>
+              <input type="email" id="vendedor_email" name="vendedor_email" placeholder="exemplo@gmail.com"
+                      required maxlength="120" autocomplete="email">
+            </div>
+            <div class="campo">
+              <label for="vendedor_tel">Telefone</label>
+              <input type="tel" id="vendedor_tel" name="vendedor_tel" placeholder="(12) 99999-9999">
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div class="modal-modelo__rodape">
+        <button type="button" class="btn btn--primary botaoFecharModal">Fechar</button>
+        <button type="submit" form="Vformulario" class="btn btn--primario" id="botaoCadastrarVend">Cadastrar</button>
+      </div>
+    </dialog>
+
     <section class="form">
       <h1>Adição de parceiros</h1>
       <form class="formulario" id="adicao" action="/api/adicao" method="post">
@@ -282,6 +341,18 @@
           <input type="text" id="cidade_loja" name="cidade_loja" maxlength="120" required
           placeholder="São Paulo" aria-describedby="ajuda_cidade">
           <p class="campo__ajuda" id="ajuda_cidade">Aqui deve ser informada a cidade em que a loja está situada</p>
+        </div>
+        <div class="campo">
+          <div class="vendedor-header">
+            <label for="vendedor">Vendedor (opcional)</label>
+            <button class="btn btn--primary" type="button" id="adicionarVend_btn">+</button>
+          </div>
+          <div id="listaVendedores" class="cards-container">
+            <div class="estado-vazio" id="estadoVazio">
+              <p>Nenhum vendedor adicionado.</p>
+              <span>Clique em "+" para começar.</span>
+            </div>
+          </div>
         </div>
         <div class="formulario__acoes">
           <button class="btn btn--ghost" type="button" id="clear_btn">Limpar</button>

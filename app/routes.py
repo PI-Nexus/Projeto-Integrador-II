@@ -98,7 +98,7 @@ def processar_solicitacao():
 @routes_bp.route('/api/adicao', methods=['POST'])
 def adicionar_parceiro():
     try:
-        dados = cadastro_parceiro(request.form.to_dict())
+        dados = cadastro_parceiro(request.get_json())
     except ValueError as e:
         return jsonify({"erro": str(e)}), 400
     except Exception as e:
