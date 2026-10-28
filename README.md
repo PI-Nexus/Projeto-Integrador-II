@@ -145,7 +145,7 @@ Projeto-Integrador-II/
 | 8   | Alta      | Como responsável pela análise de cartões, quero que cartões DM possam ser aprovados independentemente da localização do cliente.     | 2          | 1      |
 | 9   | Média      | Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar.     | 5          | 2      |
 | 10   | Média      | Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento.     | 5          | 2      |
-| 11   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 2      |
+| 11   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 3      |
 | 12   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
 
 ## 📋 Planejamento das Sprints
@@ -165,19 +165,19 @@ Projeto-Integrador-II/
 
 ---
 
-### Sprint 2 — 13/15 pontos
+### Sprint 2 — 10/15 pontos
 
 
 - ✅ #9 — Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar. (5 pontos)
 - ✅ #10 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
-- ✅ #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### Sprint 3 — 5/15 pontos
+### Sprint 3 — 8/15 pontos
 
+- #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
 - #12 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
 
 **Dentro da capacidade planejada.**
@@ -189,8 +189,8 @@ Projeto-Integrador-II/
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
 | Sprint 1 | 35 pontos | 33 pontos |
-| Sprint 2 | 15 pontos | 13 pontos |
-| Sprint 3 | 15 pontos | 5 pontos |
+| Sprint 2 | 15 pontos | 10 pontos |
+| Sprint 3 | 15 pontos | 8 pontos |
 
 > **Observação:** a pontuação representa uma estimativa relativa de esforço e complexidade. Ela pode ser revisada pela equipe durante o planejamento da Sprint, caso novas informações ou dependências sejam identificadas.
 
