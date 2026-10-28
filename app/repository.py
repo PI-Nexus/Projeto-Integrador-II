@@ -1,7 +1,8 @@
 # Todas as consultas SQL (Lojas, Pré-qualificação, Cadastro)
 
 from database import get_connection
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 #método para inserção na database
 #tab = nome da tabela, col = colunas da tabela, val = valores a serem inseridos
@@ -87,16 +88,17 @@ def verificador(
             return result if result else False
 
 
+
 def cadastrar_cliente(dados: dict, status: str) -> int:
-    eh_colab = 1 if dados["colaborador"] else 0
-    matricula = (dados.get("matricula") or None) if eh_colab else None
     id_loja = int(dados["loja"]) if dados.get("loja") else None
 
-    # get_connection faz commit ao sair e rollback se houver exceção
+    # Abre a conexão com o banco
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id_cliente FROM cliente WHERE cpf_cliente = %s",
-                        (dados["cpf"],))
+            cur.execute(
+                "SELECT id_cliente FROM cliente WHERE cpf_cliente = %s",
+                (dados["cpf"],)
+            )
             row = cur.fetchone()
 
             if row:
@@ -105,29 +107,38 @@ def cadastrar_cliente(dados: dict, status: str) -> int:
                 cur.execute(
                     """INSERT INTO cliente
                        (nome_cliente, cpf_cliente, data_nasc_cliente, telefone_cliente,
-                        email_cliente, colaborador_dm, matricula_dm, renda_mensal)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (dados["nome"], dados["cpf"], dados["nascimento"], dados["celular"],
-                     dados["email"], eh_colab, matricula, dados["renda"]),
+                        email_cliente, renda_mensal)
+                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (
+                        dados["nome"], dados["cpf"], dados["nascimento"],
+                        dados["celular"], dados["email"], dados["renda"]
+                    ),
                 )
                 id_cliente = cur.lastrowid
 
-                cur.execute("SELECT id_estado FROM estado WHERE uf = %s", (dados["uf"],))
+                cur.execute(
+                    "SELECT id_estado FROM estado WHERE uf = %s",
+                    (dados["uf"],)
+                )
                 estado = cur.fetchone()
+
                 if not estado:
                     raise ValueError(f"UF inexistente: {dados['uf']}")
 
                 cur.execute(
-                    "SELECT id_cidade FROM cidade WHERE nome_cidade = %s AND id_estado = %s",
-                    (dados["cidade"], estado[0]),
+                    """SELECT id_cidade FROM cidade
+                       WHERE nome_cidade = %s AND id_estado = %s""",
+                    (dados["cidade"], estado[0])
                 )
                 cidade = cur.fetchone()
+
                 if cidade:
                     id_cidade = cidade[0]
                 else:
                     cur.execute(
-                        "INSERT INTO cidade (nome_cidade, id_estado) VALUES (%s, %s)",
-                        (dados["cidade"], estado[0]),
+                        """INSERT INTO cidade (nome_cidade, id_estado)
+                           VALUES (%s, %s)""",
+                        (dados["cidade"], estado[0])
                     )
                     id_cidade = cur.lastrowid
 
@@ -135,23 +146,43 @@ def cadastrar_cliente(dados: dict, status: str) -> int:
                     """INSERT INTO endereco
                        (id_cliente, cep, logradouro, numero, bairro, id_cidade)
                        VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (id_cliente, dados["cep"], dados["logradouro"], dados["numero"],
-                     dados["bairro"], id_cidade),
+                    (
+                        id_cliente, dados["cep"], dados["logradouro"],
+                        dados["numero"], dados["bairro"], id_cidade
+                    ),
                 )
 
-            cur.execute("SELECT id_cartao FROM cartao WHERE tipo_cartao = %s",
-                        (dados["tipo_cartao"],))
-            cartao = cur.fetchone()
-            if not cartao:
-                raise ValueError(f"Cartão inexistente: {dados['tipo_cartao']}")
-
             cur.execute(
-                """INSERT INTO solicitacao_cartao (id_cliente, id_cartao, id_loja, status)
-                   VALUES (%s, %s, %s, %s)""",
-                (id_cliente, cartao[0], id_loja, status),
+                "SELECT id_cartao FROM cartao WHERE tipo_cartao = %s",
+                (dados["tipo_cartao"],)
             )
+            cartao = cur.fetchone()
+
+            if not cartao:
+                raise ValueError(
+                    f"Cartão inexistente: {dados['tipo_cartao']}"
+                )
+
+            # Define o horário de São Paulo para a nova solicitação
+            data_solicitacao = datetime.now(
+                ZoneInfo("America/Sao_Paulo")
+            )
+
+            # Insere a solicitação com a data explícita
+            cur.execute(
+                """INSERT INTO solicitacao_cartao
+                   (id_cliente, id_cartao, id_loja, status, data_solicitacao)
+                   VALUES (%s, %s, %s, %s, %s)""",
+                (
+                    id_cliente, cartao[0], id_loja,
+                    status, data_solicitacao
+                ),
+            )
+
             id_solicitacao = cur.lastrowid
+
     return id_solicitacao
+
 
 def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
     """
@@ -165,21 +196,27 @@ def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
  
     Ajuste o nome da tabela/coluna da loja se for diferente de loja.nome_loja.
     """
+
     query = """
         SELECT s.id_solicitacao,
                c.nome_cliente,
+               col.ativo,
                c.cpf_cliente,
                c.renda_mensal,
                s.id_cartao,
+               ca.nome_cartao,
                l.nome_loja,
                s.data_solicitacao,
                s.status
         FROM solicitacao_cartao AS s
         INNER JOIN cliente AS c ON c.id_cliente = s.id_cliente
+        LEFT JOIN colaborador as col ON col.cpf = c.cpf_cliente
+        INNER JOIN cartao AS ca ON ca.id_cartao = s.id_cartao
         LEFT JOIN loja AS l ON l.id_loja = s.id_loja
         ORDER BY s.data_solicitacao DESC, s.id_solicitacao DESC
         LIMIT %s
     """
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(query, (limite,))

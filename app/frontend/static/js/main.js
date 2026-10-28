@@ -241,17 +241,6 @@
       }
     },
     {
-      id: 'matricula',
-      validar: function (formulario) {
-        var colaborador = formulario.colaborador ? formulario.colaborador.checked : false;
-        var valor = formulario.matricula ? formulario.matricula.value.trim() : '';
-        if (colaborador && !DMUtils.campoPreenchido(valor)) {
-          return 'Informe sua matrícula DM — obrigatória para colaboradores.';
-        }
-        return '';
-      }
-    },
-    {
       id: 'cep',
       validar: function (formulario) {
         var campo = formulario.cep;
@@ -410,3 +399,90 @@
   }
 
 })();
+
+// MODAL EM ADMIN 
+const modal = document.getElementById('modalSolicitacao');
+const linhas = document.querySelectorAll('.linha-solicitacao');
+
+const campos = {
+  id: document.getElementById('modalIdentificador'),
+  nome: document.getElementById('detalheNome'),
+  cpf: document.getElementById('detalheCpf'),
+  renda: document.getElementById('detalheRenda'),
+  cartao: document.getElementById('detalheCartao'),
+  loja: document.getElementById('detalheLoja'),
+  data: document.getElementById('detalheData'),
+  status: document.getElementById('detalheStatus')
+};
+
+function abrirDetalhes(linha) {
+  const dados = linha.dataset;
+
+  campos.id.textContent = `Solicitação #${dados.id}`;
+  campos.nome.textContent = dados.nome;
+  campos.cpf.textContent = dados.cpf;
+  campos.renda.textContent = dados.renda;
+  campos.cartao.textContent = dados.cartao;
+  campos.loja.textContent = dados.loja;
+  campos.data.textContent = dados.data;
+
+  
+  const colaborador = dados.colaborador === 'Sim';
+
+  const campoColaborador = document.getElementById('detalheColaborador');
+  campoColaborador.textContent = colaborador
+    ? 'Colaborador DM'
+    : 'Não colaborador';
+
+  campoColaborador.className = 'status ' +
+    (colaborador ? 'status--aprovado' : 'status--em-analise');
+
+  const statusOriginal = dados.status;
+  const statusNormalizado = statusOriginal.toLowerCase()
+    .replaceAll(' ', '_');
+
+  const rotulos = {
+    'analise': 'Em análise',
+    'em_analise': 'Em análise',
+    'aprovado': 'Aprovado',
+    'negado': 'Negado',
+    'reprovado': 'Reprovado'
+  };
+
+  campos.status.textContent =
+    rotulos[statusNormalizado] || statusOriginal;
+
+  campos.status.className = 'status';
+  if (['analise', 'em_analise'].includes(statusNormalizado)) {
+    campos.status.classList.add('status--analise');
+  } else if (statusNormalizado === 'aprovado') {
+    campos.status.classList.add('status--aprovado');
+  } else if (['negado', 'reprovado'].includes(statusNormalizado)) {
+    campos.status.classList.add('status--negado');
+  }
+
+  modal.showModal();
+}
+
+linhas.forEach((linha) => {
+  linha.addEventListener('click', () => abrirDetalhes(linha));
+
+  linha.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter' || evento.key === ' ') {
+      evento.preventDefault();
+      abrirDetalhes(linha);
+    }
+  });
+});
+
+document.getElementById('fecharModal')
+  .addEventListener('click', () => modal.close());
+
+document.getElementById('botaoFecharModal')
+  .addEventListener('click', () => modal.close());
+
+modal.addEventListener('click', (evento) => {
+  if (evento.target === modal) {
+    modal.close();
+  }
+});
