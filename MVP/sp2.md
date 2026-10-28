@@ -1,4 +1,4 @@
-# 📌 MVP - Gestão de Parceiros, Vendedores e Elegibilidade Nacional do Cartão DM (Sprint 2)
+# 📌 MVP - Gestão de Parceiros e Elegibilidade Nacional do Cartão DM (Sprint 2)
 
 ## 🎯 Objetivo do MVP
 
