@@ -1,4 +1,4 @@
-# 📌 MVP - Gestão de Parceiros, Vendedores e Elegibilidade Nacional do Cartão DM (Sprint 2)
+# 📌 MVP - Gestão de Parceiros e Elegibilidade Nacional do Cartão DM (Sprint 2)
 
 ## 🎯 Objetivo do MVP
 
@@ -129,4 +129,4 @@ A aplicação mantém a base tecnológica da Sprint 1: aplicação Web em Python
 ## 📂 Anexos / Evidências
 
 **Vídeo de Demonstração**\
-Confira o website em funcionamento: https://youtu.be/9zSZ0oM3F0M
+Confira o website em funcionamento: https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx
