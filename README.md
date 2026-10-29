@@ -8,7 +8,7 @@
 
 [![Demonstração](docs/img/dm_fundo.png/)](https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx)
 
-> 🔗 [Clique para assistir no YouTube](https://youtu.be/9zSZ0oM3F0M)
+> 🔗 [Clique para assistir no YouTube](https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx)
 
 # 📑 Índice
 
