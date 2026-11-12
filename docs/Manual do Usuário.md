@@ -21,7 +21,7 @@ Os cartões disponíveis são:
 * **Clientes de lojas parceiras:** Pessoas que desejam o cartão da sua loja preferida (Cartão Loja).
 * **Clientes que preferem o digital:** Pessoas que querem um cartão sem versão física e sem restrição de estado (Cartão Loja Digital).
 * **Colaboradores da DM:** Funcionários que possuem regras próprias de aprovação.
-* **Administradores:** Pessoas responsáveis por cadastrar parceiros e vendedores e acompanhar as solicitações no painel administrativo (veja a [seção 5](#5-painel-administrativo)).
+* **Administradores:** Pessoas responsáveis por cadastrar parceiros e acompanhar as solicitações no painel administrativo (veja a [seção 5](#5-painel-administrativo)).
 
 #### Dores que o site atende
 
@@ -36,7 +36,9 @@ Os cartões disponíveis são:
 ### 3. Acessando o Site
 
 1. Abra o navegador (computador ou celular).
-2. Acesse o endereço do site. Ao executar o projeto na sua máquina (veja o [Manual de Instalação](Manual%20de%20Instalação.md)), o endereço é `http://localhost:5000`.
+2. Acesse o endereço do site. Ao executar o projeto na sua máquina (veja o [Manual de Instalação](Manual%20de%20Instalação.md)), o endereço é:
+   * `http://localhost` se a instalação foi feita com **Docker**;
+   * `http://localhost:5000` se a instalação foi **manual**.
 3. A página inicial será exibida.
 
 > **Requisito:** é necessária conexão com a Internet. O site consulta o CEP no serviço ViaCEP, o salário mínimo vigente no Banco Central e carrega a fonte do Google Fonts.
@@ -90,29 +92,33 @@ Selecione uma das três opções: `Cartão DM Visa`, `Cartão Loja` ou `Cartão 
 | E-mail | `voce@email.com` | É por ele que o resultado é comunicado |
 | Celular | Com DDD | O formato `(12) 99999-9999` entra sozinho |
 | Renda mensal | Em reais | Use **vírgula** para os centavos (ex.: `3500,00` ou `3.500,00`). É usada na análise |
-| Sou colaborador da DM | Marque só se for o seu caso | Ao marcar, informe a **matrícula DM** |
+
+> **Colaboradores da DM** não precisam marcar nada nem informar matrícula: o sistema identifica o colaborador pelo **CPF** informado, comparando-o com a base de colaboradores ativos da DM.
 
 **Etapa 3 · Onde você está**
 
 1. Digite o **CEP**. Ao sair do campo, `Rua`, `Bairro`, `Cidade` e `Estado` são preenchidos automaticamente.
-2. Informe o **número** e, se quiser, o **complemento**.
+2. Informe o **número** e, se quiser, o **complemento** (opcional).
 3. Se o CEP não for encontrado, você ainda pode preencher os campos e escolher o estado manualmente na lista.
 
 > O estado do seu CEP define quais lojas parceiras aparecem na Etapa 4.
 
 **Etapa 4 · Sua loja**
 
-* **Loja parceira:** escolha uma loja na lista. Ela mostra as lojas do **estado selecionado** e também as **lojas digitais** (que não têm restrição de estado e aparecem com o aviso de que não há cartão físico). Parceiros recém-cadastrados no painel administrativo aparecem aqui imediatamente.
-* **Vendedor que te atendeu** *(opcional)*: se alguém da loja te ajudou, informe o nome ou o código. O vendedor só é aceito se pertencer à loja escolhida, e o pedido fica registrado com essa atribuição. Se ninguém te atendeu, deixe em branco.
-* Para **Cartão Loja** e **Cartão Loja Digital**, escolher a loja é **obrigatório**.
+* **Loja parceira:** a lista mostra as lojas físicas do **estado selecionado** e também as **lojas digitais**, que não têm restrição de estado. Cada opção aparece no formato *Nome da loja — Cidade/UF*. Parceiros recém-cadastrados no painel administrativo aparecem aqui imediatamente.
+* **O tipo da loja precisa combinar com o cartão escolhido** (se não combinar, o site recusa o envio e mostra um aviso):
+  * **Cartão Loja:** escolha uma loja **física do mesmo estado** do seu endereço. Lojas digitais ou de outro estado não são aceitas.
+  * **Cartão Loja Digital:** escolha uma loja **digital**. Lojas físicas não são aceitas.
+  * Nos dois casos, escolher a loja é **obrigatório**.
+* **Vendedor que te atendeu** *(opcional)*: o campo aparece no formulário, mas **nesta versão ainda não é validado nem gravado**: o que for digitado é ignorado e o pedido segue normalmente. A atribuição do pedido a vendedores está prevista para a Sprint 3.
 
-> 💡 **Dica:** no **Cartão DM Visa**, escolher a loja é opcional: o pedido pode ser enviado sem selecionar loja e é avaliado da mesma forma em qualquer estado.
+> 💡 **Dica:** no **Cartão DM Visa**, escolher a loja é opcional: o pedido pode ser enviado sem selecionar loja e é avaliado da mesma forma em qualquer estado. Se você selecionar uma loja, ela é ignorada e o pedido é registrado sem loja.
 
 **Confirmação**
 
 Marque a autorização para consulta dos seus dados na análise de crédito e clique em **`Enviar solicitação`**. O botão muda para *Enviando...* enquanto o pedido é processado.
 
-Se algum campo estiver incorreto ou faltando, uma mensagem em vermelho aparece abaixo dele (por exemplo: *"CPF inválido. Confira os números digitados."* ou *"Você precisa ter 18 anos ou mais."*) e o cursor vai para o primeiro campo com problema.
+Se algum campo estiver incorreto ou faltando, uma mensagem em vermelho aparece abaixo dele (por exemplo: *"CPF inválido. Confira os números digitados."* ou *"Você precisa ter 18 anos ou mais."*) e o cursor vai para o primeiro campo com problema. Erros detectados pelo servidor (por exemplo, uma loja que não combina com o cartão) aparecem em uma janela de aviso.
 
 ---
 
@@ -130,6 +136,10 @@ Próximos passos
 1. Confirme seu e-mail pelo link que acabamos de enviar.
 2. Separe um documento com foto para a retirada.
 3. Assim que o cartão estiver pronto, avisamos por e-mail e SMS.
+
+Protocolo: —
+Cartão solicitado: (nome do cartão pedido)
+Loja: (loja escolhida, ou — quando não há loja)
 ```
 
 **🕒 Sua solicitação está em análise**
@@ -142,35 +152,43 @@ O que acontece agora
 1. Nosso time analisa as informações que você enviou.
 2. Você recebe o resultado por e-mail em até 48 horas.
 3. Se precisarmos de algum documento, avisamos pelo mesmo e-mail.
+
+Protocolo: —
+Cartão solicitado: (nome do cartão pedido)
+Loja: (loja escolhida, ou — quando não há loja)
 ```
 
 **❌ Não foi dessa vez**
 
 ```
-Não conseguimos aprovar seu cartão agora.
-Você pode tentar de novo em 90 dias.
+Não conseguimos aprovar seu cartão agora. Isso pode mudar com o tempo —
+você pode tentar de novo em 90 dias.
 
 Mas temos outras opções pra você
-• DM Cred — microcrédito, com parcelas que cabem no bolso.
-• Empréstimo Pessoal — dinheiro na conta para quitar dívidas ou cobrir imprevistos.
+Estes produtos passam por uma análise diferente da do cartão e podem se
+encaixar melhor no seu momento.
+• DM Cred — microcrédito para resolver o que não pode esperar, com parcelas que cabem no bolso.
+• Empréstimo Pessoal — dinheiro na conta pra quitar dívidas, cobrir um imprevisto ou tirar um plano do papel.
 ```
 
 Nas telas **Aprovado** e **Em análise** há o botão `Voltar para o início`. Na tela **Não foi dessa vez**, os botões `Conhecer o DM Cred` e `Simular empréstimo` abrem o portal da DM em outra aba; para voltar ao site, clique no logo DM no cabeçalho.
+
+> O resumo exibido nas telas **Aprovado** e **Em análise** mostra o último pedido enviado no seu navegador.
 
 ---
 
 #### 4.5 Como o pedido é avaliado (regras de pré-qualificação)
 
-O resultado depende do seu perfil e do cartão escolhido:
+O resultado depende do cartão escolhido e do CPF informado:
 
-| Perfil | Cartão DM Visa | Cartão Loja / Loja Digital |
+| Cartão | Situação | Resultado |
 |---|---|---|
-| **Colaborador DM** com CPF e matrícula cadastrados | Aprovado | Não aprovado |
-| **Colaborador DM** não localizado na base | Em análise | Não aprovado |
-| **Não colaborador**, renda ≥ 1,5 × salário mínimo | Em análise | Em análise |
-| **Não colaborador**, renda < 1,5 × salário mínimo | Não aprovado | Não aprovado |
+| **Cartão DM Visa** | CPF consta na base de **colaboradores ativos** da DM | Aprovado |
+| **Cartão DM Visa** | CPF não consta na base de colaboradores | Não aprovado |
+| **Cartão Loja / Cartão Loja Digital** | Qualquer cliente, colaborador ou não | Não aprovado (veja a [seção 7](#7-limitações-conhecidas-desta-versão)) |
+| **Cartão Loja / Cartão Loja Digital** | Não foi possível consultar o salário mínimo no Banco Central | Em análise |
 
-* O **salário mínimo** usado no cálculo é o vigente, consultado no Banco Central. Por exemplo, com o salário mínimo em R$ 1.621,00, a renda mínima é de R$ 2.431,50.
+* Nos cartões de loja, o sistema consulta o **salário mínimo vigente** no Banco Central para comparar com a renda informada (regra de renda mínima de 1,5 × salário mínimo; por exemplo, com o salário mínimo em R$ 1.621,00, a renda mínima é de R$ 2.431,50). A seção 7 explica como esse resultado é tratado nesta versão.
 * Colaboradores da DM utilizam apenas o **Cartão DM Visa**; pedidos de Cartão Loja de colaboradores não são aprovados.
 
 **Restrições geográficas**
@@ -178,59 +196,67 @@ O resultado depende do seu perfil e do cartão escolhido:
 | Cartão | Regra |
 |---|---|
 | **DM Visa** | Pode ser solicitado de **qualquer estado**, sem exigir a escolha de uma loja |
-| **Cartão Loja** | Só permite escolher lojas do **mesmo estado do CEP** informado |
-| **Cartão Loja Digital** | **Sem restrição de estado**. Não é emitido cartão físico |
+| **Cartão Loja** | Só permite escolher lojas **físicas** do **mesmo estado** do endereço informado |
+| **Cartão Loja Digital** | **Sem restrição de estado**, mas exige uma loja **digital**. Não é emitido cartão físico |
 
 ---
 
 ### 5. Painel administrativo
 
-Esta seção é voltada ao **administrador** da DM. O painel permite incluir novos parceiros e vendedores sem depender da equipe de desenvolvimento nem de acesso direto ao banco de dados.
+Esta seção é voltada ao **administrador** da DM. O painel permite acompanhar as solicitações recebidas e incluir novos parceiros sem depender da equipe de desenvolvimento nem de acesso direto ao banco de dados.
 
 ---
 
 #### 5.1 Acessando o painel
 
-1. Acesse `http://localhost:5000/admin` (ou o endereço do site seguido de `/admin`).
-2. Informe a **senha de administrador**, definida na variável `ADMIN_PASSWORD` durante a instalação (veja o [Manual de Instalação](Manual%20de%20Instalação.md)).
+1. Acesse `http://localhost/admin` na instalação com Docker, ou `http://localhost:5000/admin` na instalação manual (ou o endereço do site seguido de `/admin`).
+2. Informe a **senha de administrador** na tela *Acesso administrativo*. Ela é definida na variável `ADMIN_PASSWORD` durante a instalação (veja o [Manual de Instalação](Manual%20de%20Instalação.md)). Se a senha estiver errada, aparece a mensagem *"Senha incorreta."*.
+3. Para encerrar a sessão, clique em **`Sair`**, no canto superior do painel.
 
-Sem a senha, o acesso às telas do painel é bloqueado. Todos os administradores usam a mesma senha.
+Sem a senha, o acesso à tela do painel é bloqueado. Todos os administradores usam a mesma senha.
+
+O painel tem duas partes, uma abaixo da outra: **Solicitações de cartão** (acompanhamento) e **Adição de parceiros** (cadastro).
 
 ---
 
 #### 5.2 Acompanhando as solicitações
 
-O painel lista as solicitações recebidas, com o resultado da pré-qualificação de cada uma (**Aprovado**, **Em análise** ou **Não aprovado**) e a coluna **Vendedor**, que mostra quem atendeu o cliente (vazia quando o pedido foi feito sem vendedor).
+A seção **Solicitações de cartão** reúne:
+
+* **Resumo em quatro indicadores:** *Total de solicitações*, *Em análise*, *Aprovadas* e *Negadas*.
+* **Tabela de solicitações**, da mais recente para a mais antiga (até as 200 mais recentes), com as colunas: **Nº**, **Cliente**, **Colaborador** (Sim/Não), **CPF**, **Renda mensal**, **Cartão**, **Loja** (— quando o pedido não tem loja), **Data** e **Status** (*Em análise*, *Aprovado* ou *Negado*).
+* **Detalhes de cada pedido:** clique em uma linha (ou use `Enter` com a linha selecionada) para abrir a janela *Detalhes da solicitação*, com os dados do cliente (nome, CPF, renda e vínculo com a DM) e do pedido (cartão, loja, data e status). Feche pelo botão `Fechar`, pelo `X` ou clicando fora da janela.
+
+Quando ainda não há pedidos, o painel mostra a mensagem *"Nenhuma solicitação ainda."*. A tabela não tem busca nem filtros.
 
 ---
 
 #### 5.3 Cadastrando um parceiro
 
-Use o formulário de cadastro de parceiros e preencha:
+Use o formulário **Adição de parceiros**, no final do painel, e preencha:
 
 | Campo | O que informar | Observações |
 |---|---|---|
-| Nome | Nome do estabelecimento | Obrigatório |
-| CNPJ | CNPJ do parceiro | Obrigatório. É validado e **não pode repetir** um CNPJ já cadastrado |
-| Cidade / UF | Localização do parceiro | Obrigatório |
-| Tipo | **Físico** ou **Digital** | Obrigatório |
-| Descrição | Texto de apresentação do parceiro | — |
+| Nome da Loja | Nome do estabelecimento | Obrigatório; precisa ter letras (de 2 a 120 caracteres) |
+| CNPJ da Loja | CNPJ do parceiro | Obrigatório. A pontuação entra sozinha; o CNPJ é conferido pelo dígito verificador e **não pode repetir** um CNPJ já cadastrado |
+| A loja é digital? | Caixa de seleção | Marque para parceiros digitais (sem cartão físico). Desmarcada, a loja é cadastrada como **física** |
+| Estado | Estado da loja | Obrigatório |
+| Cidade | Cidade da loja | Obrigatório; use apenas letras, espaços, hífen, ponto ou apóstrofo |
 
-Depois de salvar, o parceiro aparece na lista de parceiros cadastrados e já fica disponível na **Etapa 4** do formulário do cliente:
+Use `Limpar` para esvaziar o formulário e `Cadastrar Loja` para gravar.
+
+Depois de gravar, o painel é recarregado, **sem mensagem de confirmação e sem lista de parceiros cadastrados**. Para conferir, abra o formulário de solicitação do cliente: o parceiro já fica disponível na **Etapa 4**:
 
 * **Parceiro físico:** aparece apenas para clientes do **mesmo estado**.
-* **Parceiro digital:** aparece para **todos os estados**, com o aviso de que não há cartão físico.
+* **Parceiro digital:** aparece para **todos os estados**.
 
-Se algum dado estiver incorreto ou o CNPJ já estiver cadastrado, o painel mostra uma mensagem explicando o problema e o parceiro não é gravado.
+Se algum campo estiver incorreto, o formulário mostra a mensagem em vermelho abaixo dele e o parceiro não é enviado. Se o servidor recusar o cadastro (por exemplo, com *"Já existe uma loja cadastrada com esse CNPJ."*), o navegador exibe uma página com a mensagem de erro e o parceiro não é gravado: use o botão **Voltar** do navegador para corrigir.
 
 ---
 
 #### 5.4 Cadastrando um vendedor
 
-Use o formulário de cadastro de vendedores e informe o **nome**, o **código do vendedor** e o **parceiro** ao qual ele está vinculado (o parceiro precisa já estar cadastrado).
-
-* O vendedor é **opcional** no pedido do cliente: pedidos sem vendedor continuam sendo registrados normalmente.
-* Quando o cliente informa um vendedor na Etapa 4, ele só é aceito se pertencer à loja escolhida. Nesse caso o pedido fica gravado com essa atribuição e o vendedor aparece na lista de solicitações do painel.
+O cadastro de vendedores (atribuição dos pedidos aos vendedores dos parceiros) está previsto para a **Sprint 3** e **ainda não está disponível** no painel. Por enquanto, o campo *Vendedor* do formulário do cliente não é validado nem gravado (veja a [Etapa 4](#43-preenchendo-o-formulário-de-solicitação)).
 
 ---
 
@@ -242,25 +268,29 @@ Use o formulário de cadastro de vendedores e informe o **nome**, o **código do
 | *"Você precisa ter 18 anos ou mais"* | O pedido só pode ser feito por maiores de 18 anos |
 | Endereço não foi preenchido | Confira o CEP (8 dígitos) e sua conexão. Você pode preencher manualmente e escolher o estado na lista |
 | Lista de lojas mostra *"Informe um CEP válido primeiro"* | Digite um CEP válido ou selecione o estado manualmente |
-| *"Nenhuma loja encontrada neste estado"* | Escolha outro estado, o Cartão DM Visa ou o Cartão Loja Digital |
+| *"Nenhuma loja encontrada neste estado"* | Escolha outro estado ou o Cartão DM Visa. Se aparecer em todos os estados, avise o administrador: provavelmente não há lojas cadastradas |
+| Aviso *"Selecione uma loja parceira."* | No Cartão Loja e no Cartão Loja Digital, escolher a loja é obrigatório |
+| Aviso *"Cartão Loja só está disponível para lojas físicas do seu estado."* | Escolha uma loja física do mesmo estado do seu endereço, ou peça o Cartão Loja Digital |
+| Aviso *"Selecione uma loja digital."* | O Cartão Loja Digital só aceita lojas digitais. Escolha uma loja digital ou peça o Cartão Loja |
 | Alerta *"Erro de comunicação com o servidor"* | Verifique sua conexão e tente novamente. Se persistir, confirme com a equipe que o servidor está em execução |
-| O vendedor informado não foi aceito | O vendedor precisa pertencer à loja escolhida. Confira o nome ou o código, ou deixe o campo em branco (ele é opcional) |
-| Painel: acesso bloqueado | Informe a senha de administrador (`ADMIN_PASSWORD`). Se não souber qual é, consulte quem instalou o sistema |
-| Painel: CNPJ rejeitado ao cadastrar parceiro | Confira se o CNPJ é válido e se o parceiro já não consta na lista de parceiros cadastrados |
-| Tela de erro ao enviar | Veja as [Limitações conhecidas](#7-limitações-conhecidas-desta-versão) |
+| Painel: *"Senha incorreta."* | Informe a senha de administrador (`ADMIN_PASSWORD`). Se não souber qual é, consulte quem instalou o sistema |
+| Painel: erro ao cadastrar parceiro (página com a mensagem de erro) | Confira se o CNPJ é válido e se o parceiro já não foi cadastrado (o CNPJ não pode se repetir). Volte pelo navegador e corrija |
+| Tela de erro ao enviar | Veja as [Limitações conhecidas](#7-limitações-conhecidas-desta-versão) e peça ajuda a quem instalou o sistema (é comum faltar carregar os dados iniciais do banco) |
 
 ---
 
 ### 7. Limitações conhecidas desta versão
 
-Este manual descreve as **Sprints 1 e 2** do projeto. Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
+Este manual descreve as **Sprints 1 e 2** do projeto (a Sprint 3, de vendedores e ofertas, está em andamento). Os pontos abaixo estão em ajuste e podem ser removidos deste manual quando forem corrigidos:
 
-* **Um CPF, uma solicitação:** enviar novamente o mesmo CPF retorna erro do servidor.
-* **Aprovação automática de colaborador:** como o CPF do colaborador já precisa existir na base, o envio dessa combinação ainda pode retornar erro do servidor em vez de abrir a tela *Aprovado*.
-* **Endereço não gravado:** o endereço informado ainda não é salvo no banco de dados.
-* **Resumo nas telas de resultado:** os campos *Protocolo*, *Cartão solicitado* e *Loja* aparecem com "—".
+* **Regras de pré-qualificação em ajuste:** o desafio da DM prevê que colaboradores tenham o Cartão DM aprovado e o Cartão Loja reprovado automaticamente, e que não colaboradores passem por análise (os aptos podem ser aprovados e os demais ficam *Em análise*). Nesta versão, o caso do colaborador está implementado, mas quem não é colaborador recebe *Não aprovado* no Cartão DM Visa, e os cartões de loja resultam em *Não aprovado* mesmo quando a renda atinge 1,5 × o salário mínimo. O status *Em análise* só aparece quando a consulta ao Banco Central falha.
+* **Vendedores:** o campo *Vendedor* do formulário e o cadastro de vendedores no painel ainda não funcionam (previstos para a Sprint 3).
+* **Complemento não gravado:** o endereço é salvo (CEP, rua, número, bairro, cidade e estado), mas o **complemento** informado ainda não é guardado no banco de dados.
+* **Mesmo CPF, novos pedidos:** enviar novamente o mesmo CPF cria uma **nova solicitação** ligada ao cadastro já existente; os dados do primeiro envio (nome, renda, endereço etc.) não são atualizados.
+* **Resumo nas telas de resultado:** o campo *Protocolo* aparece com "—" e a tela *Não foi dessa vez* não traz resumo do pedido.
+* **Painel sem lista de parceiros:** depois de cadastrar um parceiro, o painel não mostra a lista de parceiros nem uma mensagem de confirmação.
 * **Cadastro de parceiros um a um:** no painel administrativo não há importação em lote (por exemplo, via CSV), o que pesa para redes com muitas unidades.
-* **Sem edição ou exclusão:** o painel permite apenas cadastrar e listar parceiros e vendedores.
+* **Sem edição ou exclusão:** o painel permite apenas cadastrar parceiros; não é possível editar nem excluir.
 * **Senha única de administrador:** o acesso ao painel usa uma única senha compartilhada, sem usuários ou perfis individuais.
 
 ---
