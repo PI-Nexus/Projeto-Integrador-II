@@ -202,7 +202,7 @@ Projeto-Integrador-II/
 |-------------------|------------|----------|-----------|
 | 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
 | 02                | 25/10/2026 | Concluída ✅ | [MVP](MVP/sp2.md)  |
-| 03                | 22/11/2026 | Em andamento 🟡 | [MVP] (MVP/sp3.md) |
+| 03                | 22/11/2026 | Em andamento 🟡 | [MVP](MVP/sp3.md) |
 | Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
 
 ---
