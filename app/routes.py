@@ -2,7 +2,7 @@
 import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
 from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro
-from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao
+from repository import (cadastrar_cliente,listar_solicitacoes_dashboard,listar_lojas_parceiras,buscar_solicitacao,cpf_possui_solicitacao)
 import requests
 import logging
 
@@ -64,17 +64,29 @@ def admin_logout():
 # ==============================================================================
 # 2. ROTA DE PROCESSAMENTO DO FORMULÁRIO (O que nós adicionámos para o Colega 2)
 # ==============================================================================
+
 @routes_bp.route('/api/solicitacoes', methods=['POST'])
 def processar_solicitacao():
     try:
         dados = tratar_solicitacao(request.form.to_dict())
-        validar_loja_do_cartao(dados)          # <- aqui
+
+        # Verifica se o CPF já possui uma solicitação cadastrada
+        if cpf_possui_solicitacao(dados["cpf"]):
+            return jsonify({
+                "erro": "Este CPF já possui uma solicitação cadastrada."
+            }), 409
+
+        validar_loja_do_cartao(dados)
+
     except ValueError as e:
         return jsonify({"erro": str(e)}), 400
 
     try:
-        validacao = validar_cliente(dados["cpf"], dados["tipo_cartao"],
-                                    dados["renda"])
+        validacao = validar_cliente(
+            dados["cpf"],
+            dados["tipo_cartao"],
+            dados["renda"]
+        )
     except (requests.RequestException, ValueError, KeyError, IndexError):
         log.exception("Falha ao validar cliente; enviando para análise")
         validacao = {"sucesso": False}
@@ -86,14 +98,24 @@ def processar_solicitacao():
 
     try:
         id_solicitacao = cadastrar_cliente(dados, status)
+
     except pymysql.err.IntegrityError as e:
         if e.args[0] == 1062:
-            return jsonify({"erro": "Já existe um cadastro com este CPF."}), 409
+            return jsonify({
+                "erro": "Já existe um cadastro com este CPF."
+            }), 409
         raise
 
     session["ultima_solicitacao"] = id_solicitacao
-    destino = {"Aprovado": "aprovado", "Negado": "negado", "Analise": "analise"}[status]
+
+    destino = {
+        "Aprovado": "aprovado",
+        "Negado": "negado",
+        "Analise": "analise"
+    }[status]
+
     return redirect(url_for(f"routes.{destino}"))
+
 
 @routes_bp.route('/api/adicao', methods=['POST'])
 def adicionar_parceiro():

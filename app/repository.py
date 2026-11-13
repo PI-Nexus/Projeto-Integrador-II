@@ -255,3 +255,18 @@ def buscar_solicitacao(id_solicitacao: int) -> dict | None:
                 return None
             colunas = [d[0] for d in cur.description]
             return dict(zip(colunas, linha))
+
+
+def cpf_possui_solicitacao(cpf: str) -> bool:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT 1
+                FROM solicitacao_cartao sc
+                INNER JOIN cliente c
+                    ON sc.id_cliente = c.id_cliente
+                WHERE c.cpf_cliente = %s
+                LIMIT 1
+            """, (cpf,))
+
+            return cur.fetchone() is not None
