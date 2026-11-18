@@ -1,8 +1,12 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
-from .services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras
-from .mock_lojas import listar_lojas_parceiras
+import pymysql
+from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro
+from repository import (cadastrar_cliente,listar_solicitacoes_dashboard,listar_lojas_parceiras,buscar_solicitacao,cpf_possui_solicitacao)
+import requests
+import logging
 
+log = logging.getLogger(__name__)
 routes_bp = Blueprint('routes', __name__)
 
 # ==============================================================================
@@ -16,41 +20,114 @@ def home():
 def solicitar():
     return render_template('solicita.html')
 
+def _solicitacao_atual():
+    id_sol = session.get("ultima_solicitacao")
+    return buscar_solicitacao(id_sol) if id_sol else None
+
 @routes_bp.route('/aprovado', methods=['GET'])
 def aprovado():
-    return render_template('aprovado.html')
+    return render_template('aprovado.html', solicitacao=_solicitacao_atual())
 
 @routes_bp.route('/analise', methods=['GET'])
 def analise():
-    return render_template('analise.html')
+    return render_template('analise.html', solicitacao=_solicitacao_atual())
 
 @routes_bp.route('/negado', methods=['GET'])
 def negado():
-    return render_template('negado.html')
+    return render_template('negado.html', solicitacao=_solicitacao_atual())
+
+@routes_bp.route("/admin", methods=["GET", "POST"])
+def admin():
+    erro = None
+
+    if request.method == "POST":
+        if senha_admin_correta(request.form.get("senha", "")):
+            session.clear()
+            session["admin"] = True
+            return redirect(url_for("routes.admin"))  # evita reenvio do POST no F5
+        erro = "Senha incorreta."
+
+    if not session.get("admin"):
+        return render_template("admin_login.html", erro=erro)
+
+    return render_template(
+        "admin.html",
+        solicitacoes=listar_solicitacoes_dashboard(),)
+
+
+@routes_bp.route("/admin/logout", methods=["POST"])
+def admin_logout():
+    session.clear()
+    return redirect(url_for("routes.admin"))
 
 
 # ==============================================================================
 # 2. ROTA DE PROCESSAMENTO DO FORMULÁRIO (O que nós adicionámos para o Colega 2)
 # ==============================================================================
+
 @routes_bp.route('/api/solicitacoes', methods=['POST'])
 def processar_solicitacao():
-    renda_raw = request.form.get('renda', '0')
-    e_colaborador = request.form.get('colaborador', '').lower()
+    try:
+        dados = tratar_solicitacao(request.form.to_dict())
 
-    if isinstance(renda_raw, str):
-        renda_limpa = renda_raw.replace('R$', '').replace('.', '').replace(',', '.').strip()
-    else:
-        renda_limpa = renda_raw
+        # Verifica se o CPF já possui uma solicitação cadastrada
+        if cpf_possui_solicitacao(dados["cpf"]):
+            return jsonify({
+                "erro": "Este CPF já possui uma solicitação cadastrada."
+            }), 409
+
+        validar_loja_do_cartao(dados)
+
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
 
     try:
-        renda = float(renda_limpa) if renda_limpa else 0.0
-    except (ValueError, TypeError):
-        renda = 0.0
+        validacao = validar_cliente(
+            dados["cpf"],
+            dados["tipo_cartao"],
+            dados["renda"]
+        )
+    except (requests.RequestException, ValueError, KeyError, IndexError):
+        log.exception("Falha ao validar cliente; enviando para análise")
+        validacao = {"sucesso": False}
 
-    # TODO: O Colega 2 irá inserir as regras de aprovação/análise/negação aqui.
+    if validacao.get("sucesso") and "aprovado" in validacao:
+        status = "Aprovado" if validacao["aprovado"] else "Negado"
+    else:
+        status = "Analise"
 
-    return redirect(url_for('routes.analise'))
+    try:
+        id_solicitacao = cadastrar_cliente(dados, status)
 
+    except pymysql.err.IntegrityError as e:
+        if e.args[0] == 1062:
+            return jsonify({
+                "erro": "Já existe um cadastro com este CPF."
+            }), 409
+        raise
+
+    session["ultima_solicitacao"] = id_solicitacao
+
+    destino = {
+        "Aprovado": "aprovado",
+        "Negado": "negado",
+        "Analise": "analise"
+    }[status]
+
+    return redirect(url_for(f"routes.{destino}"))
+
+
+@routes_bp.route('/api/adicao', methods=['POST'])
+def adicionar_parceiro():
+    try:
+        dados = cadastro_parceiro(request.form.to_dict())
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
+    except Exception as e:
+        log.exception("Erro ao cadastrar loja parceira")
+        return jsonify({"erro": "Não foi possível cadastrar a loja."}), 500
+
+    return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
 
 # ==============================================================================
 # 3. ENDPOINTS DE API - CEP E LOJAS (O que o Colega 1 fez)
@@ -121,3 +198,11 @@ def filtrarLojasParceirasPorUf(uf):
         "total": len(lojas_encontradas),
         "lojas": lojas_encontradas
     }), 200
+
+@routes_bp.app_template_filter("brl")
+def brl(valor):
+    """1234.5 -> R$ 1.234,50"""
+    if valor is None:
+        return "—"
+    texto = f"{valor:,.2f}"  # 1,234.50
+    return "R$ " + texto.replace(",", "_").replace(".", ",").replace("_", ".")

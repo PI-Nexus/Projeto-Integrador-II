@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template
 from flask_cors import CORS
-from app.routes import routes_bp
+from routes import routes_bp
 
 # Mapeia os caminhos absolutos para as pastas frontend
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -9,6 +9,11 @@ template_dir = os.path.join(base_dir, 'frontend', 'templates')
 static_dir = os.path.join(base_dir, 'frontend', 'static')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app.secret_key = os.environ["FLASK_SECRET_KEY"]
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
 CORS(app)
 
 # Rota principal para carregar o index.html
@@ -23,4 +28,4 @@ if __name__ == '__main__':
     print("\n=============================================")
     print("      BACKEND RODANDO COM SUCESSO!           ")
     print("=============================================\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0')

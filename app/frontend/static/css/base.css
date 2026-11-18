@@ -17,6 +17,7 @@ body {
   color: var(--dm-tinta);
   background: var(--dm-branco);
   -webkit-font-smoothing: antialiased;
+  min-height: 100%;
 }
 
 h1, h2, h3, h4, p, ul, ol, dl, dd, figure, fieldset, legend { margin: 0; padding: 0; }

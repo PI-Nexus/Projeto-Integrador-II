@@ -28,26 +28,27 @@
 
     <p class="resultado__anuncio" role="status" aria-live="polite"></p>
 
-    <!-- ==================== EM ANÁLISE ==================== -->
-    <section class="resultado resultado--em-analise" id="em-analise" aria-labelledby="em-analise-titulo">
-      <h2 id="em-analise-titulo">Sua solicitação está em análise</h2>
+    <!-- ==================== APROVADO ==================== -->
+    <section class="resultado resultado--aprovado" id="aprovado" aria-labelledby="aprovado-titulo">
+      <h2 id="aprovado-titulo">Aprovado!</h2>
       <p class="resultado__mensagem">
-        Recebemos seu pedido e ele está passando por uma análise mais detalhada.
-        Isso é normal e não significa que foi negado.
+        Boa notícia: seu cartão foi aprovado. Agora é só concluir a ativação.
       </p>
 
-      <h3>O que acontece agora</h3>
+      <h3>Próximos passos</h3>
       <ol class="resultado__passos">
-        <li>Nosso time analisa as informações que você enviou.</li>
-        <li>Você recebe o resultado por e-mail em até 48 horas.</li>
-        <li>Se precisarmos de algum documento, avisamos pelo mesmo e-mail.</li>
+        <li>Confirme seu e-mail pelo link que acabamos de enviar.</li>
+        <li>Separe um documento com foto para a retirada.</li>
+        <li>Assim que o cartão estiver pronto, avisamos por e-mail e SMS.</li>
       </ol>
 
       <dl class="resultado__resumo">
         <dt>Protocolo</dt>
         <dd data-campo="protocolo">—</dd>
         <dt>Cartão solicitado</dt>
-        <dd data-campo="cartao">—</dd>
+        <dd data-campo="cartao">{{ solicitacao.nome_cartao if solicitacao else '—' }}</dd>
+        <dt>Loja</dt>
+        <dd data-campo="loja">{{ (solicitacao.nome_loja if solicitacao else None) or '—' }}</dd>
       </dl>
 
       <a class="btn btn--primario" href="{{ url_for('routes.home') }}">Voltar para o início</a>
