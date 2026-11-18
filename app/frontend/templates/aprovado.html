@@ -15,7 +15,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 </head>
 
-<body>
+  {% include '_popup_produtos.html' %}
+</body>
   <header class="cabecalho cabecalho--simples">
     <a class="cabecalho__logo" href="{{ url_for('routes.home') }}">
       <img src="{{ url_for('static', filename='img/logo-dm.svg') }}" width="32" height="34" alt="DM — voltar para a página inicial">

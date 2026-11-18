@@ -1154,3 +1154,71 @@ main > h1 {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ==================================================== POP-UP DE PRODUTOS ==== */
+/*
+  Faixa fixa na base das telas de resultado. Não é modal: não bloqueia a página nem
+  rouba o foco. O JS reserva o espaço dela no fim da página (padding-bottom do body),
+  então nenhum conteúdo fica escondido atrás dela.
+*/
+.popup-produtos {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 40;
+  padding: var(--e-3) calc(var(--esp-borda) + var(--e-6)) var(--e-3) var(--esp-borda);
+  background: var(--dm-lilas);
+  border-top: 3px solid var(--dm-coral);
+  box-shadow: 0 -8px 24px rgb(0 0 51 / 0.08);
+  color: var(--dm-tinta);
+
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity var(--transicao), transform var(--transicao);
+}
+.popup-produtos[hidden] { display: none; }
+.popup-produtos--visivel { opacity: 1; transform: translateY(0); }
+
+.popup-produtos__conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--e-2) var(--e-5);
+  max-width: var(--largura-conteudo);
+  margin-inline: auto;
+}
+.popup-produtos__texto { font-size: var(--texto-p); }
+.popup-produtos__texto strong { color: var(--dm-azul); }
+
+.popup-produtos__acoes { display: flex; flex-wrap: wrap; gap: var(--e-2); }
+.popup-produtos__acoes .btn {
+  min-height: 36px;
+  padding: 0 var(--e-4);
+  font-size: var(--texto-pp);
+}
+
+.popup-produtos__fechar {
+  position: absolute;
+  top: 50%;
+  right: var(--esp-borda);
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--dm-tinta);
+  cursor: pointer;
+  transition: background-color var(--transicao);
+}
+.popup-produtos__fechar:hover { background: var(--dm-cinza); }
+
+@media (max-width: 40rem) {
+  .popup-produtos__conteudo { flex-direction: column; align-items: stretch; }
+  .popup-produtos__acoes { display: grid; grid-template-columns: 1fr 1fr; }
+  .popup-produtos__acoes .btn { padding: 0 var(--e-2); }
+  .popup-produtos__fechar { top: var(--e-3); transform: none; }
+}
