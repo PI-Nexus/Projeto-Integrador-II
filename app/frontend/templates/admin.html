@@ -12,9 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="./static/img/dm-favicon-32x-32x.ico">
 
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
 </head>
 
 <body class="pagina-admin">
@@ -39,122 +42,257 @@
     <div class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></div>
   </div>
 
-  <main id="conteudo">
-    <section class="solicitacoes">
-      <h1>Solicitações de cartão</h1>
+    <main id="conteudo">
 
-      {% set resumo = namespace(total=0, analise=0, aprovadas=0, negadas=0) %}
-      {% for s in solicitacoes %}
-      {% set resumo.total = resumo.total + 1 %}
-      {% set status_atual = s.status|string|lower|replace(' ', '_') %}
-      {% if status_atual in ['analise', 'em_analise', 'em_análise'] %}
-      {% set resumo.analise = resumo.analise + 1 %}
-      {% elif status_atual == 'aprovado' %}
-      {% set resumo.aprovadas = resumo.aprovadas + 1 %}
-      {% elif status_atual in ['negado', 'reprovado'] %}
-      {% set resumo.negadas = resumo.negadas + 1 %}
-      {% endif %}
-      {% endfor %}
+    <!-- ABAS -->
+    <ul class="nav nav-tabs" id="abasAdmin" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="aba-solicitacoes" data-bs-toggle="tab"
+          data-bs-target="#painel-solicitacoes" type="button" role="tab"
+          aria-controls="painel-solicitacoes" aria-selected="true">
+          Solicitações de cartão
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="aba-parceiros" data-bs-toggle="tab"
+          data-bs-target="#painel-parceiros" type="button" role="tab"
+          aria-controls="painel-parceiros" aria-selected="false">
+          Adição de parceiros
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="aba-colaboradores" data-bs-toggle="tab"
+          data-bs-target="#painel-colaboradores" type="button" role="tab"
+          aria-controls="painel-colaboradores" aria-selected="false">
+          Adição de colaboradores
+        </button>
+      </li>
+    </ul>
 
-      <div class="resumo-admin" aria-label="Resumo das solicitações">
-        <article class="resumo-admin__card">
-          <span class="resumo-admin__rotulo">Total de solicitações</span>
-          <strong class="resumo-admin__valor">{{ resumo.total }}</strong>
-        </article>
+    <div class="tab-content" id="abasAdminConteudo">
 
-        <article class="resumo-admin__card resumo-admin__card--analise">
-          <span class="resumo-admin__rotulo">Em análise</span>
-          <strong class="resumo-admin__valor">{{ resumo.analise }}</strong>
-        </article>
+      <!-- ABA 1: SOLICITAÇÕES -->
+      <div class="tab-pane fade show active" id="painel-solicitacoes" role="tabpanel"
+        aria-labelledby="aba-solicitacoes" tabindex="0">
+        <section class="solicitacoes">
+          <h1>Solicitações de cartão</h1>
 
-        <article class="resumo-admin__card resumo-admin__card--aprovadas">
-          <span class="resumo-admin__rotulo">Aprovadas</span>
-          <strong class="resumo-admin__valor">{{ resumo.aprovadas }}</strong>
-        </article>
+          {% set resumo = namespace(total=0, analise=0, aprovadas=0, negadas=0) %}
+          {% for s in solicitacoes %}
+          {% set resumo.total = resumo.total + 1 %}
+          {% set status_atual = s.status|string|lower|replace(' ', '_') %}
+          {% if status_atual in ['analise', 'em_analise', 'em_análise'] %}
+          {% set resumo.analise = resumo.analise + 1 %}
+          {% elif status_atual == 'aprovado' %}
+          {% set resumo.aprovadas = resumo.aprovadas + 1 %}
+          {% elif status_atual in ['negado', 'reprovado'] %}
+          {% set resumo.negadas = resumo.negadas + 1 %}
+          {% endif %}
+          {% endfor %}
 
-        <article class="resumo-admin__card resumo-admin__card--negadas">
-          <span class="resumo-admin__rotulo">Negadas</span>
-          <strong class="resumo-admin__valor">{{ resumo.negadas }}</strong>
-        </article>
+          <div class="resumo-panel" aria-label="Resumo das solicitações">
+            <article class="resumo-panel__card">
+              <span class="resumo-panel__rotulo">Total de solicitações</span>
+              <strong class="resumo-panel__valor">{{ resumo.total }}</strong>
+            </article>
+
+            <article class="resumo-panel__card resumo-panel__card--analise">
+              <span class="resumo-panel__rotulo">Em análise</span>
+              <strong class="resumo-panel__valor">{{ resumo.analise }}</strong>
+            </article>
+
+            <article class="resumo-panel__card resumo-panel__card--aprovadas">
+              <span class="resumo-panel__rotulo">Aprovadas</span>
+              <strong class="resumo-panel__valor">{{ resumo.aprovadas }}</strong>
+            </article>
+
+            <article class="resumo-panel__card resumo-panel__card--negadas">
+              <span class="resumo-panel__rotulo">Negadas</span>
+              <strong class="resumo-panel__valor">{{ resumo.negadas }}</strong>
+            </article>
+          </div>
+
+
+          {% if solicitacoes %}
+          <p class="solicitacoes__total">
+            {{ solicitacoes|length }} {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}, da mais recente
+            para a mais antiga.
+          </p>
+
+          {% set rotulos = {'EM_ANALISE': 'Em análise', 'APROVADO': 'Aprovado', 'REPROVADO': 'Reprovado'} %}
+
+          <div class="tabela-wrap" role="region" aria-label="Tabela de solicitações de cartão" tabindex="0">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col" class="num">Nº</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Colaborador</th>
+                  <th scope="col">CPF</th>
+                  <th scope="col" class="num">Renda mensal</th>
+                  <th scope="col" class="num">Cartão</th>
+                  <th scope="col">Loja</th>
+                  <th scope="col">Data</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for s in solicitacoes %}
+                <tr class="linha-solicitacao" tabindex="0" role="button"
+                  aria-label="Ver detalhes da solicitação {{ s.id_solicitacao }}" data-id="{{ s.id_solicitacao }}"
+                  data-nome="{{ s.nome_cliente|e }}" data-cpf="{{ s.cpf_cliente|e }}"
+                  data-renda="{{ s.renda_mensal|brl|e }}" data-cartao="{{ s.nome_cartao|e }}"
+                  data-loja="{{ (s.nome_loja or 'Sem loja')|e }}"
+                  data-data="{{ s.data_solicitacao.strftime('%d/%m/%Y às %H:%M') }}" data-status="{{ s.status|e }}"
+                  data-colaborador="{{ 'Sim' if s.ativo else 'Não' }}">
+                  <td class="num">{{ s.id_solicitacao }}</td>
+                  <td>{{ s.nome_cliente }}</td>
+                  <td>{{ "Sim" if s.ativo == 1 else "Não" }}</td>
+                  <td>{{ s.cpf_cliente }}</td>
+                  <td class="num">{{ s.renda_mensal|brl }}</td>
+                  <td>{{ s.nome_cartao }}</td>
+                  <td>
+                    {% if s.nome_loja %}
+                    {{ s.nome_loja }}
+                    {% else %}
+                    <span aria-hidden="true">—</span>
+                    <span class="so-leitor">Sem loja</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <time datetime="{{ s.data_solicitacao.isoformat() }}">
+                      {{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}
+                    </time>
+                  </td>
+                  <td>
+                    {% set rotulos = {
+                    'EM_ANALISE': 'Em análise',
+                    'ANALISE': 'Em análise',
+                    'APROVADO': 'Aprovado',
+                    'NEGADO': 'Negado',
+                    'REPROVADO': 'Reprovado'
+                    } %}
+                    <span class="status status--{{ s.status|lower|replace('_', '-') }}">
+                      {{ rotulos.get(s.status|upper, s.status) }}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="solicitacoes__vazio">Nenhuma solicitação ainda. Elas aparecem aqui assim que alguém enviar o formulário.
+          </p>
+          {% endif %}
+        </section>
       </div>
 
-
-      {% if solicitacoes %}
-      <p class="solicitacoes__total">
-        {{ solicitacoes|length }} {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}, da mais recente
-        para a mais antiga.
-      </p>
-
-      {% set rotulos = {'EM_ANALISE': 'Em análise', 'APROVADO': 'Aprovado', 'REPROVADO': 'Reprovado'} %}
-
-      <div class="tabela-wrap" role="region" aria-label="Tabela de solicitações de cartão" tabindex="0">
-        <table class="tabela">
-          <thead>
-            <tr>
-              <th scope="col" class="num">Nº</th>
-              <th scope="col">Cliente</th>
-              <th scope="col">Colaborador</th>
-              <th scope="col">CPF</th>
-              <th scope="col" class="num">Renda mensal</th>
-              <th scope="col" class="num">Cartão</th>
-              <th scope="col">Loja</th>
-              <th scope="col">Data</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {% for s in solicitacoes %}
-            <tr class="linha-solicitacao" tabindex="0" role="button"
-              aria-label="Ver detalhes da solicitação {{ s.id_solicitacao }}" data-id="{{ s.id_solicitacao }}"
-              data-nome="{{ s.nome_cliente|e }}" data-cpf="{{ s.cpf_cliente|e }}"
-              data-renda="{{ s.renda_mensal|brl|e }}" data-cartao="{{ s.nome_cartao|e }}"
-              data-loja="{{ (s.nome_loja or 'Sem loja')|e }}"
-              data-data="{{ s.data_solicitacao.strftime('%d/%m/%Y às %H:%M') }}" data-status="{{ s.status|e }}"
-              data-colaborador="{{ 'Sim' if s.ativo else 'Não' }}">
-              <td class="num">{{ s.id_solicitacao }}</td>
-              <td>{{ s.nome_cliente }}</td>
-              <td>{{ "Sim" if s.ativo == 1 else "Não" }}</td>
-              <td>{{ s.cpf_cliente }}</td>
-              <td class="num">{{ s.renda_mensal|brl }}</td>
-              <td>{{ s.nome_cartao }}</td>
-              <td>
-                {% if s.nome_loja %}
-                {{ s.nome_loja }}
-                {% else %}
-                <span aria-hidden="true">—</span>
-                <span class="so-leitor">Sem loja</span>
-                {% endif %}
-              </td>
-              <td>
-                <time datetime="{{ s.data_solicitacao.isoformat() }}">
-                  {{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}
-                </time>
-              </td>
-              <td>
-                {% set rotulos = {
-                'EM_ANALISE': 'Em análise',
-                'ANALISE': 'Em análise',
-                'APROVADO': 'Aprovado',
-                'NEGADO': 'Negado',
-                'REPROVADO': 'Reprovado'
-                } %}
-                <span class="status status--{{ s.status|lower|replace('_', '-') }}">
-                  {{ rotulos.get(s.status|upper, s.status) }}
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <!-- ABA 2: ADIÇÃO DE PARCEIROS -->
+      <div class="tab-pane fade" id="painel-parceiros" role="tabpanel"
+        aria-labelledby="aba-parceiros" tabindex="0">
+        <section class="form">
+          <h1>Adição de parceiros</h1>
+          <form class="formulario" id="adicao-parc" action="/api/adicao-parc" method="post">
+            <div class="campo">
+              <label for="nome_loja">Nome da Loja</label>
+              <input type="text" id="nome_loja" name="nome_loja" maxlength="120" required
+              autocomplete="off" placeholder="Nome da Loja" aria-describedby="ajuda_nome">
+              <p class="campo__ajuda" id="ajuda_nome">Aqui deve ser escrito o nome da loja a ser adicionada</p>
+            </div>
+            <div class="campo">
+              <label for="cnpj_loja">CNPJ da Loja</label>
+              <input type="text" id="cnpj_loja" name="cnpj_loja" maxlength="18" required
+              placeholder="00.000.000/0000-00" aria-describedby="ajuda_cnpj">
+              <p class="campo__ajuda" id="ajuda_cnpj">Aqui é necessário o CNPJ da loja a ser adicionada</p>
+            </div>
+            <div class="campo campo--checkbox">
+              <label for="eh_digital">A loja é digital?</label>
+              <input type="checkbox" id="eh_digital" name="eh_digital" value="1">
+            </div>
+            <div class="campo">
+              <label for="uf">Estado</label>
+              <select id="uf" name="uf" required>
+                <option value="">Selecione</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="cidade_loja">Cidade</label>
+              <input type="text" id="cidade_loja" name="cidade_loja" maxlength="120" required
+              placeholder="São Paulo" aria-describedby="ajuda_cidade">
+              <p class="campo__ajuda" id="ajuda_cidade">Aqui deve ser informada a cidade em que a loja está situada</p>
+            </div>
+            <div class="formulario__acoes">
+              <button class="btn btn--ghost" type="button" id="clear_btn">Limpar</button>
+              <button class="btn btn--primario" type="submit">Cadastrar Loja</button>
+            </div>
+          </form>
+        </section>
       </div>
-      {% else %}
-      <p class="solicitacoes__vazio">Nenhuma solicitação ainda. Elas aparecem aqui assim que alguém enviar o formulário.
-      </p>
-      {% endif %}
-    </section>
 
-    <!-- MODAL -->
+      <div class="tab-pane fade" id="painel-colaboradores" role="tabpanel"
+        aria-labelledby="aba-colaboradores" tabindex="0">
+        <section class="form">
+          {% set resumo = namespace(total=0) %}
+          {% for c in colaboradores %}
+          {% set resumo.total = resumo.total + 1 %}
+          {% endfor %}
+          <div class="resumo-panel" aria-label="Resumo dos colaboradores">
+            <article class="resumo-panel__card">
+              <span class="resumo-panel__rotulo">Total de colaboradores</span>
+              <strong class="resumo-panel__valor">{{ resumo.total }}</strong>
+            </article>
+          </div>
+          <h1>Adição de colaboradores</h1>
+          <form id="adicao-colab" action="/api/adicao-colab" class="formulario" method="post">
+            <div class="campo">
+              <label for="matricula_colab">Matrícula do Colaborador</label>
+              <input type="text" id="matricula" name="matricula_colab" required inputmode="numeric"
+                 maxlength="20" placeholder="00000000000000000000" aria-describedby="ajuda_matricula">
+              <p class="campo__ajuda" id="ajuda_matricula">Insera a matrícula do colaborador aqui.</p>
+            </div>
+            <div class="campo">
+              <label for="cpf_colab">CPF do Colaborador DM</label>
+              <input type="text" id="cpf_colab" name="cpf_colab" required inputmode="numeric"
+                 pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" maxlength="14"
+                 autocomplete="off" placeholder="000.000.000-00" aria-describedby="ajuda_cpf">
+              <p class="campo__ajuda" id="ajuda_cpf">Digite apenas números — a pontuação entra sozinha.</p>
+            </div>
+          </form>
+        </section>
+      </div>
+    
+    </div>
+
+    <!-- MODAL (fora das abas, para abrir de qualquer lugar) -->
     <dialog class="modal-solicitacao" id="modalSolicitacao" aria-labelledby="modalTitulo">
       <div class="modal-solicitacao__cabecalho">
         <div>
@@ -225,70 +363,7 @@
         <button type="button" class="btn btn--primary" id="botaoFecharModal">Fechar</button>
       </div>
     </dialog>
-    <section class="form">
-      <h1>Adição de parceiros</h1>
-      <form class="formulario" id="adicao" action="/api/adicao" method="post">
-        <div class="campo">
-          <label for="nome_loja">Nome da Loja</label>
-          <input type="text" id="nome_loja" name="nome_loja" maxlength="120" required
-          autocomplete="off" placeholder="Nome da Loja" aria-describedby="ajuda_nome">
-          <p class="campo__ajuda" id="ajuda_nome">Aqui deve ser escrito o nome da loja a ser adicionada</p>
-        </div>
-        <div class="campo">
-          <label for="cnpj_loja">CNPJ da Loja</label>
-          <input type="text" id="cnpj_loja" name="cnpj_loja" maxlength="18" required
-          placeholder="00.000.000/0000-00" aria-describedby="ajuda_cnpj">
-          <p class="campo__ajuda" id="ajuda_cnpj">Aqui é necessário o CNPJ da loja a ser adicionada</p>
-        </div>
-        <div class="campo campo--checkbox">
-          <label for="eh_digital">A loja é digital?</label>
-          <input type="checkbox" id="eh_digital" name="eh_digital" value="1">
-        </div>
-        <div class="campo">
-          <label for="uf">Estado</label>
-          <select id="uf" name="uf" required>
-            <option value="">Selecione</option>
-            <option value="AC">Acre</option>
-            <option value="AL">Alagoas</option>
-            <option value="AP">Amapá</option>
-            <option value="AM">Amazonas</option>
-            <option value="BA">Bahia</option>
-            <option value="CE">Ceará</option>
-            <option value="DF">Distrito Federal</option>
-            <option value="ES">Espírito Santo</option>
-            <option value="GO">Goiás</option>
-            <option value="MA">Maranhão</option>
-            <option value="MT">Mato Grosso</option>
-            <option value="MS">Mato Grosso do Sul</option>
-            <option value="MG">Minas Gerais</option>
-            <option value="PA">Pará</option>
-            <option value="PB">Paraíba</option>
-            <option value="PR">Paraná</option>
-            <option value="PE">Pernambuco</option>
-            <option value="PI">Piauí</option>
-            <option value="RJ">Rio de Janeiro</option>
-            <option value="RN">Rio Grande do Norte</option>
-            <option value="RS">Rio Grande do Sul</option>
-            <option value="RO">Rondônia</option>
-            <option value="RR">Roraima</option>
-            <option value="SC">Santa Catarina</option>
-            <option value="SP">São Paulo</option>
-            <option value="SE">Sergipe</option>
-            <option value="TO">Tocantins</option>
-          </select>
-        </div>
-        <div class="campo">
-          <label for="cidade_loja">Cidade</label>
-          <input type="text" id="cidade_loja" name="cidade_loja" maxlength="120" required
-          placeholder="São Paulo" aria-describedby="ajuda_cidade">
-          <p class="campo__ajuda" id="ajuda_cidade">Aqui deve ser informada a cidade em que a loja está situada</p>
-        </div>
-        <div class="formulario__acoes">
-          <button class="btn btn--ghost" type="button" id="clear_btn">Limpar</button>
-          <button class="btn btn--primario" type="submit">Cadastrar Loja</button>
-        </div>
-      </form>
-    </section>
+
   </main>
   <footer class="rodape rodape--simples">
     <p class="rodape__aviso">Acesso restrito a administradores.</p>

@@ -2,7 +2,7 @@
 import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
 from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro
-from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao
+from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao, listar_colaboradores
 import requests
 import logging
 
@@ -52,7 +52,8 @@ def admin():
 
     return render_template(
         "admin.html",
-        solicitacoes=listar_solicitacoes_dashboard(),)
+        solicitacoes=listar_solicitacoes_dashboard(),
+        colaboradores=listar_colaboradores())
 
 
 @routes_bp.route("/admin/logout", methods=["POST"])
@@ -79,8 +80,15 @@ def processar_solicitacao():
         log.exception("Falha ao validar cliente; enviando para análise")
         validacao = {"sucesso": False}
 
-    if validacao.get("sucesso") and "aprovado" in validacao:
-        status = "Aprovado" if validacao["aprovado"] else "Negado"
+    if validacao.get("sucesso") and validacao.get("aprovado"):
+        status = "Aprovado"
+
+    elif validacao.get("elegivel"):
+        status = "Analise"
+
+    elif validacao.get("sucesso"):
+        status = "Negado"
+
     else:
         status = "Analise"
 
@@ -95,7 +103,7 @@ def processar_solicitacao():
     destino = {"Aprovado": "aprovado", "Negado": "negado", "Analise": "analise"}[status]
     return redirect(url_for(f"routes.{destino}"))
 
-@routes_bp.route('/api/adicao', methods=['POST'])
+@routes_bp.route('/api/adicao-parc', methods=['POST'])
 def adicionar_parceiro():
     try:
         dados = cadastro_parceiro(request.form.to_dict())

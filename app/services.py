@@ -115,15 +115,12 @@ def validar_cliente(cpf_cliente: str, tipo_cartao: str, renda: float) -> dict:
         if result:
             return {
                 "sucesso": True,
+                "elegivel": True,
                 "aprovado": True,
                 "motivo": "Colaborador ativo encontrado"
             }
 
-        return {
-            "sucesso": True,
-            "aprovado": False,
-            "motivo": "CPF não encontrado entre os colaboradores ativos"
-        }
+    # Se não for colaborador ativo, continua para a análise de renda
 
     # Verifica os demais cartões
     resposta = requests.get(

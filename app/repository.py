@@ -255,3 +255,16 @@ def buscar_solicitacao(id_solicitacao: int) -> dict | None:
                 return None
             colunas = [d[0] for d in cur.description]
             return dict(zip(colunas, linha))
+
+def listar_colaboradores() -> list[dict]:
+    query = """
+        SELECT col.matricula, c.nome_cliente, col.cpf, col.ativo
+        FROM colaborador AS col
+        LEFT JOIN cliente AS c ON col.cpf = c.cpf_cliente
+        ORDER BY col.matricula
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query)
+            colunas = [d[0] for d in cur.description]
+            return [dict(zip(colunas, linha)) for linha in cur.fetchall()]
