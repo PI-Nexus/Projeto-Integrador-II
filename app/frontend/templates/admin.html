@@ -275,7 +275,7 @@
           <form id="adicao-colab" action="/api/adicao-colab" class="formulario" method="post">
             <div class="campo">
               <label for="matricula_colab">Matrícula do Colaborador</label>
-              <input type="text" id="matricula" name="matricula_colab" required inputmode="numeric"
+              <input type="text" id="matricula_colab" name="matricula_colab" required inputmode="numeric"
                  maxlength="20" placeholder="00000000000000000000" aria-describedby="ajuda_matricula">
               <p class="campo__ajuda" id="ajuda_matricula">Insera a matrícula do colaborador aqui.</p>
             </div>
@@ -285,6 +285,10 @@
                  pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" maxlength="14"
                  autocomplete="off" placeholder="000.000.000-00" aria-describedby="ajuda_cpf">
               <p class="campo__ajuda" id="ajuda_cpf">Digite apenas números — a pontuação entra sozinha.</p>
+            </div>
+            <div class="formulario__acoes">
+              <button class="btn btn--ghost" type="button" id="clear_btn">Limpar</button>
+              <button class="btn btn--primario" type="submit">Cadastrar Colaborador</button>
             </div>
           </form>
         </section>
@@ -372,5 +376,6 @@
   <script src="{{ url_for('static', filename='js/util.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script src="{{ url_for('static', filename='js/parceiros.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/colaborador.js') }}"></script>
 </body>
 </html>

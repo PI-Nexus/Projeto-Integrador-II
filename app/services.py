@@ -308,3 +308,33 @@ def cadastro_parceiro(dados: dict) -> None:
     except Exception:
         log.exception("Erro ao cadastrar parceiro")
         raise
+
+def cadastro_colaborador(dados: dict) -> None:
+    matricula = dados.get("matricula_colab", "").strip()
+    cpf = re.sub(r"\D", "", dados.get("cpf_colab", ""))
+
+    if not matricula:
+        raise ValueError("Matrícula do colaborador é obrigatória.")
+
+    if not cpf or len(cpf) != 11:
+        raise ValueError("CPF do colaborador é inválido.")
+
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO colaborador (matricula, cpf)
+                    VALUES (%s, %s)
+                    """,
+                    (matricula, cpf)
+                )
+
+    except pymysql.err.IntegrityError as e:
+        if e.args[0] == 1062:
+            raise ValueError("Já existe um colaborador cadastrado com essa matrícula.")
+        raise
+
+    except Exception:
+        log.exception("Erro ao cadastrar colaborador")
+        raise

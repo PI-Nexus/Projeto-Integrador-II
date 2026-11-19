@@ -1,7 +1,7 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro
+from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro, cadastro_colaborador
 from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao, listar_colaboradores, cpf_possui_solicitacao
 import requests
 import logging
@@ -133,6 +133,18 @@ def adicionar_parceiro():
     except Exception as e:
         log.exception("Erro ao cadastrar loja parceira")
         return jsonify({"erro": "Não foi possível cadastrar a loja."}), 500
+
+    return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
+
+@routes_bp.route('/api/adicao-colab', methods=['POST'])
+def adicionar_colaborador():
+    try:
+        dados = cadastro_colaborador(request.form.to_dict())
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
+    except Exception as e:
+        log.exception("Erro ao cadastrar colaborador")
+        return jsonify({"erro": "Não foi possível cadastrar o colaborador."}), 500
 
     return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
 

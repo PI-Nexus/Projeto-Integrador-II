@@ -261,6 +261,7 @@ def listar_colaboradores() -> list[dict]:
         SELECT col.matricula, c.nome_cliente, col.cpf, col.ativo
         FROM colaborador AS col
         LEFT JOIN cliente AS c ON col.cpf = c.cpf_cliente
+        WHERE col.ativo = 1
         ORDER BY col.matricula
     """
     with get_connection() as conn:
