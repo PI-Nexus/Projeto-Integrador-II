@@ -486,3 +486,18 @@ modal.addEventListener('click', (evento) => {
     modal.close();
   }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    var chave = 'abaAdminAtiva';
+    try {
+      var salva = sessionStorage.getItem(chave);
+      var botao = salva && document.querySelector('[data-bs-target="' + salva + '"]');
+      if (botao) bootstrap.Tab.getOrCreateInstance(botao).show();
+    } catch (e) { }
+
+    document.querySelectorAll('#abasAdmin [data-bs-toggle="tab"]').forEach(function (el) {
+      el.addEventListener('shown.bs.tab', function (ev) {
+        try { sessionStorage.setItem(chave, ev.target.getAttribute('data-bs-target')); } catch (e) { }
+      });
+    });
+  });

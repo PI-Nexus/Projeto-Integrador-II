@@ -769,14 +769,14 @@ main > h1 {
 
 /* ===== Resumo do painel administrativo ===== */
 
-.resumo-admin {
+.resumo-panel {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--e-4);
   margin: var(--e-5) 0;
 }
 
-.resumo-admin__card {
+.resumo-panel__card {
   min-width: 0;
   padding: var(--e-4);
   background: var(--dm-branco);
@@ -786,26 +786,26 @@ main > h1 {
   box-shadow: var(--sombra-card);
 }
 
-.resumo-admin__card--analise {
+.resumo-panel__card--analise {
   border-top-color: #D99A17;
 }
 
-.resumo-admin__card--aprovadas {
+.resumo-panel__card--aprovadas {
   border-top-color: #27845B;
 }
 
-.resumo-admin__card--negadas {
+.resumo-panel__card--negadas {
   border-top-color: #C94A4A;
 }
 
-.resumo-admin__rotulo {
+.resumo-panel__rotulo {
   display: block;
   margin-bottom: var(--e-2);
   color: var(--dm-cinza-texto);
   font-size: var(--texto-p);
 }
 
-.resumo-admin__valor {
+.resumo-panel__valor {
   display: block;
   color: var(--dm-tinta);
   font-size: 1.8rem;
@@ -1153,4 +1153,10 @@ main > h1 {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+#abasAdmin {
+  max-width: var(--largura-conteudo);
+  margin: var(--e-5) auto 0;
+  padding-inline: var(--esp-borda);
 }
