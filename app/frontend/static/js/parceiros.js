@@ -41,7 +41,7 @@
   document.addEventListener('DOMContentLoaded', inicializar);
 
   function inicializar() {
-    var formulario = document.getElementById('adicao');
+    var formulario = document.getElementById('adicao-parc');
     if (!formulario) return;
 
     // Sem isso, o navegador bloqueia o envio com as bolhas nativas (required,
@@ -240,5 +240,102 @@
 
     return elemento;
   }
+
+
+function inicializarUnidades() {
+  var lista = document.getElementById('lista-ceps');
+  var adicionar = document.getElementById('adicionar-cep');
+
+  var manual = document.getElementById('unidades-manual');
+  var csv = document.getElementById('unidades-csv');
+  var arquivo = document.getElementById('arquivo_unidades');
+
+  var camposFisicos = document.getElementById('campos-fisicos');
+  var checkboxDigital = document.getElementById('eh_digital');
+
+  if (!lista || !adicionar) return;
+
+  var contador = 1;
+
+  function atualizarModo() {
+    var modo = document.querySelector(
+      'input[name="modo_unidades"]:checked'
+    );
+
+    var digital = checkboxDigital.checked;
+
+    var usarCsv = modo && modo.value === 'csv';
+
+    camposFisicos.hidden = digital;
+
+    manual.hidden = digital || usarCsv;
+    csv.hidden = digital || !usarCsv;
+
+    arquivo.disabled = digital || !usarCsv;
+    arquivo.required = !digital && usarCsv;
+
+    lista.querySelectorAll('input').forEach(function (campo) {
+      campo.disabled = digital || usarCsv;
+      campo.required = !digital && !usarCsv;
+    });
+  }
+
+  adicionar.addEventListener('click', function () {
+    var numero = contador++;
+
+    var campo = document.createElement('div');
+    campo.className = 'campo campo-cep';
+
+    campo.innerHTML = `
+      <label for="cep_unidade_${numero}">
+        CEP da unidade
+      </label>
+
+      <div class="campo-cep__linha">
+        <input type="text"
+               id="cep_unidade_${numero}"
+               name="ceps_unidades"
+               maxlength="9"
+               placeholder="00000-000"
+               required>
+
+        <button type="button"
+                class="btn btn--ghost remover-cep">
+          Remover
+        </button>
+      </div>
+    `;
+
+    lista.appendChild(campo);
+    atualizarModo();
+
+    campo.querySelector('input').focus();
+  });
+
+  lista.addEventListener('click', function (evento) {
+    if (!evento.target.classList.contains('remover-cep')) {
+      return;
+    }
+
+    var campos = lista.querySelectorAll('.campo-cep');
+
+    if (campos.length > 1) {
+      evento.target.closest('.campo-cep').remove();
+    }
+
+    atualizarModo();
+  });
+
+  document.querySelectorAll(
+    'input[name="modo_unidades"]'
+  ).forEach(function (radio) {
+    radio.addEventListener('change', atualizarModo);
+  });
+
+  checkboxDigital.addEventListener('change', atualizarModo);
+
+  atualizarModo();
+}
+
 
 })();

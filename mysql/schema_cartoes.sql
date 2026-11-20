@@ -87,7 +87,7 @@ CREATE TABLE loja (
     nome_loja       VARCHAR(150) NOT NULL,
     cnpj_loja       CHAR(14) NOT NULL UNIQUE,
     status_loja     VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
-    id_cidade       INT NOT NULL,
+    id_cidade       INT NULL,
     descricao_loja  TEXT,
     eh_digital      TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_loja_cidade
@@ -96,6 +96,24 @@ CREATE TABLE loja (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE INDEX idx_loja_cidade ON loja(id_cidade);
+
+CREATE TABLE unidade_loja (
+    id_unidade      INT AUTO_INCREMENT PRIMARY KEY,
+    id_loja         INT NOT NULL,
+    id_cidade       INT NOT NULL,
+    status_unidade  VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
+    cep_unidade     CHAR(8) NOT NULL,
+    CONSTRAINT fk_unidade_loja
+        FOREIGN KEY (id_loja) REFERENCES loja(id_loja)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_unidade_cidade
+        FOREIGN KEY (id_cidade) REFERENCES cidade(id_cidade)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT uk_loja_cep
+        UNIQUE (id_loja, cep_unidade)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX idx_unidade_cidade ON unidade_loja(id_cidade);
 
 -- ---------------------------------------------------------------------
 -- Tabela: cartao (catálogo de tipos/modalidades de cartão oferecidos)

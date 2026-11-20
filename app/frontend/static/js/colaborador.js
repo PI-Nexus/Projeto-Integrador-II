@@ -82,10 +82,10 @@
     },
 
     {
-      id: 'cpf_colab',
+      id: 'cpf',
 
       validar: function (formulario) {
-        var campo = formulario.elements.cpf_colab;
+        var campo = formulario.elements.cpf;
         var valor = campo ? campo.value : '';
 
         if (!valor.trim()) {

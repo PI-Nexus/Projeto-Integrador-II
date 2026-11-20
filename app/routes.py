@@ -1,8 +1,8 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 import pymysql
 from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
-from services import consultar_cep, validar_cartao_loja, filtrar_lojas_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro, cadastro_colaborador
-from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_lojas_parceiras, buscar_solicitacao, listar_colaboradores, cpf_possui_solicitacao
+from services import consultar_cep, validar_cartao_loja, filtrar_unidades_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro, cadastro_colaborador, obter_opcoes_cartao
+from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_unidades_parceiras, buscar_solicitacao, listar_colaboradores, cpf_possui_solicitacao
 import requests
 import logging
 
@@ -124,17 +124,38 @@ def processar_solicitacao():
 
     return redirect(url_for(f"routes.{destino}"))
 
+
 @routes_bp.route('/api/adicao-parc', methods=['POST'])
 def adicionar_parceiro():
+
     try:
-        dados = cadastro_parceiro(request.form.to_dict())
+        arquivo_unidades = request.files.get("arquivo_unidades")
+
+        resultado = cadastro_parceiro(
+            request.form,
+            arquivo_unidades
+        )
+
+        if not resultado.get("sucesso"):
+            return jsonify({
+                "erro": resultado.get(
+                    "mensagem",
+                    "Não foi possível cadastrar a loja."
+                )
+            }), 400
+
+        return redirect(url_for("routes.admin"))
+
     except ValueError as e:
         return jsonify({"erro": str(e)}), 400
-    except Exception as e:
-        log.exception("Erro ao cadastrar loja parceira")
-        return jsonify({"erro": "Não foi possível cadastrar a loja."}), 500
 
-    return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
+    except Exception:
+        log.exception("Erro ao cadastrar loja parceira")
+
+        return jsonify({
+            "erro": "Não foi possível cadastrar a loja."
+        }), 500
+
 
 @routes_bp.route('/api/adicao-colab', methods=['POST'])
 def adicionar_colaborador():
@@ -182,40 +203,52 @@ def rota_validar_cartao_loja():
 @routes_bp.route('/filtrar-lojas-parceiras/<string:cep>', methods=['GET'])
 def filtrarLojasParceiras(cep):
     resultado_cep = consultar_cep(cep)
+
     if not resultado_cep.get("sucesso"):
         return jsonify(resultado_cep), 400
-    
+
     uf_cliente = resultado_cep.get("uf")
-    todas_as_lojas = listar_lojas_parceiras()
-    lojas_encontradas = filtrar_lojas_parceiras(todas_as_lojas, uf_cliente)
+
+    todas_as_unidades = listar_unidades_parceiras()
+
+    unidades_encontradas = filtrar_unidades_parceiras(
+        todas_as_unidades,
+        uf_cliente
+    )
 
     return jsonify({
         "sucesso": True,
         "uf_cliente": uf_cliente,
-        "total": len(lojas_encontradas),
-        "lojas": lojas_encontradas
+        "total": len(unidades_encontradas),
+        "unidades": unidades_encontradas
     }), 200
 
 
 @routes_bp.route('/filtrar-lojas-parceiras/uf/<string:uf>', methods=['GET'])
 def filtrarLojasParceirasPorUf(uf):
     uf_normalizada = str(uf).strip().upper()
+    tipo = request.args.get("tipo", "").strip().lower()
+
     if len(uf_normalizada) != 2 or not uf_normalizada.isalpha():
         return jsonify({
             "sucesso": False,
             "erro": "UF inválida."
         }), 400
 
-    lojas_encontradas = filtrar_lojas_parceiras(
-        listar_lojas_parceiras(),
-        uf_normalizada
-    )
+    if tipo not in ("loja", "loja_digital"):
+        return jsonify({
+            "sucesso": False,
+            "erro": "Tipo de cartão inválido."
+        }), 400
+
+    opcoes = obter_opcoes_cartao(tipo, uf_normalizada)
 
     return jsonify({
         "sucesso": True,
         "uf": uf_normalizada,
-        "total": len(lojas_encontradas),
-        "lojas": lojas_encontradas
+        "tipo_cartao": tipo,
+        "total": len(opcoes),
+        "opcoes": opcoes
     }), 200
 
 @routes_bp.app_template_filter("brl")

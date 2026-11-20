@@ -1160,3 +1160,201 @@ main > h1 {
   margin: var(--e-5) auto 0;
   padding-inline: var(--esp-borda);
 }
+
+
+/* =========================================================
+   UNIDADES DA LOJA
+   ========================================================= */
+
+.unidades {
+    margin-top: var(--e-6);
+    padding: var(--e-5);
+    background: var(--dm-lilas);
+    border: 1px solid var(--dm-cinza);
+    border-radius: var(--raio-card);
+}
+
+.unidades__titulo {
+    color: var(--dm-azul);
+    font-size: var(--texto-g);
+    margin-bottom: var(--e-2);
+}
+
+.unidades__descricao {
+    max-width: var(--largura-texto);
+    color: var(--dm-cinza-texto);
+    font-size: var(--texto-p);
+    margin-bottom: var(--e-5);
+}
+
+.unidades__opcoes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin-bottom: var(--e-5);
+}
+
+.unidades__opcao {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--e-3);
+    padding: var(--e-4);
+    background: var(--dm-branco);
+    border: 2px solid var(--dm-cinza);
+    border-radius: var(--raio-mini);
+    cursor: pointer;
+    transition: border-color var(--transicao),
+                background-color var(--transicao);
+}
+
+.unidades__opcao:hover {
+    border-color: var(--dm-azul);
+}
+
+.unidades__opcao:has(input:checked) {
+    border-color: var(--dm-azul);
+    background: var(--dm-branco);
+}
+
+.unidades__opcao input {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.2rem;
+    accent-color: var(--dm-azul);
+    flex-shrink: 0;
+}
+
+.unidades__opcao-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.unidades__opcao-conteudo strong {
+    color: var(--dm-azul);
+    font-size: var(--texto-p);
+}
+
+.unidades__opcao-conteudo small {
+    color: var(--dm-cinza-texto);
+}
+
+/* Áreas de conteúdo */
+
+.unidades__conteudo {
+    padding: var(--e-4);
+    background: var(--dm-branco);
+    border: 1px solid var(--dm-cinza);
+    border-radius: var(--raio-mini);
+}
+
+.unidades__conteudo[hidden] {
+    display: none !important;
+}
+
+/* Lista de CEPs */
+
+.unidades__lista {
+    display: grid;
+    gap: var(--e-3);
+}
+
+.unidade-cep {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--e-3);
+}
+
+.unidade-cep .campo {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+}
+
+.unidade-cep .campo input {
+    max-width: none;
+}
+
+.unidade-cep__remover {
+    min-height: var(--altura-btn);
+    padding-inline: var(--e-4);
+    margin-bottom: 0;
+    color: #C62828;
+    border: 1px solid #C62828;
+    border-radius: var(--raio-pill);
+    background: transparent;
+    font-size: var(--texto-p);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--transicao),
+                color var(--transicao);
+}
+
+.unidade-cep__remover:hover:not(:disabled) {
+    color: var(--dm-branco);
+    background: #C62828;
+}
+
+.unidade-cep__remover:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.unidades__adicionar {
+    margin-top: var(--e-4);
+    color: var(--dm-azul);
+}
+
+/* Importação CSV */
+
+.unidades__arquivo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-3);
+}
+
+.unidades__arquivo input[type="file"] {
+    max-width: 100%;
+    min-height: auto;
+    padding: var(--e-3);
+    border: 1px dashed var(--dm-azul);
+    border-radius: var(--raio-mini);
+    background: var(--dm-lilas);
+    cursor: pointer;
+}
+
+.unidades__arquivo input[type="file"]:hover {
+    border-color: var(--dm-azul-escuro);
+}
+
+.unidades__arquivo .campo__ajuda {
+    margin-top: 0;
+}
+
+.unidades__arquivo-nome {
+    color: var(--dm-azul);
+    font-size: var(--texto-p);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* Responsividade */
+
+@media (max-width: 40rem) {
+    .unidades {
+        padding: var(--e-4);
+    }
+
+    .unidades__opcoes {
+        grid-template-columns: 1fr;
+    }
+
+    .unidade-cep {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .unidade-cep__remover {
+        align-self: flex-start;
+    }
+}
