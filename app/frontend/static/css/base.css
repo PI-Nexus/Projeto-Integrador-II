@@ -11,13 +11,13 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  font-family: var(--fonte);
-  font-size: var(--texto-m);
-  line-height: var(--altura-texto);
-  color: var(--dm-tinta);
-  background: var(--dm-branco);
-  -webkit-font-smoothing: antialiased;
-  min-height: 100%;
+  font-family: var(--fonte) !important;
+  font-size: var(--texto-m) !important;
+  line-height: var(--altura-texto) !important;
+  color: var(--dm-tinta) !important;
+  background: var(--dm-branco) !important;
+  -webkit-font-smoothing: antialiased !important;
+  min-height: 100% !important;
 }
 
 h1, h2, h3, h4, p, ul, ol, dl, dd, figure, fieldset, legend { margin: 0; padding: 0; }
@@ -96,7 +96,8 @@ mark {
   em "conteudo" por padrão, e quem precisa sangrar de ponta a ponta só pede
   `grid-column: full`. Resolve o layout sem um único <div> de wrapper no HTML.
 */
-main > section {
+main > section,
+main > .tab-content > .tab-pane > section {
   display: grid;
   grid-template-columns:
     [full-start] minmax(var(--esp-borda), 1fr)
@@ -104,10 +105,13 @@ main > section {
     minmax(var(--esp-borda), 1fr) [full-end];
   padding-block: var(--esp-secao);
 }
-main > section > * { grid-column: conteudo; }
+main > section > *,
+main > .tab-content > .tab-pane > section > * { grid-column: conteudo; }
 
-main > section > h2 { margin-bottom: var(--e-4); }
-main > section > h2 + p { margin-bottom: var(--e-7); }
+main > section > h2,
+main > .tab-content > .tab-pane > section > h2 { margin-bottom: var(--e-4); }
+main > section > h2 + p,
+main > .tab-content > .tab-pane > section > h2 + p { margin-bottom: var(--e-7); }
 
 /* Texto de apoio abaixo do título da seção */
 .secao__apoio {

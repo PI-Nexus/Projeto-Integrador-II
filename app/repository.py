@@ -87,75 +87,124 @@ def verificador(
             result = cur.fetchone()
             return result if result else False
 
-
-
 def cadastrar_cliente(dados: dict, status: str) -> int:
-    id_loja = int(dados["loja"]) if dados.get("loja") else None
 
-    # Abre a conexão com o banco
+    id_loja = None
+
     with get_connection() as conn:
         with conn.cursor() as cur:
+
+            # Recupera o ID da loja conforme o cartão selecionado
+            if dados["tipo_cartao"] == "loja":
+                id_unidade = int(dados["loja"])
+
+                cur.execute(
+                    """
+                    SELECT id_loja
+                    FROM unidade_loja
+                    WHERE id_unidade = %s
+                    """,
+                    (id_unidade,)
+                )
+
+                unidade = cur.fetchone()
+
+                if not unidade:
+                    raise ValueError("Unidade parceira não encontrada.")
+
+                id_loja = unidade[0]
+
+            elif dados["tipo_cartao"] == "loja_digital":
+                id_loja = int(dados["loja"])
+
+            # Busca cliente existente
             cur.execute(
                 "SELECT id_cliente FROM cliente WHERE cpf_cliente = %s",
                 (dados["cpf"],)
             )
+
             row = cur.fetchone()
 
             if row:
                 id_cliente = row[0]
+
             else:
                 cur.execute(
-                    """INSERT INTO cliente
-                       (nome_cliente, cpf_cliente, data_nasc_cliente, telefone_cliente,
-                        email_cliente, renda_mensal)
-                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                    """
+                    INSERT INTO cliente
+                    (nome_cliente, cpf_cliente, data_nasc_cliente,
+                     telefone_cliente, email_cliente, renda_mensal)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
                     (
-                        dados["nome"], dados["cpf"], dados["nascimento"],
-                        dados["celular"], dados["email"], dados["renda"]
-                    ),
+                        dados["nome"],
+                        dados["cpf"],
+                        dados["nascimento"],
+                        dados["celular"],
+                        dados["email"],
+                        dados["renda"]
+                    )
                 )
+
                 id_cliente = cur.lastrowid
 
                 cur.execute(
                     "SELECT id_estado FROM estado WHERE uf = %s",
                     (dados["uf"],)
                 )
+
                 estado = cur.fetchone()
 
                 if not estado:
                     raise ValueError(f"UF inexistente: {dados['uf']}")
 
                 cur.execute(
-                    """SELECT id_cidade FROM cidade
-                       WHERE nome_cidade = %s AND id_estado = %s""",
+                    """
+                    SELECT id_cidade
+                    FROM cidade
+                    WHERE nome_cidade = %s AND id_estado = %s
+                    """,
                     (dados["cidade"], estado[0])
                 )
+
                 cidade = cur.fetchone()
 
                 if cidade:
                     id_cidade = cidade[0]
+
                 else:
                     cur.execute(
-                        """INSERT INTO cidade (nome_cidade, id_estado)
-                           VALUES (%s, %s)""",
+                        """
+                        INSERT INTO cidade (nome_cidade, id_estado)
+                        VALUES (%s, %s)
+                        """,
                         (dados["cidade"], estado[0])
                     )
+
                     id_cidade = cur.lastrowid
 
                 cur.execute(
-                    """INSERT INTO endereco
-                       (id_cliente, cep, logradouro, numero, bairro, id_cidade)
-                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                    """
+                    INSERT INTO endereco
+                    (id_cliente, cep, logradouro, numero, bairro, id_cidade)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
                     (
-                        id_cliente, dados["cep"], dados["logradouro"],
-                        dados["numero"], dados["bairro"], id_cidade
-                    ),
+                        id_cliente,
+                        dados["cep"],
+                        dados["logradouro"],
+                        dados["numero"],
+                        dados["bairro"],
+                        id_cidade
+                    )
                 )
 
+            # Busca cartão
             cur.execute(
                 "SELECT id_cartao FROM cartao WHERE tipo_cartao = %s",
                 (dados["tipo_cartao"],)
             )
+
             cartao = cur.fetchone()
 
             if not cartao:
@@ -163,26 +212,30 @@ def cadastrar_cliente(dados: dict, status: str) -> int:
                     f"Cartão inexistente: {dados['tipo_cartao']}"
                 )
 
-            # Define o horário de São Paulo para a nova solicitação
+            # Horário de São Paulo
             data_solicitacao = datetime.now(
                 ZoneInfo("America/Sao_Paulo")
             )
 
-            # Insere a solicitação com a data explícita
+            # Cadastra solicitação
             cur.execute(
-                """INSERT INTO solicitacao_cartao
-                   (id_cliente, id_cartao, id_loja, status, data_solicitacao)
-                   VALUES (%s, %s, %s, %s, %s)""",
+                """
+                INSERT INTO solicitacao_cartao
+                (id_cliente, id_cartao, id_loja, status, data_solicitacao)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
                 (
-                    id_cliente, cartao[0], id_loja,
-                    status, data_solicitacao
-                ),
+                    id_cliente,
+                    cartao[0],
+                    id_loja,
+                    status,
+                    data_solicitacao
+                )
             )
 
             id_solicitacao = cur.lastrowid
 
     return id_solicitacao
-
 
 def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
     """
@@ -223,21 +276,63 @@ def listar_solicitacoes_dashboard(limite: int = 200) -> list[dict]:
             colunas = [d[0] for d in cur.description]
             return [dict(zip(colunas, linha)) for linha in cur.fetchall()]
 
-def listar_lojas_parceiras() -> list[dict]:
+def listar_unidades_parceiras() -> list[dict]:
     query = """
-        SELECT l.id_loja AS id, l.nome_loja AS nome, c.nome_cidade AS cidade,
-               e.uf, l.eh_digital
-        FROM loja AS l
-        JOIN cidade AS c ON c.id_cidade = l.id_cidade
-        JOIN estado AS e ON e.id_estado = c.id_estado
-        WHERE l.status_loja = 'ATIVA'
-        ORDER BY e.uf, c.nome_cidade, l.nome_loja
+        SELECT
+            u.id_unidade AS id,
+            l.id_loja,
+            l.nome_loja AS nome,
+            u.cep_unidade AS cep,
+            c.nome_cidade AS cidade,
+            e.uf
+        FROM unidade_loja AS u
+        JOIN loja AS l
+            ON l.id_loja = u.id_loja
+        JOIN cidade AS c
+            ON c.id_cidade = u.id_cidade
+        JOIN estado AS e
+            ON e.id_estado = c.id_estado
+        WHERE
+            l.status_loja = 'ATIVA'
+            AND u.status_unidade = 'ATIVA'
+        ORDER BY
+            e.uf,
+            c.nome_cidade,
+            l.nome_loja
     """
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(query)
             colunas = [d[0] for d in cur.description]
-            return [dict(zip(colunas, linha)) for linha in cur.fetchall()]
+
+            return [
+                dict(zip(colunas, linha))
+                for linha in cur.fetchall()
+            ]
+
+def listar_lojas_digitais() -> list[dict]:
+    query = """
+        SELECT
+            id_loja AS id,
+            nome_loja AS nome,
+            eh_digital
+        FROM loja
+        WHERE
+            status_loja = 'ATIVA'
+            AND eh_digital = 1
+        ORDER BY nome_loja
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query)
+            colunas = [d[0] for d in cur.description]
+
+            return [
+                dict(zip(colunas, linha))
+                for linha in cur.fetchall()
+            ]
 
 def buscar_solicitacao(id_solicitacao: int) -> dict | None:
     query = """
@@ -255,3 +350,31 @@ def buscar_solicitacao(id_solicitacao: int) -> dict | None:
                 return None
             colunas = [d[0] for d in cur.description]
             return dict(zip(colunas, linha))
+
+def listar_colaboradores() -> list[dict]:
+    query = """
+        SELECT col.matricula, c.nome_cliente, col.cpf, col.ativo
+        FROM colaborador AS col
+        LEFT JOIN cliente AS c ON col.cpf = c.cpf_cliente
+        WHERE col.ativo = 1
+        ORDER BY col.matricula
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query)
+            colunas = [d[0] for d in cur.description]
+            return [dict(zip(colunas, linha)) for linha in cur.fetchall()]
+
+def cpf_possui_solicitacao(cpf: str) -> bool:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT 1
+                FROM solicitacao_cartao sc
+                INNER JOIN cliente c
+                    ON sc.id_cliente = c.id_cliente
+                WHERE c.cpf_cliente = %s
+                LIMIT 1
+            """, (cpf,))
+
+            return cur.fetchone() is not None
