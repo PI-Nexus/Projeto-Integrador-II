@@ -115,6 +115,19 @@ CREATE TABLE unidade_loja (
 
 CREATE INDEX idx_unidade_cidade ON unidade_loja(id_cidade);
 
+CREATE TABLE vendedor (
+    id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
+    id_loja INT,
+    nome_vendedor VARCHAR(150) NOT NULL,
+    email_vendedor VARCHAR(150) UNIQUE,
+    telefone_vendedor VARCHAR(20),
+	CONSTRAINT fk_vendedor_loja	
+        FOREIGN KEY (id_loja) REFERENCES loja (id_loja)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX idx_vendedor_loja ON vendedor(id_loja);
+
 -- ---------------------------------------------------------------------
 -- Tabela: cartao (catálogo de tipos/modalidades de cartão oferecidos)
 -- ---------------------------------------------------------------------

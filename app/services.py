@@ -6,6 +6,7 @@ import requests
 import logging
 import csv
 import io
+import pandas as pd
 from database import get_connection
 from repository import selectdb, listar_unidades_parceiras, listar_lojas_digitais
 from datetime import datetime, date
@@ -425,6 +426,78 @@ def obter_lista_ceps(dados, arquivo_unidades=None):
 
     return ceps_validos
 
+def obter_lista_vendedores(arquivo_vendedores):
+    vendedores = []
+    extensoes = {"csv", "xlsx"}
+    colunas = {
+    "nome",
+    "email",
+    "telefone"
+    }
+
+    extensao = arquivo_vendedores.filename.rsplit(".", 1)[-1].lower()
+
+    if extensao not in extensoes:
+        raise ValueError("Arquivo com formato incorreto.")
+
+    # Leitura do arquivo
+    try:
+        if extensao == "csv":
+            df = pd.read_csv(
+                arquivo_vendedores.stream,
+                encoding="utf-8-sig"
+            )
+
+        else:
+            df = pd.read_excel(
+                arquivo_vendedores.stream,
+                engine="openpyxl"\
+            )
+
+    except Exception as e:
+        raise ValueError("Não foi possível ler o arquivo.")
+    
+    df.columns = (
+        df.columns.astype(str)
+        .str.strip()
+        .str.lower()
+    )
+   
+    colunas_faltando = colunas - set(df.columns)
+
+    if colunas_faltando:
+        raise ValueError(f"Arquivo não tem as colunas: {", ".join(colunas_faltando)}")
+
+    if df.empty:
+        raise ValueError("Arquivo vazio.")
+
+    # Verifica se tem linha vazia
+    for coluna in colunas:
+        df[coluna] = df[coluna].fillna("").astype(str).str.strip()
+
+        if (df[coluna] == "").any():
+            raise ValueError(f"A coluna {coluna} tem uma linha vazia.")
+
+    email_invalido = df[
+        ~df["email"].str.fullmatch(
+            r"[^@\s]+@[^@\s]+\.[^@\s]+"
+        )
+    ]
+
+    if not email_invalido.empty:
+        raise ValueError("Existe um email inválido")
+
+    df["telefone"] = (
+    df["telefone"]
+    .astype(str)
+    .str.replace(r"\D", "", regex=True)
+    )
+
+    if (df["telefone"].str.len() < 10).any():
+        raise ValueError("Existe um telefone inválido")
+    
+    vendedores = df.to_dict(orient="records")
+    return vendedores
 
 def consultar_unidades(ceps):
     unidades = []
@@ -492,11 +565,40 @@ def cadastrar_unidades(cur, id_loja, unidades):
 
     return cadastradas
 
+def cadastrar_vendedor(cur, id_loja, arquivo_vendedores):
+    vendedores = obter_lista_vendedores(arquivo_vendedores)
+    cadastros = 0
 
-def cadastro_parceiro(dados, arquivo_unidades=None):
+    for vendedor in vendedores:
+        cur.execute("""
+            SELECT id_vendedor
+            FROM vendedor
+            WHERE email_vendedor = %s
+            LIMIT 1
+        """, (vendedor["email"], ))
+
+        if cur.fetchone():
+            continue
+
+        cur.execute("""
+            INSERT INTO vendedor
+                (id_loja, nome_vendedor, email_vendedor, telefone_vendedor)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            id_loja,
+            vendedor["nome"],
+            vendedor["email"],
+            vendedor["telefone"]
+        ))
+
+        cadastros += 1
+        
+    return cadastros
+
+def cadastro_parceiro(dados, arquivo_unidades=None, arquivo_vendedor=None):
     """
     Cadastra uma loja parceira e, quando aplicável,
-    suas unidades físicas.
+    suas unidades físicas e vendedores.
     """
 
     conn = None
@@ -617,7 +719,20 @@ def cadastro_parceiro(dados, arquivo_unidades=None):
                     )
 
                 # -----------------------------
-                # 7. Finalização
+                # 7. Cadastro dos vendedores
+                # -----------------------------
+                
+                total_vendedores = 0
+
+                if arquivo_vendedor:
+                    total_vendedores = cadastrar_vendedor(
+                        cur,
+                        id_loja,
+                        arquivo_vendedor
+                    )
+
+                # -----------------------------
+                # 8. Finalização
                 # -----------------------------
 
                 conn.commit()
@@ -633,7 +748,8 @@ def cadastro_parceiro(dados, arquivo_unidades=None):
             "sucesso": True,
              "mensagem": "Parceiro cadastrado com sucesso.",
             "id_loja": id_loja,
-            "unidades_cadastradas": total_unidades
+            "unidades_cadastradas": total_unidades,
+            "vendedores_cadastrados": total_vendedores
         }
 
 

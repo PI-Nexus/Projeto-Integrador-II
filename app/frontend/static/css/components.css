@@ -600,6 +600,18 @@ main > h1 {
 }
 .formulario__acoes .btn--ghost { color: var(--dm-azul); }
 
+.campo input[type="file"] {
+    border: 0px;
+    border-radius: 0px;
+    padding: 0px;
+}
+
+.campo input[type="file"]::file-selector-button {
+  background: transparent;
+  border-radius: 10px;
+}
+
+
 /* ========================================================= RESULTADO ==== */
 
 .resultado__anuncio:empty { display: none; }

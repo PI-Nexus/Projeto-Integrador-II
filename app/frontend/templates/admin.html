@@ -368,6 +368,29 @@
                 </p>
               </div>
 
+              <div class="campo">
+              <label for="vendedor_loja">Vendedores (opcional)</label>
+              <input
+              type="file" 
+              id="vendedor_loja" 
+              name="vendedor_loja" 
+              aria-describedby="ajuda_vendedor" 
+              accept=".csv, .xlsx">
+              <p class="campo__ajuda" id="ajuda_vendedor">
+                Aqui deve ser selecionado um
+                <a href="{{ url_for('static', filename='files/exemplo.csv') }}"
+                download="exemplo.csv">
+                  .csv
+                </a>
+                ou
+                <a href="{{ url_for('static', filename='files/exemplo.xlsx') }}"
+                download="exemplo.xlsx">
+                  .xlsx
+                </a>
+                com os vendedores
+              </p>
+              </div>
+
               <div class="unidades" id="campos-unidades">
                 <h3 class="unidades__titulo">Unidades físicas</h3>
 

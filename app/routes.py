@@ -130,10 +130,11 @@ def adicionar_parceiro():
 
     try:
         arquivo_unidades = request.files.get("arquivo_unidades")
-
+        arquivo_vendedor = request.files.get("vendedor_loja")
         resultado = cadastro_parceiro(
             request.form,
-            arquivo_unidades
+            arquivo_unidades,
+            arquivo_vendedor
         )
 
         if not resultado.get("sucesso"):

@@ -126,6 +126,18 @@
         if (!NOME_DE_CIDADE.test(valor)) return 'Use apenas letras, espaços, hífen ou apóstrofo no nome da cidade.';
         return '';
       }
+    },
+    {
+      id: 'vendedor_loja',
+      validar: function (formulario) {
+        var campo = formulario.elements.vendedor_loja;
+        var arq = campo.files[0];
+        const extensaovalida = ["csv", "xlsx"];
+        const extensao = arq.name.split(".").pop().toLowerCase();
+        if (!extensaovalida.includes(extensao)) return 'Tipo de arquivo não permitido.';
+        if (arq.size > 5 * 1024 * 1024) return 'Arquivo deve ter no máximo 5 MB.';
+        return '';
+      }
     }
   ];
 
