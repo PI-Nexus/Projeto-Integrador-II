@@ -122,6 +122,21 @@
             Adição de colaboradores
           </button>
         </li>
+
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="aba-vendedores"
+            data-bs-toggle="tab"
+            data-bs-target="#painel-vendedores"
+            type="button"
+            role="tab"
+            aria-controls="painel-vendedores"
+            aria-selected="false"
+          >
+            Cadastro de vendedores
+          </button>
+        </li>
       </ul>
 
       <div class="tab-content" id="abasAdminConteudo">
@@ -544,6 +559,167 @@
             </form>
           </section>
         </div>
+        <!-- ABA 4: CADASTRO DE VENDEDORES -->
+        <div
+          class="tab-pane fade"
+          id="painel-vendedores"
+          role="tabpanel"
+          aria-labelledby="aba-vendedores"
+          tabindex="0"
+        >
+          <section class="form">
+            <h1>Cadastro de vendedores</h1>
+
+            <form
+              id="adicao-vendedor"
+              action="/api/adicao-vendedor"
+              method="post"
+              class="formulario"
+            >
+              <!-- Pesquisa da loja -->
+              <div class="campo">
+                <label for="pesquisa-loja-vendedor">Loja parceira</label>
+
+                <input
+                  type="text"
+                  id="pesquisa-loja-vendedor"
+                  placeholder="Digite o nome da loja"
+                  autocomplete="off"
+                  required
+                />
+
+                <p class="campo__ajuda">
+                  Pesquise e selecione a loja à qual o vendedor pertence.
+                </p>
+
+                <div
+                  id="resultados-lojas-vendedor"
+                  aria-live="polite"
+                ></div>
+
+                <input type="hidden" name="id_loja" id="id-loja-vendedor" />
+              </div>
+
+              <!-- Loja selecionada -->
+              <div class="campo" id="loja-selecionada-vendedor" hidden>
+                <p class="campo__ajuda">
+                  Loja selecionada:
+                  <strong id="nome-loja-selecionada"></strong>
+                </p>
+
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  id="alterar-loja-vendedor"
+                >
+                  Alterar loja
+                </button>
+              </div>
+
+              <!-- Pesquisa da unidade -->
+              <div class="campo" id="campo-unidade-vendedor" hidden>
+                <label for="pesquisa-unidade-vendedor">Unidade</label>
+
+                <input
+                  type="text"
+                  id="pesquisa-unidade-vendedor"
+                  placeholder="Digite a cidade ou o CEP"
+                  autocomplete="off"
+                  disabled
+                />
+
+                <p class="campo__ajuda">
+                  Pesquise pela cidade ou pelo CEP da unidade.
+                </p>
+
+                <div
+                  id="resultados-unidades-vendedor"
+                  aria-live="polite"
+                ></div>
+
+                <input
+                  type="hidden"
+                  name="id_unidade"
+                  id="id-unidade-vendedor"
+                />
+              </div>
+
+              <!-- Unidade selecionada -->
+              <div class="campo" id="unidade-selecionada-vendedor" hidden>
+                <p class="campo__ajuda">
+                  Unidade selecionada:
+                  <strong id="dados-unidade-selecionada"></strong>
+                </p>
+
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  id="alterar-unidade-vendedor"
+                >
+                  Alterar unidade
+                </button>
+              </div>
+
+              <!-- Dados do vendedor -->
+              <div class="campo">
+                <label for="nome-vendedor">Nome do vendedor</label>
+                <input
+                  type="text"
+                  id="nome-vendedor"
+                  name="nome"
+                  maxlength="120"
+                  placeholder="Nome completo"
+                  required
+                />
+              </div>
+
+              <div class="campo">
+                <label for="cpf-vendedor">CPF</label>
+                <input
+                  type="text"
+                  id="cpf-vendedor"
+                  name="cpf"
+                  maxlength="14"
+                  inputmode="numeric"
+                  placeholder="000.000.000-00"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+
+              <div class="campo">
+                <label for="email-vendedor">E-mail</label>
+                <input
+                  type="email"
+                  id="email-vendedor"
+                  name="email"
+                  maxlength="150"
+                  placeholder="vendedor@email.com"
+                  required
+                />
+              </div>
+
+              <div class="formulario__acoes">
+                <button
+                  class="btn btn--ghost"
+                  type="reset"
+                  id="limpar-vendedor"
+                >
+                  Limpar
+                </button>
+
+                <button
+                  class="btn btn--primario"
+                  type="submit"
+                  id="cadastrar-vendedor"
+                  disabled
+                >
+                  Cadastrar vendedor
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
 
       <!-- MODAL (fora das abas, para abrir de qualquer lugar) -->
@@ -651,5 +827,6 @@
     <script src="{{ url_for('static', filename='js/parceiros.js') }}"></script>
     <script src="{{ url_for('static', filename='js/colaborador.js') }}"></script>
     <script src="{{ url_for('static', filename='js/unidades.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/vendedor.js') }}" defer></script>
   </body>
 </html>

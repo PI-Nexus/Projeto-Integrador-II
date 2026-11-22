@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login do Vendedor</title>
+  <meta name="description" content="Área do vendedor">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='img/dm-favicon-32x-32x.ico') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+
+<body class="pagina-login">
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="cabecalho cabecalho--simples">
+    <a class="cabecalho__logo" href="/">
+      <img src="{{ url_for('static', filename='img/logo-dm.svg') }}"
+           width="32" height="34" alt="DM – página inicial">
+    </a>
+    <span class="cabecalho__titulo">Área do vendedor</span>
+  </header>
+
+  <div class="faixa-multicolor" aria-hidden="true">
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--azul"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--coral"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--amarelo"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--aqua"></div>
+    <div class="faixa-multicolor__bloco faixa-multicolor__bloco--verde"></div>
+  </div>
+
+  <main id="conteudo">
+    <section class="login">
+      <form class="login__card"
+            method="POST"
+            action="{{ url_for('routes.portal_vendedor') }}">
+
+        <h1>Acesso do vendedor</h1>
+        <p class="login__apoio">
+          Entre com seus dados cadastrados para visualizar as solicitações da sua unidade.
+        </p>
+
+        {% if erro %}
+        <p class="login__erro" role="alert">{{ erro }}</p>
+        {% endif %}
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input type="email"
+                 id="email"
+                 name="email"
+                 maxlength="150"
+                 placeholder="vendedor@email.com"
+                 autocomplete="username"
+                 required
+                 autofocus>
+        </div>
+
+        <div class="campo">
+          <label for="cpf">CPF</label>
+          <input type="text"
+                 id="cpf"
+                 name="cpf"
+                 maxlength="14"
+                 inputmode="numeric"
+                 placeholder="000.000.000-00"
+                 autocomplete="off"
+                 required>
+        </div>
+
+        <button class="btn btn--primario" type="submit">Entrar</button>
+
+        <p class="login__apoio">
+          <a href="{{ url_for('routes.admin') }}">Voltar ao acesso administrativo</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="rodape rodape--simples">
+    <p class="rodape__aviso">Acesso restrito a vendedores cadastrados.</p>
+  </footer>
+</body>
+</html>
