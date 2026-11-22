@@ -551,6 +551,11 @@ def cadastrar_unidades(cur, id_loja, unidades):
         if cur.fetchone():
             continue
 
+        # print("INSERINDO UNIDADE:")
+        # print("ID LOJA:", id_loja)
+        # print("ID CIDADE:", id_cidade)
+        # print("CEP:", unidade["cep"])
+    
         cur.execute("""
             INSERT INTO unidade_loja
                 (id_loja, id_cidade, cep_unidade)
@@ -712,11 +717,16 @@ def cadastro_parceiro(dados, arquivo_unidades=None, arquivo_vendedor=None):
                 total_unidades = 0
 
                 if not eh_digital:
+                    print("LOJA CADASTRADA:", id_loja)
+                    print("UNIDADES RECEBIDAS:", unidades)
+
                     total_unidades = cadastrar_unidades(
                         cur,
                         id_loja,
                         unidades
                     )
+
+                    print("TOTAL DE UNIDADES CADASTRADAS:", total_unidades)
 
                 # -----------------------------
                 # 7. Cadastro dos vendedores

@@ -90,6 +90,7 @@ def verificador(
 def cadastrar_cliente(dados: dict, status: str) -> int:
 
     id_loja = None
+    id_unidade = None
 
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -218,20 +219,18 @@ def cadastrar_cliente(dados: dict, status: str) -> int:
             )
 
             # Cadastra solicitação
-            cur.execute(
-                """
+            cur.execute("""
                 INSERT INTO solicitacao_cartao
-                (id_cliente, id_cartao, id_loja, status, data_solicitacao)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (
-                    id_cliente,
-                    cartao[0],
-                    id_loja,
-                    status,
-                    data_solicitacao
-                )
-            )
+                    (id_cliente, id_cartao, id_loja, id_unidade, status, data_solicitacao)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                id_cliente,
+                cartao[0],
+                id_loja,
+                id_unidade,
+                status,
+                data_solicitacao
+            ))
 
             id_solicitacao = cur.lastrowid
 
@@ -378,3 +377,211 @@ def cpf_possui_solicitacao(cpf: str) -> bool:
             """, (cpf,))
 
             return cur.fetchone() is not None
+
+
+def cadastrar_vendedor(nome: str, cpf: str, email: str, id_unidade: int):
+    cpf = ''.join(filter(str.isdigit, cpf))
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO vendedor
+                    (id_unidade, nome_vendedor, cpf_vendedor,
+                     email_vendedor, status_vendedor)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (
+                    id_unidade,
+                    nome,
+                    cpf,
+                    email,
+                    "Ativo"
+                )
+            )
+
+            return cur.lastrowid
+
+def buscar_lojas_vendedor(termo: str):
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+
+            pesquisa = f"%{termo}%"
+
+            cur.execute(
+                """
+                SELECT
+                    id_loja,
+                    nome_loja
+                FROM loja
+                WHERE
+                    nome_loja LIKE %s
+                    AND status_loja = 'ATIVA'
+                    AND eh_digital = 0
+                ORDER BY nome_loja
+                LIMIT 20
+                """,
+                (pesquisa,)
+            )
+
+            lojas = cur.fetchall()
+
+            return [
+                {
+                    "id_loja": loja[0],
+                    "nome_loja": loja[1]
+                }
+                for loja in lojas
+            ]
+
+def buscar_unidades_da_loja(id_loja: int, termo: str):
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+
+            pesquisa = f"%{termo}%"
+
+            cur.execute(
+                """
+                SELECT
+                    u.id_unidade,
+                    u.cep_unidade,
+                    c.nome_cidade,
+                    e.uf
+                FROM unidade_loja u
+                INNER JOIN cidade c
+                    ON c.id_cidade = u.id_cidade
+                INNER JOIN estado e
+                    ON e.id_estado = c.id_estado
+                WHERE
+                    u.id_loja = %s
+                    AND (
+                        c.nome_cidade LIKE %s
+                        OR u.cep_unidade LIKE %s
+                    )
+                    AND u.status_unidade = 'ATIVA'
+                ORDER BY c.nome_cidade
+                LIMIT 20
+                """,
+                (id_loja, pesquisa, pesquisa)
+            )
+
+            unidades = cur.fetchall()
+
+            return [
+                {
+                    "id_unidade": unidade[0],
+                    "cep": unidade[1],
+                    "cidade": unidade[2],
+                    "uf": unidade[3]
+                }
+                for unidade in unidades
+            ]
+
+def autenticar_vendedor(email: str, cpf: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    v.id_vendedor,
+                    v.nome_vendedor,
+                    v.id_unidade,
+                    l.nome_loja
+                FROM vendedor v
+                INNER JOIN unidade_loja u
+                    ON u.id_unidade = v.id_unidade
+                INNER JOIN loja l
+                    ON l.id_loja = u.id_loja
+                WHERE v.email_vendedor = %s
+                  AND v.cpf_vendedor = %s
+                  AND v.status_vendedor = 'ATIVO'
+                """,
+                (email, cpf)
+            )
+
+            vendedor = cur.fetchone()
+
+            if not vendedor:
+                return None
+
+            return {
+                "id_vendedor": vendedor[0],
+                "nome": vendedor[1],
+                "id_unidade": vendedor[2],
+                "nome_loja": vendedor[3]
+            }
+
+def listar_solicitacoes_vendedor(id_unidade: int):
+
+    query = """
+        SELECT
+            s.id_solicitacao,
+            c.nome_cliente,
+            c.cpf_cliente,
+            c.renda_mensal,
+            ca.nome_cartao,
+            l.nome_loja,
+            s.data_solicitacao,
+            s.status,
+            s.motivo_decisao,
+            s.id_vendedor_analise,
+            v.nome_vendedor AS nome_vendedor_analise
+        FROM solicitacao_cartao s
+        INNER JOIN cliente c
+            ON c.id_cliente = s.id_cliente
+        INNER JOIN cartao ca
+            ON ca.id_cartao = s.id_cartao
+        LEFT JOIN loja l
+            ON l.id_loja = s.id_loja
+        LEFT JOIN vendedor v
+            ON v.id_vendedor = s.id_vendedor_analise
+        WHERE s.id_unidade = %s
+        ORDER BY s.data_solicitacao DESC
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+
+            cur.execute(query, (id_unidade,))
+
+            colunas = [coluna[0] for coluna in cur.description]
+
+            return [
+                dict(zip(colunas, linha))
+                for linha in cur.fetchall()
+            ]
+
+def decidir_solicitacao_vendedor(
+    id_solicitacao: int,
+    id_unidade: int,
+    id_vendedor: int,
+    decisao: str,
+    motivo: str | None = None
+) -> bool:
+
+    query = """
+        UPDATE solicitacao_cartao
+        SET
+            status = %s,
+            id_vendedor_analise = %s,
+            motivo_decisao = %s
+        WHERE id_solicitacao = %s
+          AND id_unidade = %s
+          AND LOWER(REPLACE(status, ' ', '_')) IN ('analise', 'em_analise')
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                query,
+                (
+                    decisao,
+                    id_vendedor,
+                    motivo,
+                    id_solicitacao,
+                    id_unidade
+                )
+            )
+
+            return cur.rowcount == 1
