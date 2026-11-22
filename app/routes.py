@@ -1,8 +1,21 @@
 # Todos os endpoints (Solicitações, Lojas e Parceiros)
 import pymysql
-from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for
+from flask import Blueprint, request, session, jsonify, render_template, redirect, url_for, flash
 from services import consultar_cep, validar_cartao_loja, filtrar_unidades_parceiras, validar_cliente, tratar_solicitacao, senha_admin_correta, validar_loja_do_cartao, cadastro_parceiro, cadastro_colaborador, obter_opcoes_cartao
-from repository import cadastrar_cliente, listar_solicitacoes_dashboard, listar_unidades_parceiras, buscar_solicitacao, listar_colaboradores, cpf_possui_solicitacao
+from repository import (
+    cadastrar_cliente,
+    listar_solicitacoes_dashboard,
+    listar_unidades_parceiras,
+    buscar_solicitacao,
+    listar_colaboradores,
+    cpf_possui_solicitacao,
+    cadastrar_vendedor,
+    buscar_unidades_da_loja,
+    buscar_lojas_vendedor,
+    autenticar_vendedor,
+    listar_solicitacoes_vendedor,
+    decidir_solicitacao_vendedor
+)
 import requests
 import logging
 
@@ -61,6 +74,109 @@ def admin_logout():
     session.clear()
     return redirect(url_for("routes.admin"))
 
+
+# ==============================================================================
+# PORTAL DO VENDEDOR
+# ==============================================================================
+
+@routes_bp.route("/vendedor", methods=["GET", "POST"])
+def portal_vendedor():
+
+    erro = None
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip()
+        cpf = "".join(filter(str.isdigit, request.form.get("cpf", "")))
+
+        if not email or len(cpf) != 11:
+            erro = "Informe um e-mail e CPF válidos."
+
+        else:
+            vendedor = autenticar_vendedor(email, cpf)
+
+            if vendedor:
+                session.clear()
+
+                session["vendedor"] = {
+                    "id_vendedor": vendedor["id_vendedor"],
+                    "id_unidade": vendedor["id_unidade"],
+                    "nome": vendedor["nome"],
+                    "nome_loja": vendedor["nome_loja"]
+                }
+
+                return redirect(url_for("routes.painel_vendedor"))
+
+            erro = "E-mail ou CPF incorretos."
+
+    return render_template("vendedor.html", erro=erro)
+
+@routes_bp.route("/vendedor/painel")
+def painel_vendedor():
+    vendedor = session.get("vendedor")
+
+    if not vendedor:
+        return redirect(url_for("routes.portal_vendedor"))
+
+    id_unidade = vendedor["id_unidade"]
+
+    solicitacoes = listar_solicitacoes_vendedor(id_unidade)
+
+    return render_template(
+        "painel_vendedor.html",
+        vendedor=vendedor,
+        solicitacoes=solicitacoes
+    )
+
+@routes_bp.route("/vendedor/logout", methods=["POST"])
+def vendedor_logout():
+
+    session.pop("vendedor", None)
+
+    return redirect(url_for("routes.portal_vendedor"))
+
+
+@routes_bp.route(
+    "/vendedor/solicitacao/<int:id_solicitacao>/decidir",
+    methods=["POST"]
+)
+def decidir_solicitacao(id_solicitacao):
+    vendedor = session.get("vendedor")
+
+    if not vendedor:
+        return redirect(url_for("routes.portal_vendedor"))
+
+    decisao = request.form.get("decisao", "").strip()
+    motivo = request.form.get("motivo_decisao", "").strip()
+
+    if decisao not in ("Aprovado", "Negado"):
+        flash("Decisão inválida.", "erro")
+        return redirect(url_for("routes.painel_vendedor"))
+
+    if decisao == "Negado" and not motivo:
+        flash("Informe o motivo da negativa.", "erro")
+        return redirect(url_for("routes.painel_vendedor"))
+
+    if decisao == "Aprovado":
+        motivo = None
+
+    sucesso = decidir_solicitacao_vendedor(
+        id_solicitacao=id_solicitacao,
+        id_unidade=vendedor["id_unidade"],
+        id_vendedor=vendedor["id_vendedor"],
+        decisao=decisao,
+        motivo=motivo
+    )
+
+    if sucesso:
+        flash("Solicitação atualizada com sucesso!", "sucesso")
+    else:
+        flash(
+            "Não foi possível atualizar. A solicitação pode já ter sido analisada ou não pertencer à sua unidade.",
+            "erro"
+        )
+
+    return redirect(url_for("routes.painel_vendedor"))
 
 # ==============================================================================
 # 2. ROTA DE PROCESSAMENTO DO FORMULÁRIO (O que nós adicionámos para o Colega 2)
@@ -168,6 +284,105 @@ def adicionar_colaborador():
         return jsonify({"erro": "Não foi possível cadastrar o colaborador."}), 500
 
     return redirect(url_for("routes.admin"))  # Redireciona para a página de administração após o cadastro
+
+@routes_bp.route('/api/buscar-lojas-vendedor', methods=['GET'])
+def api_buscar_lojas_vendedor():
+
+    if not session.get("admin"):
+        return jsonify({"erro": "Acesso não autorizado."}), 401
+
+    termo = request.args.get("termo", "").strip()
+
+    if len(termo) < 2:
+        return jsonify({"sucesso": True, "lojas": []}), 200
+
+    try:
+        lojas = buscar_lojas_vendedor(termo)
+
+        return jsonify({
+            "sucesso": True,
+            "lojas": lojas
+        }), 200
+
+    except Exception:
+        log.exception("Erro ao buscar lojas para vendedor")
+        return jsonify({
+            "sucesso": False,
+            "erro": "Não foi possível buscar as lojas."
+        }), 500
+
+@routes_bp.route('/api/buscar-unidades-loja/<int:id_loja>', methods=['GET'])
+def api_buscar_unidades_loja(id_loja):
+
+    if not session.get("admin"):
+        return jsonify({"erro": "Acesso não autorizado."}), 401
+
+    termo = request.args.get("termo", "").strip()
+
+    if len(termo) < 2:
+        return jsonify({
+            "sucesso": True,
+            "unidades": []
+        }), 200
+
+    try:
+        unidades = buscar_unidades_da_loja(id_loja, termo)
+
+        return jsonify({
+            "sucesso": True,
+            "unidades": unidades
+        }), 200
+
+    except Exception:
+        log.exception("Erro ao buscar unidades da loja")
+
+        return jsonify({
+            "sucesso": False,
+            "erro": "Não foi possível buscar as unidades."
+        }), 500
+
+@routes_bp.route('/api/adicao-vendedor', methods=['POST'])
+def adicionar_vendedor():
+
+    if not session.get("admin"):
+        return jsonify({
+            "erro": "Acesso não autorizado."
+        }), 401
+
+    try:
+        nome = request.form.get("nome", "").strip()
+        cpf = request.form.get("cpf", "").strip()
+        email = request.form.get("email", "").strip()
+        id_unidade = request.form.get("id_unidade", "").strip()
+
+        if not nome or not cpf or not email or not id_unidade:
+            return jsonify({
+                "erro": "Preencha todos os campos."
+            }), 400
+
+        cadastrar_vendedor(
+            nome,
+            cpf,
+            email,
+            int(id_unidade)
+        )
+
+        return redirect(url_for("routes.admin"))
+
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
+
+    except pymysql.err.IntegrityError:
+        return jsonify({
+            "erro": "CPF ou e-mail já cadastrado."
+        }), 409
+
+    except Exception:
+        log.exception("Erro ao cadastrar vendedor")
+
+        return jsonify({
+            "erro": "Não foi possível cadastrar o vendedor."
+        }), 500
 
 # ==============================================================================
 # 3. ENDPOINTS DE API - CEP E LOJAS (O que o Colega 1 fez)
