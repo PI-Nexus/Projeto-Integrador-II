@@ -1,0 +1,19 @@
+<!-- Faixa discreta de outros produtos DM (telas de resultado). Não bloqueia a página. -->
+<aside class="popup-produtos" id="popup-produtos" aria-label="Outros produtos DM" hidden>
+  <div class="popup-produtos__conteudo">
+    <p class="popup-produtos__texto"><strong>Conheça também:</strong> outros produtos DM pra você.</p>
+
+    <div class="popup-produtos__acoes">
+      <a class="btn btn--secundario" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">DM Cred</a>
+      <a class="btn btn--secundario" href="https://www.vocedm.com.br/portal/" target="_blank" rel="noopener">Empréstimo Pessoal</a>
+    </div>
+  </div>
+
+  <button class="popup-produtos__fechar" type="button" aria-label="Fechar sugestões de produtos" data-popup-fechar>
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
+  </button>
+</aside>
+
+<script src="{{ url_for('static', filename='js/popup-produtos.js') }}" defer></script>
