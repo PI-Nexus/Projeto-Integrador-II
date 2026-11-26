@@ -17,8 +17,9 @@ Para executar a aplicação localmente é necessário possuir os seguintes pré-
 
 | Serviço | Porta | Observação |
 |---|---|---|
-| Aplicação web (Flask) | `5000` | Fixa. Acesse em `http://localhost:5000` |
-| MySQL (no Docker) | `3308` no seu computador → `3306` no container | Definida pela variável `PORT` do `.env` |
+| Aplicação web (Docker) | `80` no seu computador → `5000` no container | Acesse em `http://localhost` |
+| Aplicação web (execução manual) | `5000` | Acesse em `http://localhost:5000` |
+| MySQL (no Docker) | `3308` no seu computador → `3306` no container | Definida pela variável `MYSQL_HOST_PORT` do `.env` |
 
 ---
 
@@ -47,24 +48,29 @@ cp .env.example .env
 copy .env.example .env
 ```
 
-Abra o `.env` e preencha as **cinco** variáveis (se `ADMIN_PASSWORD` e `FLASK_SECRET_KEY` não estiverem no `.env.example`, acrescente-as):
+Abra o `.env` e preencha as **cinco** variáveis a seguir. As linhas `DB_*` ao final do arquivo já vêm prontas para o Docker e não precisam ser alteradas.
 
 | Variável | O que informar | Exemplo |
 |---|---|---|
 | `MYSQL_ROOT_PASSWORD` | Senha do usuário `root` do MySQL (a mesma será usada pela aplicação) | `MinhaSenha@123` |
 | `DATABASE` | Nome do banco de dados. **Use `db_cartoes`**, pois é o nome criado pelo script `mysql/schema_cartoes.sql` | `db_cartoes` |
-| `PORT` | Porta do seu computador que será ligada ao MySQL do container. **Troque o texto de exemplo por um número** | `3308` |
+| `MYSQL_HOST_PORT` | Porta do seu computador que será ligada ao MySQL do container. Deve ser um número | `3308` |
 | `ADMIN_PASSWORD` | Senha de acesso ao painel administrativo (`/admin`) | `SenhaDoAdmin@123` |
-| `FLASK_SECRET_KEY` | Chave secreta usada pelo Flask para proteger a sessão de login do painel. Use um texto longo e aleatório | `troque-por-um-texto-longo-e-aleatorio` |
+| `FLASK_SECRET_KEY` | Chave secreta usada pelo Flask para proteger as sessões de login (painel administrativo e área do vendedor). Use um texto longo e aleatório | `troque-por-um-texto-longo-e-aleatorio` |
 
 Exemplo de `.env` pronto:
 
 ```env
 MYSQL_ROOT_PASSWORD=MinhaSenha@123
 DATABASE=db_cartoes
-PORT=3308
+MYSQL_HOST_PORT=3308
 ADMIN_PASSWORD=SenhaDoAdmin@123
 FLASK_SECRET_KEY=troque-por-um-texto-longo-e-aleatorio
+DB_HOST="mysql"
+DB_USER="root"
+DB_PASSWORD="${MYSQL_ROOT_PASSWORD}"
+DB_NAME="${DATABASE}"
+DB_PORT="3306"
 ```
 
 Para gerar uma chave aleatória para o `FLASK_SECRET_KEY`, execute:
@@ -81,7 +87,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 
 O projeto pode ser executado de duas maneiras: via **Docker Compose** (método automatizado) ou **Manual/Local** (configurando Python e MySQL diretamente no sistema operacional).
 
-Em ambos os casos, ao final é necessário carregar os **dados iniciais** do banco (passo obrigatório, explicado em cada opção).
+Em ambos os casos, ao final é necessário carregar os **dados iniciais** do banco (passo obrigatório, explicado em cada opção) e cadastrar pelo menos um parceiro no painel administrativo para que o Cartão Loja possa ser solicitado.
 
 ---
 
@@ -104,27 +110,32 @@ docker compose up --build
 
 #### Passo 2: Carregar os dados iniciais (uma única vez)
 
-O script `schema_cartoes.sql` cria apenas as tabelas. É preciso cadastrar os estados, os tipos de cartão e as lojas parceiras, senão o envio do formulário retorna erro. Com os containers em execução, abra **outro terminal** na raiz do projeto:
+O script `schema_cartoes.sql` cria apenas as tabelas. É preciso cadastrar os estados e os tipos de cartão, senão o envio do formulário retorna erro. Com os containers em execução, abra **outro terminal** na raiz do projeto:
 
 **Linux / macOS / Git Bash:**
 ```bash
 docker exec -i mysql-cartoes sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" db_cartoes' < mysql/seed_dados_iniciais.sql
 ```
 
-**Windows PowerShell** (substitua `SUA_SENHA` pela senha do `.env`):
+**Windows PowerShell:**
 ```powershell
-Get-Content mysql/seed_dados_iniciais.sql -Raw | docker exec -i mysql-cartoes mysql -uroot -pSUA_SENHA db_cartoes
+docker cp mysql/seed_dados_iniciais.sql mysql-cartoes:/tmp/seed_dados_iniciais.sql
+docker exec mysql-cartoes sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" db_cartoes < /tmp/seed_dados_iniciais.sql'
 ```
 
-> Alternativa: abra o arquivo `mysql/seed_dados_iniciais.sql` no MySQL Workbench ou DBeaver, conectado em `localhost` na porta definida em `PORT`, e execute-o.
+> Alternativa: abra o arquivo `mysql/seed_dados_iniciais.sql` no MySQL Workbench ou DBeaver, conectado em `localhost` na porta definida em `MYSQL_HOST_PORT`, e execute-o.
 
-Se o comando retornar erro de *duplicate entry*, os dados já foram carregados antes — não é preciso repetir.
+O script pode ser executado novamente sem duplicar os dados.
+
+#### Passo 3: Cadastrar o primeiro parceiro
+
+Os dados iniciais não incluem lojas. Acesse `http://localhost/admin`, informe a senha definida em `ADMIN_PASSWORD` e, na aba **Adição de parceiros**, cadastre ao menos uma loja física com as unidades desejadas (veja o [Manual do Usuário](Manual%20do%20Usu%C3%A1rio.md), seção 5.3). Para testar o Cartão Loja Digital, cadastre também uma loja digital.
 
 #### Encerrando
 
 * Para parar: `Ctrl + C` ou, em outro terminal, `docker compose down`.
 * Os dados do banco ficam guardados em um volume (`mysql_data`) e **permanecem** entre execuções.
-* Para **apagar tudo e recomeçar do zero** (por exemplo, para trocar a senha do banco): `docker compose down -v` e depois repita os passos 1 e 2.
+* Para **apagar tudo e recomeçar do zero** (por exemplo, para trocar a senha do banco): `docker compose down -v` e depois repita os passos 1 a 3.
 
 ---
 
@@ -142,7 +153,7 @@ mysql -u root -p < mysql/schema_cartoes.sql
 mysql -u root -p < mysql/seed_dados_iniciais.sql
 ```
 
-O primeiro cria o banco `db_cartoes` e suas tabelas; o segundo carrega os estados, os tipos de cartão e as lojas parceiras. Execute o segundo **apenas uma vez**.
+O primeiro cria o banco `db_cartoes` e suas tabelas; o segundo carrega os estados e os tipos de cartão. O segundo script pode ser executado novamente sem duplicar os dados.
 
 #### Passo 2: Instalação das Dependências do Python
 
@@ -177,8 +188,8 @@ Na execução manual, a aplicação **não lê o arquivo `.env` automaticamente*
 | `DB_USER` | Não | `root` | Usuário do MySQL |
 | `DB_NAME` | Não | `db_cartoes` | Nome do banco de dados |
 | `DB_PORT` | Não | `3306` | Porta do MySQL (use `3308` se estiver usando o MySQL do Docker) |
+| `FLASK_SECRET_KEY` | **Sim** | — | Chave secreta do Flask (texto longo e aleatório), usada nas sessões de login. Sem ela a aplicação não inicia |
 | `ADMIN_PASSWORD` | Sim, para usar o painel `/admin` | — | Senha de acesso ao painel administrativo |
-| `FLASK_SECRET_KEY` | Sim, para usar o painel `/admin` | — | Chave secreta do Flask (texto longo e aleatório), usada na sessão de login do painel |
 
 **Linux / macOS:**
 ```bash
@@ -212,17 +223,21 @@ Na raiz do repositório, com o ambiente virtual ativo e as variáveis definidas,
 python app/app.py
 ```
 
+#### Passo 5: Cadastrar o primeiro parceiro
+
+Acesse `http://localhost:5000/admin`, informe a senha definida em `ADMIN_PASSWORD` e, na aba **Adição de parceiros**, cadastre ao menos uma loja física com as unidades desejadas (veja o [Manual do Usuário](Manual%20do%20Usu%C3%A1rio.md), seção 5.3). Para testar o Cartão Loja Digital, cadastre também uma loja digital.
+
 ---
 
-### Atualizando uma instalação anterior (da Sprint 1 para a Sprint 2)
+### Atualizando uma instalação anterior (da Sprint 2 para a Sprint 3)
 
-A Sprint 2 alterou o banco de dados: foi criada a tabela `vendedor` e a tabela `solicitacao_cartao` ganhou a coluna `id_vendedor` (opcional, ligada a `vendedor`). Se você já tinha o banco criado com a versão da Sprint 1, o `schema_cartoes.sql` não é executado de novo sozinho, então é preciso recriar o banco.
+A Sprint 3 alterou o banco de dados: foi criada a tabela `unidade_loja` (unidades físicas das lojas parceiras), a tabela `vendedor` passou a ser vinculada a uma unidade (`id_unidade`) e a tabela `solicitacao_cartao` ganhou as colunas `id_unidade`, `id_vendedor_analise` e `motivo_decisao`. Se você já tinha o banco criado com a versão anterior, o `schema_cartoes.sql` não é executado de novo sozinho, então é preciso recriar o banco.
 
-> ⚠️ **Atenção:** os passos abaixo **apagam todos os dados** do banco (solicitações já enviadas, parceiros cadastrados etc.).
+> ⚠️ **Atenção:** os passos abaixo **apagam todos os dados** do banco (solicitações já enviadas, parceiros, colaboradores e vendedores cadastrados etc.).
 
-1. Atualize o código (`git pull`) e confira se o seu `.env` já tem `ADMIN_PASSWORD` e `FLASK_SECRET_KEY`.
+1. Atualize o código (`git pull`) e confira se o seu `.env` tem `MYSQL_HOST_PORT`, `ADMIN_PASSWORD` e `FLASK_SECRET_KEY`.
 2. Recrie o banco:
-   * **Docker:** execute `docker compose down -v` e repita os passos 1 e 2 da Opção 1.
+   * **Docker:** execute `docker compose down -v` e repita os passos 1 a 3 da Opção 1.
    * **Manual:** apague o banco e rode os dois scripts novamente:
 
 ```bash
@@ -240,21 +255,26 @@ Em instalações novas não é preciso fazer nada: o `schema_cartoes.sql` já cr
 Após a inicialização do servidor (via Docker ou execução local):
 
 1. Abra seu navegador de preferência.
-2. Acesse a URL: **`http://localhost:5000`** (a porta da aplicação é fixa; a variável `PORT` do `.env` refere-se somente ao MySQL).
+2. Acesse a URL: **`http://localhost`** se estiver usando o Docker, ou **`http://localhost:5000`** na execução manual (a variável `MYSQL_HOST_PORT` do `.env` refere-se somente ao MySQL).
 3. A landing page deve ser exibida. Clique em **`Peça seu cartão`** para abrir o formulário de solicitação.
-4. Para acessar o painel administrativo, abra `http://localhost:5000/admin` e informe a senha definida em `ADMIN_PASSWORD`.
+4. Para acessar o painel administrativo, clique no ícone de engrenagem do cabeçalho ou abra `/admin` e informe a senha definida em `ADMIN_PASSWORD`.
+5. Para acessar a área do vendedor, abra `/vendedor` e informe o e-mail e o CPF cadastrados pelo administrador.
 
 **Verificação rápida**
 
+Os endereços abaixo usam o prefixo do passo 2 (`http://localhost` no Docker ou `http://localhost:5000` na execução manual).
+
 | Endereço | O que deve acontecer |
 |---|---|
-| `http://localhost:5000/` | Landing page com os três cartões |
-| `http://localhost:5000/solicitar` | Formulário de solicitação |
-| `http://localhost:5000/consultar-cep/12245000` | JSON com o endereço do CEP (`"sucesso": true`) |
-| `http://localhost:5000/filtrar-lojas-parceiras/uf/SP` | JSON com as lojas de SP e a loja digital |
-| `http://localhost:5000/admin` | Painel administrativo, protegido por senha (`ADMIN_PASSWORD`); sem a senha, o acesso é bloqueado |
+| `/` | Landing page com os três cartões |
+| `/solicitar` | Formulário de solicitação |
+| `/consultar-cep/12245000` | JSON com o endereço do CEP (`"sucesso": true`) |
+| `/filtrar-lojas-parceiras/uf/SP?tipo=loja` | JSON com as unidades de lojas parceiras de SP (lista vazia até que um parceiro com unidade em SP seja cadastrado) |
+| `/filtrar-lojas-parceiras/uf/SP?tipo=loja_digital` | JSON com as lojas digitais cadastradas |
+| `/admin` | Painel administrativo, protegido por senha (`ADMIN_PASSWORD`); sem a senha, o acesso é bloqueado |
+| `/vendedor` | Tela de login da área do vendedor |
 
-Para aprender a usar o site e o painel administrativo, consulte o [Manual do Usuário](Manual%20do%20Usuário.md).
+Para aprender a usar o site, o painel administrativo e a área do vendedor, consulte o [Manual do Usuário](Manual%20do%20Usu%C3%A1rio.md).
 
 ---
 
@@ -262,13 +282,17 @@ Para aprender a usar o site e o painel administrativo, consulte o [Manual do Usu
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| Erro de porta inválida (*invalid port*) ao subir o Docker | `PORT` no `.env` ainda com o texto de exemplo (`PortaDeSuaEscolha`) | Substitua por um número, por exemplo `3308` |
-| `Bind for 0.0.0.0:3308 failed` | A porta escolhida em `PORT` já está em uso | Informe outro número livre no `.env` |
-| `Bind for 0.0.0.0:5000 failed` / porta 5000 ocupada | Outro programa usa a porta 5000 (no macOS, o *AirPlay Receiver*) | Encerre o programa que usa a porta 5000 (no macOS: *Ajustes do Sistema → Geral → AirDrop e Handoff → Receptor AirPlay*, desative) |
-| `RuntimeError: MYSQL_ROOT_PASSWORD não foi configurada no ambiente` | Na execução manual, `DB_PASSWORD` não está definida no terminal | Defina `DB_PASSWORD` (Passo 3 da Opção 2). A mensagem cita outro nome de variável, mas é a `DB_PASSWORD` que falta |
+| Erro de porta inválida (*invalid port*) ao subir o Docker | `MYSQL_HOST_PORT` no `.env` com um valor que não é número | Informe um número, por exemplo `3308` |
+| `Bind for 0.0.0.0:3308 failed` | A porta escolhida em `MYSQL_HOST_PORT` já está em uso | Informe outro número livre no `.env` |
+| `Bind for 0.0.0.0:80 failed` / porta 80 ocupada | Outro programa usa a porta 80 | Encerre o programa que usa a porta 80 ou altere o mapeamento `"80:5000"` do serviço `app` no `docker-compose.yml` (por exemplo, `"8080:5000"`) e acesse `http://localhost:8080` |
+| Porta 5000 ocupada na execução manual | Outro programa usa a porta 5000 (no macOS, o *AirPlay Receiver*) | Encerre o programa que usa a porta 5000 (no macOS: *Ajustes do Sistema → Geral → AirDrop e Handoff → Receptor AirPlay*, desative) |
+| `RuntimeError: DB_PASSWORD não foi configurada no ambiente` | Na execução manual, `DB_PASSWORD` não está definida no terminal; no Docker, `MYSQL_ROOT_PASSWORD` está vazia no `.env` | Defina `DB_PASSWORD` (Passo 3 da Opção 2) ou preencha `MYSQL_ROOT_PASSWORD` no `.env` |
+| `KeyError: 'FLASK_SECRET_KEY'` ao iniciar | `FLASK_SECRET_KEY` não está definida | Defina a variável (veja a seção 1.3 ou o Passo 3 da Opção 2) |
 | `SyntaxError` ao iniciar em `repository.py` | Python anterior à 3.12 | Instale o Python 3.12 ou superior |
 | `Access denied for user 'root'` ou `Unknown database` | Senha divergente ou `DATABASE` diferente de `db_cartoes` | Confira o `.env`. Se mudou a senha depois da primeira execução do Docker, rode `docker compose down -v` e suba novamente |
-| Erro 500 (*Internal Server Error*) ao enviar o formulário | Dados iniciais não carregados, CPF já utilizado em outro envio, ou MySQL fora do ar | Execute o `seed_dados_iniciais.sql`; teste com outro CPF; confira se o MySQL está saudável |
-| CEP não preenche o endereço / erro ao enviar como não colaborador | Sem Internet ou serviço externo (ViaCEP, Banco Central) indisponível | Verifique a conexão e tente novamente |
+| Erro 500 (*Internal Server Error*) ao enviar o formulário | Dados iniciais não carregados ou MySQL fora do ar | Execute o `seed_dados_iniciais.sql`; confira se o MySQL está saudável |
+| Mensagem *Este CPF já possui uma solicitação cadastrada* | Cada CPF só pode ter uma solicitação | Use outro CPF para testar |
+| Lista de lojas mostra *Nenhuma unidade encontrada neste estado* ou *Nenhuma loja digital disponível* | Nenhum parceiro cadastrado para o estado ou para o tipo de cartão escolhido | Cadastre o parceiro no painel administrativo (aba **Adição de parceiros**) |
+| CEP não preenche o endereço / erro ao cadastrar as unidades de um parceiro | Sem Internet ou serviço externo (ViaCEP) indisponível | Verifique a conexão e tente novamente |
 | `/admin` bloqueia o acesso, não aceita a senha ou dá erro ao entrar | `ADMIN_PASSWORD` ou `FLASK_SECRET_KEY` ausentes ou diferentes do que você digitou | Confira o `.env` (Docker) ou as variáveis do terminal (execução manual). No Docker, depois de alterar o `.env`, execute `docker compose down` e `docker compose up --build` |
-| `Unknown column 'id_vendedor'` ou `Table 'db_cartoes.vendedor' doesn't exist` | Banco criado com a versão da Sprint 1 | Recrie o banco, conforme [Atualizando uma instalação anterior](#atualizando-uma-instalação-anterior-da-sprint-1-para-a-sprint-2) |
+| `Unknown column 'id_unidade'` ou `Table 'db_cartoes.unidade_loja' doesn't exist` | Banco criado com a versão anterior à Sprint 3 | Recrie o banco, conforme [Atualizando uma instalação anterior](#atualizando-uma-instalação-anterior-da-sprint-2-para-a-sprint-3) |
