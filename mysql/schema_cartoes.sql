@@ -1,6 +1,6 @@
+
 -- =====================================================================
 -- Script de criação do banco de dados - Sistema de Solicitação de Cartões
--- Baseado no modelo conceitual fornecido
 -- Compatível com MySQL 8.x
 -- =====================================================================
 
@@ -14,18 +14,18 @@ USE db_cartoes;
 -- Tabela: estado
 -- ---------------------------------------------------------------------
 CREATE TABLE estado (
-    id_estado   INT AUTO_INCREMENT PRIMARY KEY,
-    nome        VARCHAR(100) NOT NULL,
-    uf          CHAR(2) NOT NULL UNIQUE
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    uf CHAR(2) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------------
 -- Tabela: cidade  (N cidades : 1 estado)
 -- ---------------------------------------------------------------------
 CREATE TABLE cidade (
-    id_cidade    INT AUTO_INCREMENT PRIMARY KEY,
-    nome_cidade  VARCHAR(150) NOT NULL,
-    id_estado    INT NOT NULL,
+    id_cidade INT AUTO_INCREMENT PRIMARY KEY,
+    nome_cidade VARCHAR(150) NOT NULL,
+    id_estado INT NOT NULL,
     UNIQUE KEY uq_cidade_estado (nome_cidade, id_estado),
     CONSTRAINT fk_cidade_estado
         FOREIGN KEY (id_estado) REFERENCES estado(id_estado)
@@ -38,9 +38,9 @@ CREATE INDEX idx_cidade_estado ON cidade(id_estado);
 -- Tabela: Colaborador
 -- ---------------------------------------------------------------------
 CREATE TABLE colaborador (
-    matricula  VARCHAR(20) PRIMARY KEY,
-    cpf        CHAR(11) NOT NULL UNIQUE,
-    ativo      TINYINT(1) NOT NULL DEFAULT 1
+    matricula VARCHAR(20) PRIMARY KEY,
+    cpf CHAR(11) NOT NULL UNIQUE,
+    ativo TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ---------------------------------------------------------------------
@@ -62,13 +62,13 @@ CREATE TABLE cliente (
 -- Tabela: endereco  (1 cliente : 1 endereço)
 -- ---------------------------------------------------------------------
 CREATE TABLE endereco (
-    id_endereco   INT AUTO_INCREMENT PRIMARY KEY,
-    id_cliente    INT NOT NULL UNIQUE,   -- UNIQUE garante o 1:1 com cliente
-    cep           CHAR(8) NOT NULL,
-    logradouro    VARCHAR(150) NOT NULL,
-    numero        VARCHAR(10),
-    bairro        VARCHAR(100),
-    id_cidade     INT NOT NULL,
+    id_endereco INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL UNIQUE,
+    cep CHAR(8) NOT NULL,
+    logradouro VARCHAR(150) NOT NULL,
+    numero VARCHAR(10),
+    bairro VARCHAR(100),
+    id_cidade INT NOT NULL,
     CONSTRAINT fk_endereco_cliente
         FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
         ON UPDATE CASCADE ON DELETE CASCADE,
@@ -83,13 +83,13 @@ CREATE INDEX idx_endereco_cidade ON endereco(id_cidade);
 -- Tabela: loja  (N lojas : 1 cidade)
 -- ---------------------------------------------------------------------
 CREATE TABLE loja (
-    id_loja         INT AUTO_INCREMENT PRIMARY KEY,
-    nome_loja       VARCHAR(150) NOT NULL,
-    cnpj_loja       CHAR(14) NOT NULL UNIQUE,
-    status_loja     VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
-    id_cidade       INT NOT NULL,
-    descricao_loja  TEXT,
-    eh_digital      TINYINT(1) NOT NULL DEFAULT 0,
+    id_loja INT AUTO_INCREMENT PRIMARY KEY,
+    nome_loja VARCHAR(150) NOT NULL,
+    cnpj_loja CHAR(14) NOT NULL UNIQUE,
+    status_loja VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
+    id_cidade INT NULL,
+    descricao_loja TEXT,
+    eh_digital TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_loja_cidade
         FOREIGN KEY (id_cidade) REFERENCES cidade(id_cidade)
         ON UPDATE CASCADE ON DELETE RESTRICT
@@ -98,7 +98,47 @@ CREATE TABLE loja (
 CREATE INDEX idx_loja_cidade ON loja(id_cidade);
 
 -- ---------------------------------------------------------------------
--- Tabela: cartao (catálogo de tipos/modalidades de cartão oferecidos)
+-- Tabela: unidade_loja
+-- ---------------------------------------------------------------------
+CREATE TABLE unidade_loja (
+    id_unidade INT AUTO_INCREMENT PRIMARY KEY,
+    id_loja INT NOT NULL,
+    id_cidade INT NOT NULL,
+    status_unidade VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
+    cep_unidade CHAR(8) NOT NULL,
+    CONSTRAINT fk_unidade_loja
+        FOREIGN KEY (id_loja) REFERENCES loja(id_loja)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_unidade_cidade
+        FOREIGN KEY (id_cidade) REFERENCES cidade(id_cidade)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT uk_loja_cep
+        UNIQUE (id_loja, cep_unidade)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX idx_unidade_cidade ON unidade_loja(id_cidade);
+
+-- ---------------------------------------------------------------------
+-- Tabela: vendedor
+-- Cada vendedor pertence a uma unidade física.
+-- ---------------------------------------------------------------------
+CREATE TABLE vendedor (
+    id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
+    id_unidade INT NOT NULL,
+    nome_vendedor VARCHAR(150) NOT NULL,
+    cpf_vendedor CHAR(11) NOT NULL UNIQUE,
+    email_vendedor VARCHAR(150) NOT NULL UNIQUE,
+    status_vendedor VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
+
+    CONSTRAINT fk_vendedor_unidade
+        FOREIGN KEY (id_unidade) REFERENCES unidade_loja(id_unidade)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX idx_vendedor_unidade ON vendedor(id_unidade);
+
+-- ---------------------------------------------------------------------
+-- Tabela: cartao
 -- ---------------------------------------------------------------------
 CREATE TABLE cartao (
     id_cartao           INT AUTO_INCREMENT PRIMARY KEY,
@@ -116,24 +156,55 @@ CREATE TABLE cartao (
 --   N solicitações : 1 loja (opcional, pode ser NULL)
 -- ---------------------------------------------------------------------
 CREATE TABLE solicitacao_cartao (
-    id_solicitacao    INT AUTO_INCREMENT PRIMARY KEY,
-    id_cliente        INT NOT NULL,
-    id_cartao         INT NOT NULL,
-    id_loja           INT NULL,
-    data_solicitacao  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status            VARCHAR(20) NOT NULL DEFAULT 'EM_ANALISE',
-    analise           TEXT,
+    id_solicitacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_cartao INT NOT NULL,
+    id_loja INT NULL,
+
+    -- Unidade física onde a solicitação foi realizada
+    id_unidade INT NULL,
+
+    -- Vendedor responsável pela análise
+    id_vendedor_analise INT NULL,
+
+    data_solicitacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) NOT NULL DEFAULT 'EM_ANALISE',
+
+    analise TEXT,
+    motivo_decisao TEXT NULL,
+
     CONSTRAINT fk_solicitacao_cliente
         FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
         ON UPDATE CASCADE ON DELETE RESTRICT,
+
     CONSTRAINT fk_solicitacao_cartao
         FOREIGN KEY (id_cartao) REFERENCES cartao(id_cartao)
         ON UPDATE CASCADE ON DELETE RESTRICT,
+
     CONSTRAINT fk_solicitacao_loja
         FOREIGN KEY (id_loja) REFERENCES loja(id_loja)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+
+    CONSTRAINT fk_solicitacao_unidade
+        FOREIGN KEY (id_unidade) REFERENCES unidade_loja(id_unidade)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+
+    CONSTRAINT fk_solicitacao_vendedor
+        FOREIGN KEY (id_vendedor_analise) REFERENCES vendedor(id_vendedor)
         ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE INDEX idx_solicitacao_cliente ON solicitacao_cartao(id_cliente);
-CREATE INDEX idx_solicitacao_cartao  ON solicitacao_cartao(id_cartao);
-CREATE INDEX idx_solicitacao_loja    ON solicitacao_cartao(id_loja);
+CREATE INDEX idx_solicitacao_cliente
+    ON solicitacao_cartao(id_cliente);
+
+CREATE INDEX idx_solicitacao_cartao
+    ON solicitacao_cartao(id_cartao);
+
+CREATE INDEX idx_solicitacao_loja
+    ON solicitacao_cartao(id_loja);
+
+CREATE INDEX idx_solicitacao_unidade
+    ON solicitacao_cartao(id_unidade);
+
+CREATE INDEX idx_solicitacao_vendedor
+    ON solicitacao_cartao(id_vendedor_analise);

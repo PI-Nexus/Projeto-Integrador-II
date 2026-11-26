@@ -4,64 +4,86 @@ import hmac
 import os
 import requests
 import logging
+import csv
+import io
 from database import get_connection
-from repository import selectdb, listar_lojas_parceiras
+from repository import selectdb, listar_unidades_parceiras, listar_lojas_digitais
 from datetime import datetime, date
 import re
 
 log = logging.getLogger(__name__)
 
+
 def consultar_cep(cep: str) -> dict:
     """
-    Consulta um CEP na API do ViaCEP.
-    Retorna um dicionário (JSON) padronizado com os dados do endereço ou o erro.
+    Consulta um CEP no ViaCEP e retorna os dados do endereço.
     """
-    # limpa o CEP para garantir apenas números
+
     cep_limpo = "".join(filter(str.isdigit, str(cep)))
 
-    # valida o tamanho do CEP antes de fazer a requisição externa
     if len(cep_limpo) != 8:
         return {
             "sucesso": False,
-            "erro": "CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos."
+            "erro": "CEP inválido. Informe exatamente 8 dígitos."
         }
 
+    # URL correta do ViaCEP
     url = f"https://viacep.com.br/ws/{cep_limpo}/json/"
 
     try:
-        response = requests.get(url, timeout=5)
-        
-        if response.status_code != 200:
-            return {
-                "sucesso": False,
-                "erro": "Falha na comunicação com o serviço de CEP."
-            }
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
 
         dados = response.json()
 
-        #  ViaCEP retorna {'erro': 'true'} se o CEP tiver 8 dígitos mas não existir
-        if "erro" in dados or dados.get("erro") is True:
+        if not isinstance(dados, dict):
             return {
                 "sucesso": False,
-                "erro": "CEP não encontrado."
+                "erro": "Resposta inesperada do serviço de CEP."
             }
 
-        # retorna um JSON estruturado dos dados
+        # Verifica se o ViaCEP informou que o CEP não existe
+        erro_cep = str(dados.get("erro", "")).lower()
+
+        if erro_cep == "true":
+            return {
+                "sucesso": False,
+                "erro": f"CEP {cep_limpo} não encontrado no ViaCEP."
+            }
+
+        cidade = dados.get("localidade")
+        uf = dados.get("uf")
+
+        if not cidade or not uf:
+            return {
+                "sucesso": False,
+                "erro": "O ViaCEP não retornou a cidade ou o estado."
+            }
+
         return {
             "sucesso": True,
             "cep": dados.get("cep"),
             "logradouro": dados.get("logradouro"),
             "bairro": dados.get("bairro"),
-            "cidade": dados.get("localidade"),
-            "uf": dados.get("uf")  
+            "cidade": cidade,
+            "uf": uf
         }
 
     except requests.exceptions.RequestException as e:
+        log.exception("Erro na consulta ao ViaCEP para o CEP %s", cep_limpo)
+
         return {
             "sucesso": False,
-            "erro": f"Erro de conexão ao buscar o CEP: {str(e)}"
+            "erro": f"Falha na comunicação com o ViaCEP: {str(e)}"
         }
 
+    except ValueError as e:
+        log.exception("Erro ao interpretar resposta do ViaCEP")
+
+        return {
+            "sucesso": False,
+            "erro": f"Resposta inválida do ViaCEP: {str(e)}"
+        }
     
 def validar_cartao_loja(cep_cliente: str, uf_loja: str, eh_loja_digital: bool = False) -> dict:
     # lojas digitais não exigem validação de estado
@@ -105,25 +127,28 @@ def validar_cartao_loja(cep_cliente: str, uf_loja: str, eh_loja_digital: bool = 
 
 def validar_cliente(cpf_cliente: str, tipo_cartao: str, renda: float) -> dict:
     # Verifica colaboradores DM
-    if tipo_cartao == "dm_visa":
-        result = selectdb(
-            tab="colaborador",
-            col=("cpf",),
-            filter={"cpf": cpf_cliente, "ativo": 1}
-        )
-
-        if result:
-            return {
-                "sucesso": True,
-                "aprovado": True,
-                "motivo": "Colaborador ativo encontrado"
-            }
-
+    result = selectdb(
+        tab="colaborador",
+        col=("cpf",),
+        filter={"cpf": cpf_cliente, "ativo": 1}
+    )
+    if tipo_cartao == "dm_visa" and result:
         return {
             "sucesso": True,
-            "aprovado": False,
-            "motivo": "CPF não encontrado entre os colaboradores ativos"
+            "elegivel": True,
+            "aprovado": True,
+            "motivo": "Colaborador ativo encontrado"
         }
+
+    elif tipo_cartao != "dm_visa" and result:
+        return {
+            "sucesso": True,
+            "elegivel": False,
+            "aprovado": False,
+            "motivo": "Colaborador ativo não é elegível para cartões de loja"
+        }
+
+    # Se não for colaborador ativo, continua para a análise de renda
 
     # Verifica os demais cartões
     resposta = requests.get(
@@ -149,28 +174,22 @@ def validar_cliente(cpf_cliente: str, tipo_cartao: str, renda: float) -> dict:
         "motivo": "Renda inferior ao mínimo exigido"
     }
 
-def filtrar_lojas_parceiras(lojas, uf_alvo):
-    if not uf_alvo or not lojas:
+def filtrar_unidades_parceiras(unidades, uf_alvo):
+    if not uf_alvo or not unidades:
         return []
 
     uf_normalizada = str(uf_alvo).strip().upper()
+
     if not uf_normalizada:
         return []
 
-    lojas_filtradas = []
-    for loja in lojas:
-        if not isinstance(loja, dict):
-            continue
-
-        if loja.get("eh_digital", False):
-            lojas_filtradas.append(loja)
-            continue
-
-        uf_loja = loja.get("uf")
-        if uf_loja and str(uf_loja).strip().upper() == uf_normalizada:
-            lojas_filtradas.append(loja)
-
-    return lojas_filtradas
+    return [
+        unidade
+        for unidade in unidades
+        if isinstance(unidade, dict)
+        and unidade.get("uf")
+        and str(unidade["uf"]).strip().upper() == uf_normalizada
+    ]
 
 def tratar_solicitacao(dados: dict) -> dict:
 
@@ -210,104 +229,453 @@ def tratar_solicitacao(dados: dict) -> dict:
 
 def validar_loja_do_cartao(dados: dict) -> None:
     tipo = dados["tipo_cartao"]
+    identificador = str(dados.get("loja", ""))
+
     if tipo == "dm_visa":
         return
-    lojas = {str(l["id"]): l for l in listar_lojas_parceiras()}
-    loja = lojas.get(str(dados.get("loja")))
-    if not loja:
-        raise ValueError("Loja inválida.")
-    if tipo == "loja" and (loja["eh_digital"] or loja["uf"] != dados["uf"]):
-        raise ValueError("Cartão Loja só está disponível para lojas físicas do seu estado.")
-    if tipo == "loja_digital" and not loja["eh_digital"]:
-        raise ValueError("Selecione uma loja digital.")
+
+    if tipo == "loja":
+        unidades = {
+            str(u["id"]): u
+            for u in listar_unidades_parceiras()
+        }
+
+        unidade = unidades.get(identificador)
+
+        if not unidade:
+            raise ValueError("Unidade parceira inválida.")
+
+        if unidade["uf"].strip().upper() != dados["uf"].strip().upper():
+            raise ValueError(
+                "Cartão Loja só está disponível para unidades físicas do seu estado."
+            )
+
+    elif tipo == "loja_digital":
+        lojas = {
+            str(l["id"]): l
+            for l in listar_lojas_digitais()
+        }
+
+        loja = lojas.get(identificador)
+
+        if not loja:
+            raise ValueError("Loja digital inválida.")
+
+def obter_opcoes_cartao(tipo, uf):
+    if tipo == "loja":
+        unidades = listar_unidades_parceiras()
+
+        return filtrar_unidades_parceiras(unidades, uf)
+
+    elif tipo == "loja_digital":
+        return listar_lojas_digitais()
+
+    return []
 
 def senha_admin_correta(senha: str) -> bool:
     esperada = os.environ["ADMIN_PASSWORD"]
     # compare_digest evita vazar informação pelo tempo de comparação
     return hmac.compare_digest(senha.encode(), esperada.encode())
 
-def cadastro_parceiro(dados: dict) -> None:
-    nome = dados.get("nome_loja", "").strip()
-    cnpj = re.sub(r"\D", "", dados.get("cnpj_loja", ""))
-    cidade = dados.get("cidade_loja", "").strip()
-    uf = dados.get("uf", "").strip().upper()
+def cadastro_colaborador(dados: dict) -> None:
+    matricula = dados.get("matricula_colab", "").strip()
+    cpf = re.sub(r"\D", "", dados.get("cpf", ""))
 
-    # O checkbox envia "1" quando marcado e não envia nada quando desmarcado.
-    eh_digital = dados.get("eh_digital") == "1"
+    if not matricula:
+        raise ValueError("Matrícula do colaborador é obrigatória.")
 
-    if not nome:
-        raise ValueError("Nome da loja é obrigatório.")
-
-    if not cnpj:
-        raise ValueError("CNPJ da loja é obrigatório.")
-
-    if not eh_digital and not cidade:
-        raise ValueError("Cidade da loja é obrigatória.")
-
-    if not eh_digital and len(uf) != 2:
-        raise ValueError("Estado da loja inválido.")
+    if not cpf or len(cpf) != 11:
+        raise ValueError("CPF do colaborador é inválido.")
 
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
-                # Procura a cidade dentro do estado selecionado.
                 cur.execute(
                     """
-                    SELECT c.id_cidade
-                    FROM cidade c
-                    JOIN estado e ON e.id_estado = c.id_estado
-                    WHERE UPPER(c.nome_cidade) = %s
-                      AND UPPER(e.uf) = %s
-                    LIMIT 1
+                    INSERT INTO colaborador (matricula, cpf)
+                    VALUES (%s, %s)
                     """,
-                    (cidade.upper(), uf)
+                    (matricula, cpf)
                 )
-
-                resultado = cur.fetchone()
-
-                if resultado:
-                    id_cidade = resultado[0]
-                else:
-                    cur.execute(
-                        """
-                        INSERT INTO cidade (nome_cidade, id_estado)
-                        VALUES (
-                            %s,
-                            (SELECT id_estado
-                             FROM estado
-                             WHERE uf = %s)
-                        )
-                        """,
-                        (cidade.capitalize(), uf)
-                    )
-
-                    id_cidade = cur.lastrowid
-
-                if eh_digital:
-                    cur.execute(
-                        """
-                        INSERT INTO loja
-                            (nome_loja, cnpj_loja, id_cidade, eh_digital)
-                        VALUES (%s, %s, (SELECT id_cidade FROM cidade WHERE nome_cidade = %s), %s)
-                        """,
-                        (nome, cnpj, cidade, 1)
-                    )
-
-                else:
-                    cur.execute(
-                        """
-                        INSERT INTO loja
-                            (nome_loja, cnpj_loja, id_cidade, eh_digital)
-                        VALUES (%s, %s, %s, %s)
-                        """,
-                        (nome, cnpj, id_cidade, 0)
-                    )
 
     except pymysql.err.IntegrityError as e:
         if e.args[0] == 1062:
-            raise ValueError("Já existe uma loja cadastrada com esse CNPJ.")
+            raise ValueError("Já existe um colaborador cadastrado com essa matrícula.")
         raise
 
     except Exception:
-        log.exception("Erro ao cadastrar parceiro")
+        log.exception("Erro ao cadastrar colaborador")
         raise
+
+
+def obter_ou_criar_cidade(cur, nome_cidade, uf):
+    """
+    Localiza uma cidade pelo nome e UF.
+    Caso não exista, cadastra a cidade.
+    """
+    cur.execute("""
+        SELECT c.id_cidade
+        FROM cidade c
+        INNER JOIN estado e ON e.id_estado = c.id_estado
+        WHERE LOWER(c.nome_cidade) = LOWER(%s)
+          AND UPPER(e.uf) = UPPER(%s)
+        LIMIT 1
+    """, (nome_cidade.strip(), uf.strip()))
+
+    resultado = cur.fetchone()
+
+    if resultado:
+        return resultado[0]
+
+    cur.execute("""
+        SELECT id_estado
+        FROM estado
+        WHERE UPPER(uf) = UPPER(%s)
+        LIMIT 1
+    """, (uf.strip(),))
+
+    estado = cur.fetchone()
+
+    if not estado:
+        raise ValueError(f"Estado '{uf}' não encontrado no banco de dados.")
+
+    id_estado = estado[0]
+
+    cur.execute("""
+        INSERT INTO cidade (nome_cidade, id_estado)
+        VALUES (%s, %s)
+    """, (nome_cidade.strip(), id_estado))
+
+    return cur.lastrowid
+
+
+def obter_lista_ceps(dados, arquivo_unidades=None):
+    """
+    Obtém os CEPs informados manualmente ou por CSV.
+    Remove duplicidades e valida o formato.
+    """
+    modo = dados.get("modo_unidades", "manual")
+
+    if modo == "manual":
+        if hasattr(dados, "getlist"):
+            ceps = dados.getlist("ceps_unidades")
+        else:
+            ceps = dados.get("ceps_unidades", [])
+
+            if isinstance(ceps, str):
+                ceps = [ceps]
+
+    elif modo == "csv":
+        if not arquivo_unidades or not arquivo_unidades.filename:
+            raise ValueError("Selecione um arquivo CSV para importar as unidades.")
+
+        conteudo = arquivo_unidades.read()
+
+        if len(conteudo) > 2 * 1024 * 1024:
+            raise ValueError("O arquivo CSV não pode ultrapassar 2 MB.")
+
+        try:
+            texto = conteudo.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            raise ValueError("O arquivo CSV deve utilizar codificação UTF-8.")
+
+        leitor = csv.DictReader(io.StringIO(texto))
+
+        if not leitor.fieldnames or "cep" not in [
+            campo.strip().lower() for campo in leitor.fieldnames
+        ]:
+            raise ValueError("O arquivo CSV precisa conter uma coluna chamada 'cep'.")
+
+        # Identifica o nome original da coluna, ignorando maiúsculas e espaços.
+        coluna_cep = next(
+            campo for campo in leitor.fieldnames
+            if campo.strip().lower() == "cep"
+        )
+
+        ceps = [
+            linha.get(coluna_cep, "")
+            for linha in leitor
+        ]
+
+    else:
+        raise ValueError("Modo de cadastro de unidades inválido.")
+
+    ceps_validos = []
+    ceps_processados = set()
+
+    for cep in ceps:
+        cep_limpo = re.sub(r"\D", "", str(cep or ""))
+
+        # Ignora linhas vazias.
+        if not cep_limpo:
+            continue
+
+        if len(cep_limpo) != 8:
+            raise ValueError(f"CEP inválido: {cep}")
+
+        if cep_limpo not in ceps_processados:
+            ceps_validos.append(cep_limpo)
+            ceps_processados.add(cep_limpo)
+
+    if not ceps_validos:
+        raise ValueError("Informe pelo menos um CEP para as unidades físicas.")
+
+    if len(ceps_validos) > 200:
+        raise ValueError("O limite máximo é de 200 unidades por cadastro.")
+
+    return ceps_validos
+
+
+def consultar_unidades(ceps):
+    unidades = []
+
+    for cep in ceps:
+        resultado = consultar_cep(cep)
+
+        print(f"CEP consultado: {cep}")
+        print(f"Resposta ViaCEP: {resultado}")
+
+        if not resultado.get("sucesso"):
+            raise ValueError(
+                f"Não foi possível consultar o CEP {cep}: "
+                f"{resultado.get('erro', 'Erro desconhecido.')}"
+            )
+
+        cidade = resultado.get("cidade")
+        uf = resultado.get("uf")
+
+        if not cidade or not uf:
+            raise ValueError(
+                f"Não foi possível identificar a cidade do CEP {cep}."
+            )
+
+        unidades.append({
+            "cep": cep,
+            "cidade": cidade,
+            "uf": uf
+        })
+
+    return unidades
+
+def cadastrar_unidades(cur, id_loja, unidades):
+    cadastradas = 0
+
+    for unidade in unidades:
+        id_cidade = obter_ou_criar_cidade(
+            cur,
+            unidade["cidade"],
+            unidade["uf"]
+        )
+
+        cur.execute("""
+            SELECT id_unidade
+            FROM unidade_loja
+            WHERE id_loja = %s
+              AND cep_unidade = %s
+            LIMIT 1
+        """, (id_loja, unidade["cep"]))
+
+        if cur.fetchone():
+            continue
+
+        # print("INSERINDO UNIDADE:")
+        # print("ID LOJA:", id_loja)
+        # print("ID CIDADE:", id_cidade)
+        # print("CEP:", unidade["cep"])
+    
+        cur.execute("""
+            INSERT INTO unidade_loja
+                (id_loja, id_cidade, cep_unidade)
+            VALUES (%s, %s, %s)
+        """, (
+            id_loja,
+            id_cidade,
+            unidade["cep"]
+        ))
+
+        cadastradas += 1
+
+    return cadastradas
+
+
+def cadastro_parceiro(dados, arquivo_unidades=None):
+    """
+    Cadastra uma loja parceira e, quando aplicável,
+    suas unidades físicas.
+    """
+
+    conn = None
+    cur = None
+
+    try:
+        # -----------------------------
+        # 1. Dados principais da loja
+        # -----------------------------
+
+        nome_loja = dados.get("nome_loja", "").strip()
+        cnpj = dados.get("cnpj_loja", "").strip().upper()
+
+        eh_digital = dados.get("eh_digital") in ("1", "on", "true", "True")
+
+        if not nome_loja:
+            raise ValueError("Informe o nome da loja.")
+
+        # CNPJ alfanumérico: 12 caracteres alfanuméricos + 2 dígitos.
+        cnpj = re.sub(r"[^A-Z0-9]", "", cnpj)
+
+        if not validar_cnpj(cnpj):
+            raise ValueError("CNPJ inválido. Verifique os caracteres e dígitos verificadores.")
+
+        # -----------------------------
+        # 2. Preparação da sede
+        # -----------------------------
+
+        id_cidade_sede = None
+        unidades = []
+
+        if not eh_digital:
+            cidade_sede = dados.get("cidade_loja", "").strip()
+            uf_sede = dados.get("uf", "").strip().upper()
+
+            if not cidade_sede or not uf_sede:
+                raise ValueError("Informe a cidade e o estado da sede.")
+
+            if not re.fullmatch(r"[A-Z]{2}", uf_sede):
+                raise ValueError("UF da sede inválida.")
+
+            # Os CEPs das unidades são independentes da sede.
+            ceps = obter_lista_ceps(dados, arquivo_unidades)
+            unidades = consultar_unidades(ceps)
+
+        else:
+            # Loja digital não deve receber unidades físicas.
+            modo = dados.get("modo_unidades", "manual")
+
+            ceps_informados = (
+                dados.getlist("ceps_unidades")
+                if hasattr(dados, "getlist")
+                else dados.get("ceps_unidades", [])
+            )
+
+            if isinstance(ceps_informados, str):
+                ceps_informados = [ceps_informados]
+
+            if any(str(cep).strip() for cep in ceps_informados):
+                raise ValueError("Lojas digitais não podem cadastrar unidades físicas.")
+
+            if arquivo_unidades and arquivo_unidades.filename:
+                raise ValueError("Lojas digitais não precisam importar unidades físicas.")
+
+        # -----------------------------
+        # 3. Conexão e transação
+        # -----------------------------
+
+        with get_connection() as conn:
+            cur = conn.cursor()
+
+            try:
+                conn.begin()
+
+                # -----------------------------
+                # 4. Localização da sede
+                # -----------------------------
+
+                if not eh_digital:
+                    id_cidade_sede = obter_ou_criar_cidade(
+                        cur,
+                        cidade_sede,
+                        uf_sede
+                    )
+
+                # -----------------------------
+                # 5. Cadastro da loja
+                # -----------------------------
+
+                cur.execute("""
+                    INSERT INTO loja (
+                        nome_loja,
+                        cnpj_loja,
+                        id_cidade,
+                        eh_digital
+                    )
+                    VALUES (%s, %s, %s, %s)
+                """, (
+                    nome_loja,
+                    cnpj,
+                    id_cidade_sede,
+                    1 if eh_digital else 0
+                ))
+
+                id_loja = cur.lastrowid
+
+                # -----------------------------
+                # 6. Cadastro das unidades
+                # -----------------------------
+
+                total_unidades = 0
+
+                if not eh_digital:
+                    print("LOJA CADASTRADA:", id_loja)
+                    print("UNIDADES RECEBIDAS:", unidades)
+
+                    total_unidades = cadastrar_unidades(
+                        cur,
+                        id_loja,
+                        unidades
+                    )
+
+                    print("TOTAL DE UNIDADES CADASTRADAS:", total_unidades)
+
+                # -----------------------------
+                # 7. Finalização
+                # -----------------------------
+
+                conn.commit()
+
+            except Exception:
+                conn.rollback()
+                raise
+
+            finally:
+                cur.close()
+
+        return {
+            "sucesso": True,
+             "mensagem": "Parceiro cadastrado com sucesso.",
+            "id_loja": id_loja,
+            "unidades_cadastradas": total_unidades
+        }
+
+
+    except ValueError:
+        if conn:
+            conn.rollback()
+        raise
+
+    except Exception:
+        if conn:
+            conn.rollback()
+        raise
+
+def validar_cnpj(cnpj):
+    cnpj = re.sub(r"[^A-Z0-9]", "", cnpj.upper())
+
+    if not re.fullmatch(r"[A-Z0-9]{12}[0-9]{2}", cnpj):
+        return False
+
+    def calcular_digito(base, pesos):
+        soma = sum(
+            (ord(caractere) - 48) * peso
+            for caractere, peso in zip(base, pesos)
+        )
+
+        resto = soma % 11
+        return "0" if resto < 2 else str(11 - resto)
+
+    pesos_1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    pesos_2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+
+    primeiro = calcular_digito(cnpj[:12], pesos_1)
+    segundo = calcular_digito(cnpj[:12] + primeiro, pesos_2)
+
+    return cnpj[-2:] == primeiro + segundo
