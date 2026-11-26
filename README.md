@@ -6,17 +6,21 @@
 
 ## 🎥 Demonstração
 
-[![Demonstração](docs/img/dm_fundo.png/)](https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx)
+[![Demonstração](docs/img/dm_fundo.png)](https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx)
 
 > 🔗 [Clique para assistir no YouTube](https://youtu.be/BsbRDVgEaKY?is=V3749dAZOJOLU9hx)
 
-# 📑 Índice
+## 📑 Índice
 
 * [🎯 Objetivo do Projeto](#-objetivo-do-projeto)
+* [📝 Descrição do Desafio](#-descrição-do-desafio)
 * [👥 Equipe](#-equipe)
 * [🎓 Orientadores](#-orientadores)
+* [📚 Tema do Semestre](#-tema-do-semestre)
+* [📖 Conhecimentos Ensinados](#-conhecimentos-ensinados)
 * [🧰 Tecnologias Utilizadas](#-tecnologias-utilizadas)
 * [🏗 Estrutura do Projeto](#-estrutura-do-projeto)
+* [🚀 Como Executar](#-como-executar)
 * [📌 Backlog do Produto](#-backlog-do-produto)
   * [📋 Planejamento das Sprints](#-planejamento-das-sprints)
     * [📊 Resumo de Esforço](#-resumo-de-esforço)
@@ -29,10 +33,12 @@
 ## 🎯 Objetivo do Projeto
 
 O objetivo do projeto é desenvolver uma landing page para captação de clientes que siga critérios de pré-qualificação, visando:
-- Uma página que seja atrativa e intuitiva para os usuários que siga a identidade visual da empresa parceira;
-- Um sistema de aprovação e reprovação automática seguindo as regras da empresa parceira
+- Uma página que seja atrativa e intuitiva para os usuários e siga a identidade visual da empresa parceira;
+- Um sistema de aprovação e reprovação automática seguindo as regras da empresa parceira;
+- Um painel administrativo para cadastro de parceiros, colaboradores e vendedores e acompanhamento das solicitações;
+- Uma área do vendedor para analisar as solicitações feitas na sua unidade.
 
-# 📝 Descrição do Desafio
+## 📝 Descrição do Desafio
 
 Desenvolver uma landing page para captação com experiência simples e intuitiva para o usuário, 
 garantindo que todas as regras de aprovação, reprovação e seleção de loja sejam aplicadas 
@@ -41,7 +47,7 @@ corretamente conforme o tipo de cliente e cartão solicitado.
 A aplicação deve verificar se o cliente é pré qualificado nas nossas bases para encaminhar o 
 processo.
 
-# 👥 Equipe
+## 👥 Equipe
 |    Função     | Nome                                  |                                                                                                                                                      LinkedIn & GitHub                                                                                                                                                      |                                                                                                
 | :-----------: | :------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | Product Owner |    Davi Couto |      [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/davi-couto-do-nascimento-7604343a6/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/DaviCouto-gd)               |
@@ -51,11 +57,11 @@ processo.
 |  Team Member  | Isaac Ferraz       |            [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/isaacferraz1311) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/isaac-ferraz)   | 
 |  Team Member  | Leonardo Gabriel       |            [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/leonardo-gabriel-dos-santos-79b848329) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/Leonardo-gabsantos) |
 |  Team Member  | Miguel Gomes       |            [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/miguelsg479/) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/miguelsg97) |
-|  Team Member  | Yago Moraes       |            [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/yago-moraes) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/YagoRGM)
+|  Team Member  | Yago Moraes       |            [![Linkedin Badge](https://img.shields.io/badge/Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/yago-moraes) [![GitHub Badge](https://img.shields.io/badge/GitHub-111217?style=flat-square&logo=github&logoColor=white)](https://github.com/YagoRGM) |
 
 ---
 
-# 🎓 Orientadores
+## 🎓 Orientadores
 
 - Prof. Jean Carlos Lourenço Costa
 - Prof. Claudio Etelvino de Lima
@@ -103,40 +109,72 @@ Aplicação Web com Banco de Dados
 
 ---
 
-# 🏗 Estrutura do Projeto
+## 🏗 Estrutura do Projeto
 
 ```
 Projeto-Integrador-II/
 ├── app/                        # Aplicação Flask principal
 │   ├── app.py                  # Inicialização do servidor Flask
-│   ├── routes.py               # Definição das rotas e endpoints (inclui /admin)
+│   ├── routes.py               # Rotas e endpoints (site, /admin e /vendedor)
 │   ├── services.py             # Regras de negócio da aplicação
 │   ├── repository.py           # Acesso e operações no banco de dados
 │   ├── database.py             # Conexão com o MySQL
-│   ├── mock_lojas.py           # Catálogo de lojas parceiras
 │   ├── requirements.txt        # Dependências Python
 │   ├── Dockerfile              # Containerização do serviço Web
 │   └── frontend/               # Camada de apresentação
-│       ├── templates/          # Páginas HTML (landing, formulário, resultados e admin)
+│       ├── templates/          # Páginas HTML (landing, formulário, resultados, admin e vendedor)
 │       └── static/             # Arquivos estáticos (CSS, JS e imagens)
 ├── docs/                       # Manuais, escopo do front-end, identidade visual e desafio
-├── MVP/                        # Registro das sprints
+├── MVP/                        # Registro das sprints (sp1, sp2 e sp3)
 ├── mysql/
-│   └── schema_cartoes.sql      # Estrutura do banco de dados e tabelas
+│   ├── schema_cartoes.sql      # Estrutura do banco de dados e tabelas
+│   └── seed_dados_iniciais.sql # Dados iniciais (estados e tipos de cartão)
 ├── docker-compose.yml          # Subida integrada do app e do MySQL
 └── .env.example                # Modelo de variáveis de ambiente
 ```
 
-**Fluxo da aplicação:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
+**Fluxo do cliente:** `index` (landing page) → `solicitar` (formulário em 4 etapas) → `POST /api/solicitacoes` (pré-qualificação) → `aprovado`, `analise` ou `negado`.
+
+**Fluxo administrativo:** `/admin` (senha) → solicitações, adição de parceiros, de colaboradores e de vendedores.
+
+**Fluxo do vendedor:** `/vendedor` (e-mail e CPF) → painel da unidade → aprovar ou recusar as solicitações em análise.
 
 ---
 
-# 📌 Backlog do Produto
+## 🚀 Como Executar
+
+1. Clone o repositório e entre na pasta:
+
+```bash
+git clone https://github.com/PI-Nexus/Projeto-Integrador-II.git
+cd Projeto-Integrador-II
+```
+
+2. Crie o arquivo `.env` a partir do modelo (`cp .env.example .env`) e preencha `MYSQL_ROOT_PASSWORD`, `ADMIN_PASSWORD` e `FLASK_SECRET_KEY`.
+3. Suba os containers:
+
+```bash
+docker compose up --build
+```
+
+4. Em outro terminal, carregue os dados iniciais (comando para Linux, macOS ou Git Bash; no Windows PowerShell, use o comando do Manual de Instalação):
+
+```bash
+docker exec -i mysql-cartoes sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" db_cartoes' < mysql/seed_dados_iniciais.sql
+```
+
+5. Acesse `http://localhost`.
+
+O passo a passo completo, inclusive a instalação sem Docker, está no [Manual de Instalação](docs/Manual%20de%20Instala%C3%A7%C3%A3o.md).
+
+---
+
+## 📌 Backlog do Produto
 
 | Rank | Prioridade | User Story                                                                                                                                              | Estimativa | Sprint |
 |------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|------------|--------|
 | 1    | Alta       | Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. | 5          | 1      |
-| 2    | Alta       | Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades.                                                              | 3          | 1      |                                                                                                                                                                                                                                                                                                                            | ...        | ...    |
+| 2    | Alta       | Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades.                                                              | 3          | 1      |
 | 3   | Alta      | Como cliente, quero preencher um formulário simples e intuitivo, para enviar os dados necessários à minha requisição.     | 5          | 1      |
 | 4   | Alta      | Como responsável pela análise de cartões, quero que o sistema aprove ou reprove automaticamente os clientes com base no cartão selecionado e nas regras de elegibilidade.     | 8          | 1      |
 | 5   | Alta      | Como responsável pela análise de cartões, quero visualizar quais clientes estão aptos e quais estão em análise, para acompanhar as requisições.     | 5          | 1      |
@@ -148,9 +186,9 @@ Projeto-Integrador-II/
 | 11   | Média      | Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores.     | 3          | 3      |
 | 12   | Baixa      | Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis.     | 5          | 3      |
 
-## 📋 Planejamento das Sprints
+### 📋 Planejamento das Sprints
 
-### Sprint 1 — 33/35 pontos
+#### Sprint 1 — 33/35 pontos
 
 - ✅ #1 — Como cliente, quero acessar uma landing page clara e atrativa, para conhecer o produto e entender suas principais funcionalidades. (5 pontos)
 - ✅ #2 — Como cliente, quero escolher qual tipo de cartão desejo requisitar, para iniciar o processo adequado às minhas necessidades. (3 pontos)
@@ -165,8 +203,7 @@ Projeto-Integrador-II/
 
 ---
 
-### Sprint 2 — 10/15 pontos
-
+#### Sprint 2 — 10/15 pontos
 
 - ✅ #9 — Como administrador, quero visualizar uma dashboard com os dados das requisições de cartão, para acompanhar o andamento e os resultados do sistema em um só lugar. (5 pontos)
 - ✅ #10 — Como administrador, quero adicionar parceiros ao sistema de forma simples, para permitir que os clientes realizem um PAC para o estabelecimento. (5 pontos)
@@ -175,16 +212,16 @@ Projeto-Integrador-II/
 
 ---
 
-### Sprint 3 — 8/15 pontos
+#### Sprint 3 — 8/15 pontos
 
-- #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
-- #12 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
+- ✅ #11 — Como administrador, quero cadastrar vendedores quando existirem, para atribuir os PACs aos respectivos vendedores. (3 pontos)
+- ✅ #12 — Como cliente, quero receber ofertas de outros produtos mesmo que minha requisição de cartão seja reprovada, para conhecer outras opções disponíveis. (5 pontos)
 
 **Dentro da capacidade planejada.**
 
 ---
 
-### 📊 Resumo de Esforço
+#### 📊 Resumo de Esforço
 
 | Sprint | Capacidade máxima | Pontos planejados |
 |--------|-------------------|-------------------|
@@ -196,14 +233,14 @@ Projeto-Integrador-II/
 
 ---
 
-# 📊 Registro das Sprints
+## 📊 Registro das Sprints
 
 | Sprint             | Previsão   | Status   | Histórico |
 |-------------------|------------|----------|-----------|
 | 01                | 27/09/2026 | Concluída ✅ | [MVP](MVP/sp1.md)  |
 | 02                | 25/10/2026 | Concluída ✅ | [MVP](MVP/sp2.md)  |
-| 03                | 22/11/2026 | Em andamento 🟡 | [MVP](MVP/sp3.md) |
-| Feira de Soluções | 03/12/2026 | a fazer | [a fazer] |
+| 03                | 22/11/2026 | Concluída ✅ | [MVP](MVP/sp3.md)  |
+| Feira de Soluções | 03/12/2026 | a fazer | —         |
 
 ---
 
@@ -222,8 +259,8 @@ Projeto-Integrador-II/
 - Código completo, limpo e **revisado** no GitHub;
 - Funcionalidade **testada e funcionando** no site;
 - Rotas do servidor **Flask** respondendo conforme esperado;
-- **Manual de Usuário** descrevendo como funciona o fluxo do site;
-- **Manual da Aplicação** com instruções de instalação, configuração e execução local;
+- **Manual do Usuário** descrevendo como funciona o fluxo do site, do painel administrativo e da área do vendedor;
+- **Manual de Instalação** com instruções de instalação, configuração e execução local;
 - Card da US **fechado e atualizado no Jira**;
 - Vídeo da etapa de entrega **gravado e disponibilizado**.
 
@@ -231,4 +268,4 @@ Projeto-Integrador-II/
 
 📖 Manual do Usuário: [Clique aqui para abrir o Manual do Usuário](docs/Manual%20do%20Usu%C3%A1rio.md)
 
-🛠️ Manual de Instalação: [Clique aqui para abrir o Manual de Instalação](docs/Manual%20de%20Instalação.md)
+🛠️ Manual de Instalação: [Clique aqui para abrir o Manual de Instalação](docs/Manual%20de%20Instala%C3%A7%C3%A3o.md)
